@@ -7,6 +7,10 @@
 
 @theme inline {
 	--font-sans: var(--font-rubik);
+	--shadow-default: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+	--shadow-buttton-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
+	--shadow-buttton-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
+	--color-primary: #70c05b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,7 +21,7 @@
 }
 
 body {
-	background: var(--background);
+	background-color: #fbf8ec;
 	color: var(--foreground);
-	font-family: var(--font-sans);
+	font-family: var(--font-rubik), sans-serif;
 }
