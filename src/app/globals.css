@@ -7,11 +7,12 @@
 
 @theme inline {
 	--font-sans: var(--font-rubik);
-	--shadow-default: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-	--shadow-buttton-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
-	--shadow-buttton-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
-	--shadow-article: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
 	--color-primary: #70c05b;
+	--shadow-default: 2px 4px 8px 0px rgba(0, 0, 0, 0.1);
+	--shadow-button-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
+	--shadow-button-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
+	--shadow-article: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
+	--shadow-card-shop: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
 }
 
 @media (prefers-color-scheme: dark) {
