@@ -12,6 +12,7 @@ const ProductCard = ({
 	basePrice,
 	discountPercent,
 	rating,
+	categories,
 }: ProductCardProps) => {
 	const calculateFinalPrice = (price: number, discount: number): number => {
 		return discount > 0 ? price * (1 - discount / 100) : price;
@@ -20,10 +21,14 @@ const ProductCard = ({
 	const calculatePriceByCard = (price: number, discount: number): number => {
 		return calculateFinalPrice(price, discount);
 	};
+	const isNewProduct = categories?.includes('new');
+	const finalPrice = isNewProduct
+		? basePrice
+		: calculateFinalPrice(basePrice, discountPercent);
 
-	const finalPrice = calculateFinalPrice(basePrice, discountPercent);
-
-	const priceByCard = calculatePriceByCard(finalPrice, cardDiscountPercent);
+	const priceByCard = isNewProduct
+		? basePrice
+		: calculatePriceByCard(finalPrice, cardDiscountPercent);
 
 	return (
 		<div className="flex flex-col justify-between w-40 rounded overflow-hidden bg-white md:w-[224px] xl:w-[272px] align-top p-0 hover:shadow-(--shadow-article) duration-300">
@@ -32,7 +37,7 @@ const ProductCard = ({
 					src={img}
 					alt="Акция"
 					fill
-					className="object-cover md:object-contain"
+					className="object-contain"
 					sizes="(max-width: 768px) 160px, (max-width: 1200px) 224px, 272px"
 				/>
 				<button className="w-8 h-8 p-2 bg-[#f3f2f1] hover:bg-[#fcd5ba] absolute top-2 right-2 opacity-50 rounded cursor-pointer duration-300">
@@ -54,11 +59,11 @@ const ProductCard = ({
 			<div className="flex flex-col justify-between p-2 gap-y-2">
 				<div className="flex flex-row justify-between items-end">
 					<div className="flex flex-col gap-x-1">
-						<div className="flex flex-row gap-x-1 text-sm md:text-lg font-bold">
+						<div className="flex flex-row gap-x-1 text-sm md:text-lg font-bold text-[#414141]">
 							<span>{formatPrice(priceByCard)}</span>
 							<span>₽</span>
 						</div>
-						{cardDiscountPercent > 0 && (
+						{discountPercent > 0 && (
 							<p className="text-[#bfbfbf] text-[8px] md:text-xs">
 								С картой
 							</p>
@@ -70,7 +75,7 @@ const ProductCard = ({
 								<span>{formatPrice(finalPrice)}</span>
 								<span>₽</span>
 							</div>
-							<p className="text-[#bfbfbf] text-[8px] md:text-xs">
+							<p className="text-[#bfbfbf] text-[8px] md:text-xs  text-right">
 								Обычная
 							</p>
 						</div>
