@@ -2,9 +2,10 @@ import Actions from './(products)/Actions';
 import Articles from './(articles)/Articles';
 import Maps from './components/Maps';
 import NewProducts from './(products)/NewProducts';
-import Purchases from './(users)/purchases/Purchases';
+
 import Slider from './components/slider/Slider';
 import SpecialOffers from './components/SpecialOffers';
+import Purchases from './(users)/Purchases';
 
 export default function Home() {
 	return (
