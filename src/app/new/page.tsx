@@ -29,7 +29,7 @@ const AllNew = async () => {
 					<h2 className="text-2xl xl:text-4xl text-left font-bold text-[#414141]">
 						Все новинки
 					</h2>
-					<ViewAllButton btnText="Главная" href="/" />
+					<ViewAllButton btnText="На главную" href="/" />
 				</div>
 				<ul className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 xl:gap-10 justify-items-center">
 					{products.map((item) => (
