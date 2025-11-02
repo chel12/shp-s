@@ -1,5 +1,4 @@
 export interface ProductCardProps {
-	
 	_id: number;
 	id: number;
 	img: string;
@@ -11,7 +10,7 @@ export interface ProductCardProps {
 		rate: number;
 		count: number;
 	};
-	weight?: string;
 	categories: string[];
-	quantity?: number;
+	weight?: string;
+	quantity: number;
 }

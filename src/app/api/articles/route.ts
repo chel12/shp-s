@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDB } from '../../../../api-routes';
+import { getDB } from '../../../../utils/api-routes';
 export const revalidate = 3600;
 export async function GET() {
 	try {

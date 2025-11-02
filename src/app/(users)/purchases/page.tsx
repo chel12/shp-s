@@ -1,11 +1,6 @@
 import ProductsSection from '@/app/(products)/ProductsSection';
 import fetchPurchases from '../fetchPurchases';
 
-export const metadata = {
-	title: 'Часто покупают в магазине "Северяночка"',
-	description: 'Купленные товары магазина "Северяночка"',
-};
-
 const AllUserPurchases = async () => {
 	try {
 		const purchases = await fetchPurchases();

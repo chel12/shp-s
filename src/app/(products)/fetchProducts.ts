@@ -8,11 +8,16 @@ const fetchProductsByCategory = async (category: string) => {
 				.NEXT_PUBLIC_BASE_URL!}/api/products?category=${category}`,
 			{ next: { revalidate: 3600 } }
 		);
-		if (!res.ok) throw new Error(`Ошибка получения продуктов ${category}`);
+		if (!res.ok)
+			throw new Error(`Серверная ошибка получения продуктов ${category}`);
 		const products: ProductCardProps[] = await res.json();
-		return shuffleArray(products);
+		const availableProducts = products.filter(
+			(product) => product.quantity > 0
+		);
+
+		return shuffleArray(availableProducts);
 	} catch (error) {
-		console.error('Ошибка в компоненте Actions:', error);
+		console.error(`'Ошибка в компоненте: ${category}'`, error);
 		throw error;
 	}
 };
