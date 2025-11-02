@@ -3,9 +3,9 @@ import iconRight from '/public/icons-header/icon-arrow-right.svg';
 import Link from 'next/link';
 import { Article } from '@/types/articles';
 
-
 const Articles = async () => {
 	let articles: Article[] = [];
+	// eslint-disable-next-line prefer-const
 	let error = null;
 	try {
 		const res = await fetch(

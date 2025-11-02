@@ -1,12 +1,26 @@
 import Image from 'next/image';
 import iconRight from '/public/icons-products/icon-arrow-right.svg';
 import ProductCard from './ProductCard';
-import database from '@/data/database.json';
+import { ProductCardProps } from '@/types/product';
 
-const Actions = () => {
-	const actionProducts = database.products.filter((p) =>
-		p.categories.includes('actions')
-	);
+const Actions = async () => {
+	// eslint-disable-next-line prefer-const
+	let products: ProductCardProps[] = [];
+	// eslint-disable-next-line prefer-const
+	let error = null;
+	try {
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL!}/api/products?category=actions`
+		);
+		products = await res.json();
+	} catch (error) {
+		error = 'Ошибка получения статей';
+		console.error('Ошибка в компоненте Article:', error);
+	}
+	if (error) {
+		return <div className="text-red-500">Ошибка: </div>;
+	}
+
 
 	return (
 		<section>
@@ -29,9 +43,9 @@ const Actions = () => {
 					</button>
 				</div>
 				<ul className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 xl:gap-10 justify-items-center">
-					{actionProducts.slice(0, 4).map((item, index) => (
+					{products.slice(0, 4).map((item, index) => (
 						<li
-							key={item.id}
+							key={item._id}
 							className={`${index >= 4 ? 'hidden' : ''}
             ${index >= 3 ? 'md:hidden xl:block' : ''}
             ${index >= 4 ? 'xl:hidden' : ''}

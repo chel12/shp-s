@@ -7,7 +7,7 @@ export async function GET() {
 		const articles = await db.collection('articles').find().toArray();
 		return NextResponse.json(articles);
 	} catch (error) {
-		console.error('Ошибка сервера:', error);
+		console.error('Ошибка при загрузке статей:', error);
 		return NextResponse.json(
 			{ message: 'Ошибка сервера' },
 			{ status: 500 }
