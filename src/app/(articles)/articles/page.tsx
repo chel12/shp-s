@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import { Article } from '@/types/articles';
-import ViewAllButton from './ViewAllButton';
+import ViewAllButton from '../../components/ViewAllButton';
 
-const Articles = async () => {
+const AllArticles = async () => {
 	let articles: Article[] = [];
 	// eslint-disable-next-line prefer-const
 	let error = null;
@@ -13,7 +13,7 @@ const Articles = async () => {
 		articles = await res.json();
 	} catch (error) {
 		error = 'Ошибка получения статей';
-		console.error('Ошибка в компоненте Article:', error);
+		console.error('Ошибка в компоненте AllArticles:', error);
 	}
 	if (error) {
 		return <div className="text-red-500">Ошибка: </div>;
@@ -21,12 +21,12 @@ const Articles = async () => {
 
 	return (
 		<section>
-			<div className="flex flex-col justify-center xl:max-w-[1208px] text-[#414141]">
+			<div className="px-[max(12px,calc((100%-1208px)/2))] flex flex-col justify-center xl:max-w-[1208px] text-[#414141] mt-20">
 				<div className="mb-4 md:mb-8 xl:mb-10 flex flex-row justify-between">
 					<h2 className="text-2xl xl:text-4xl text-left font-bold">
-						Статьи
+						Все статьи
 					</h2>
-					<ViewAllButton btnText="К статьям" href="articles" />
+					<ViewAllButton btnText="На главную" href="/" />
 				</div>
 
 				{/* Список статей */}
@@ -69,4 +69,4 @@ const Articles = async () => {
 	);
 };
 
-export default Articles;
+export default AllArticles;

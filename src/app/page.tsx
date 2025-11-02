@@ -1,10 +1,10 @@
-import Actions from "./components/Actions";
-import Articles from "./components/Articles";
-import Maps from "./components/Maps";
-import NewProducts from "./components/NewProducts";
-import Purchases from "./components/Purchases";
-import Slider from "./components/slider/Slider";
-import SpecialOffers from "./components/SpecialOffers";
+import Actions from './(products)/Actions';
+import Articles from './(articles)/Articles';
+import Maps from './components/Maps';
+import NewProducts from './(products)/NewProducts';
+import Purchases from './(users)/purchases/Purchases';
+import Slider from './components/slider/Slider';
+import SpecialOffers from './components/SpecialOffers';
 
 export default function Home() {
 	return (
