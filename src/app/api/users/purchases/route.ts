@@ -1,0 +1,32 @@
+import { NextResponse } from 'next/server';
+import { getDB } from '../../../../../api-routes';
+export const revalidate = 3600;
+
+export async function GET() {
+	try {
+		const db = await getDB();
+		const user = await db.collection('users').findOne({});
+		if (!user?.purchases?.length) {
+			return NextResponse.json([]);
+		}
+		const productIds = user.purchases.map((p: { id: number }) => p.id);
+
+		const products = await db
+			.collection('products')
+			.find({ id: { $in: productIds } })
+			.toArray();
+		return NextResponse.json(
+			products.map((product) => {
+				const { discountPercent, ...rest } = product;
+				void discountPercent;
+				return rest;
+			})
+		);
+	} catch (error) {
+		console.error('Ошибка при загрузке купленных продуктов:', error);
+		return NextResponse.json(
+			{ message: 'Ошибка сервера' },
+			{ status: 500 }
+		);
+	}
+}

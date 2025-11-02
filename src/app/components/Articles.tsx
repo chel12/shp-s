@@ -1,7 +1,6 @@
 import Image from 'next/image';
-import iconRight from '/public/icons-header/icon-arrow-right.svg';
-import Link from 'next/link';
 import { Article } from '@/types/articles';
+import ViewAllButton from './ViewAllButton';
 
 const Articles = async () => {
 	let articles: Article[] = [];
@@ -27,20 +26,7 @@ const Articles = async () => {
 					<h2 className="text-2xl xl:text-4xl text-left font-bold">
 						Статьи
 					</h2>
-					<Link
-						href="#"
-						className="flex flex-row items-center gap-x-2 cursor-pointer">
-						<p className="text-base text-center text-[#606060] hover:text-[#bfbfbf] duration-300">
-							К статьям
-						</p>
-						<Image
-							src={iconRight}
-							alt="К статьям"
-							width={24}
-							height={24}
-							sizes="24px"
-						/>
-					</Link>
+					<ViewAllButton btnText="К статьям" href="articles" />
 				</div>
 
 				{/* Список статей */}

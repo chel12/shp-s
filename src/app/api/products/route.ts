@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDB } from '../../../../api-routes';
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export async function GET(request: Request) {
 	try {
@@ -14,7 +16,7 @@ export async function GET(request: Request) {
 		}
 		const products = await (await getDB())
 			.collection('products')
-			.find({ categorires: category })
+			.find({ categories: category })
 			.toArray();
 		return NextResponse.json(products);
 	} catch (error) {

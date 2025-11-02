@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${rubik.className} font-sans`}>
+			<body className={`${rubik.variable} font-sans`}>
 				<Header />
 				{children}
 				<Footer />
