@@ -1,5 +1,5 @@
 import fetchProductsByCategory from '../fetchProducts';
-import GenericProductListPage from '../GenericProductListPage';
+import GenericProductListPage from '../GenericProductsListPage';
 import ProductsSection from '../ProductsSection';
 
 export const metadata = {
@@ -23,22 +23,6 @@ const AllActions = async ({
 			}}
 		/>
 	);
-	// try {
-	// 	const products = await fetchProductsByCategory('actions');
-	// 	return (
-	// 		<ProductsSection
-	// 			title="Все акции"
-	// 			viewAllButton={{ text: 'На главную', href: '/' }}
-	// 			products={products}
-	// 		/>
-	// 	);
-	// } catch {
-	// 	return (
-	// 		<div className="text-red-500">
-	// 			Ошибка: не удалось загрузить акции
-	// 		</div>
-	// 	);
-	// }
 };
 
 export default AllActions;
