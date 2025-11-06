@@ -1,4 +1,4 @@
-import { Locations } from "@/types/shop";
+import { Locations } from '@/types/shops';
 
 export const locations: Locations = {
 	borisovichi: {

@@ -1,7 +1,7 @@
-export interface Article {
-	_id: string;
-	img: string;
-	title: string;
-	text: string;
-	createdAt: string;
+export interface ArticleCardProps {
+  _id: string;
+  img: string;
+  title: string;
+  text: string;
+  createdAt: string;
 }

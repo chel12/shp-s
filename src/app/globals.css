@@ -1,33 +1,40 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 :root {
-	/* --background: #ffffff;
+  /* --background: #ffffff;
   --foreground: #171717; */
 }
 
 @theme inline {
-	--font-sans: var(--font-rubik);
-	--color-primary: #70c05b;
-	--shadow-default: 2px 4px 8px 0px rgba(0, 0, 0, 0.1);
-	--shadow-button-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
-	--shadow-button-secondary: 4px 8px 16px 0px rgba(0, 0, 0, 0.1);
-	--shadow-button-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
-	--shadow-article: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
-	--shadow-card-shop: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
+  --font-sans: var(--font-rubik);
+  --color-primary: #70c05b;
+  --shadow-default: 2px 4px 8px 0px rgba(0, 0, 0, 0.1);
+  --shadow-button-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
+  --shadow-button-secondary: 4px 8px 16px 0px rgba(0, 0, 0, 0.1);
+  --shadow-button-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
+  --shadow-article: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
+  --shadow-card-shop: 0px 8px 16px 0px rgba(202, 147, 96, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
-	/* :root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	} */
+  /* :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  } */
 }
 
 body {
-	background-color: #fbf8ec;
-	color: var(--foreground);
-	font-family: var(--font-rubik), sans-serif;
+  background-color: #fbf8ec;
+  color: var(--foreground);
+  font-family: var(--font-rubik), sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.no-ymaps-copyright [class*='copyrights-pane'] {
-	visibility: hidden;
+
+.no-ymaps-copyright [class*="copyrights-pane"] {
+  visibility: hidden;
 }
+
+/* className="no-ymaps-copyright w-full h-[354px]" */
