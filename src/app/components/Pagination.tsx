@@ -1,5 +1,6 @@
 'use client';
-import { PaginationProps } from '@/types/PaginationProps';
+
+import { PaginationProps } from '@/types/paginationProps';
 import Link from 'next/link';
 
 const createPageUrl = (
@@ -12,6 +13,35 @@ const createPageUrl = (
 	return `${basePath}?${newParams.toString()}`;
 };
 
+const getVisiblePages = (totalPages: number, currentPage: number) => {
+	if (totalPages <= 5) {
+		return Array.from({ length: totalPages }, (_, i) => i + 1);
+	}
+
+	let start = Math.max(1, currentPage - 2);
+	let end = Math.min(totalPages, currentPage + 2);
+
+	if (currentPage <= 3) {
+		end = 5;
+	} else if (currentPage >= totalPages - 2) {
+		start = totalPages - 4;
+	}
+
+	const pages: (number | string)[] = [];
+
+	if (start > 1) pages.push(1);
+
+	if (start > 2) pages.push('...');
+
+	for (let i = start; i <= end; i++) pages.push(i);
+
+	if (end < totalPages - 1) pages.push('...');
+
+	if (end < totalPages) pages.push(totalPages);
+
+	return pages;
+};
+
 const Pagination = ({
 	totalItems,
 	currentPage,
@@ -21,64 +51,89 @@ const Pagination = ({
 }: PaginationProps) => {
 	const totalPages = Math.ceil(totalItems / itemsPerPage);
 	const params = new URLSearchParams(searchQuery);
+	const visiblePages = getVisiblePages(totalPages, currentPage);
 
-	const buttonBase = 'px-5 py-2 rounded duration-300';
-	const buttonActive = 'bg-[#ff6633] text-white hover:bg-[#70c05b]';
-	const buttonDisabled = 'opacity-50 cursor-not-allowed';
+	const buttonSize =
+		'w-5 h-5 md:w-10 md:h-10 flex items-center justify-center rounded duration-300';
+	const buttonActive = 'bg-[#ff6633] text-white hover:bg-[#ff6633]';
+	const buttonDisabled = 'bg-[#fcd5ba] cursor-not-allowed';
+	const pageButtonClass = `border border-[#ff6633] ${buttonSize}`;
 
 	return (
-		<>
-			<div className="flex justify-center gap-4 mt-8 mb-12">
+		<div className="flex justify-center mt-10 mb-20 text-white text-sm md: text-base">
+			<nav className="flex gap-1 md: gap-2 items-center">
 				<Link
-					className={`${buttonBase} ${
-						currentPage === 1 ? buttonDisabled : buttonActive
-					}`}
-					aria-disabled={currentPage === 1}
 					href={createPageUrl(basePath, params, 1)}
-					onClick={(e) => {
-						if (currentPage === 1) e.preventDefault();
-					}}>
-					В начало
-				</Link>
-				<Link
-					className={`${buttonBase} ${
-						currentPage === 1 ? buttonDisabled : buttonActive
-					}`}
 					aria-disabled={currentPage === 1}
+					tabIndex={currentPage === 1 ? -1 : undefined}
+					className={`${buttonSize} ${
+						currentPage === 1 ? buttonDisabled : buttonActive
+					}`}>
+					&laquo;
+				</Link>
+				<Link
 					href={createPageUrl(basePath, params, currentPage - 1)}
-					onClick={(e) => {
-						if (currentPage === 1) e.preventDefault();
-					}}>
-					Назад
+					aria-disabled={currentPage === 1}
+					tabIndex={currentPage === 1 ? -1 : undefined}
+					className={`${buttonSize} ${
+						currentPage === 1 ? buttonDisabled : buttonActive
+					}`}>
+					&lsaquo;
 				</Link>
+
+				{visiblePages.map((page, index) => {
+					if (page === '...') {
+						return (
+							<span
+								key={`ellipsis-${index}`}
+								className={`${buttonSize} text-[#ff6633]`}>
+								...
+							</span>
+						);
+					}
+					return (
+						<Link
+							key={page}
+							href={createPageUrl(
+								basePath,
+								params,
+								page as number
+							)}
+							className={`${pageButtonClass} ${
+								currentPage === page
+									? 'bg-[#ff6633] text-white border-transparent'
+									: 'text-[#ff6633] bg-white hover:bg-[#ff6633] hover:text-white hover:border-transparents'
+							}`}>
+							{page}
+						</Link>
+					);
+				})}
+
 				<Link
-					className={`${buttonBase} ${
-						currentPage === totalPages
-							? buttonDisabled
-							: buttonActive
-					}`}
-					aria-disabled={currentPage === totalPages}
 					href={createPageUrl(basePath, params, currentPage + 1)}
-					onClick={(e) => {
-						if (currentPage === totalPages) e.preventDefault();
-					}}>
-					Вперёд
-				</Link>
-				<Link
-					className={`${buttonBase} ${
+					aria-disabled={currentPage === totalPages}
+					tabIndex={currentPage === totalPages ? -1 : undefined}
+					className={`${buttonSize} ${
 						currentPage === totalPages
 							? buttonDisabled
 							: buttonActive
-					}`}
-					aria-disabled={currentPage === totalPages}
-					href={createPageUrl(basePath, params, totalPages)}
-					onClick={(e) => {
-						if (currentPage === totalPages) e.preventDefault();
-					}}>
-					В конец
+					}`}>
+					&rsaquo;
 				</Link>
-			</div>
-		</>
+
+				<Link
+					href={createPageUrl(basePath, params, totalPages)}
+					aria-disabled={currentPage === totalPages}
+					tabIndex={currentPage === totalPages ? -1 : undefined}
+					className={`${buttonSize} ${
+						currentPage === totalPages
+							? buttonDisabled
+							: buttonActive
+					}`}>
+					&raquo;
+				</Link>
+			</nav>
+		</div>
 	);
 };
 
