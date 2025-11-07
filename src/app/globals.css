@@ -1,40 +1,65 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  /* --background: #ffffff;
+	/* --background: #ffffff;
   --foreground: #171717; */
 }
 
 @theme inline {
-  --font-sans: var(--font-rubik);
-  --color-primary: #70c05b;
-  --shadow-default: 2px 4px 8px 0px rgba(0, 0, 0, 0.1);
-  --shadow-button-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
-  --shadow-button-secondary: 4px 8px 16px 0px rgba(0, 0, 0, 0.1);
-  --shadow-button-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
-  --shadow-article: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
-  --shadow-card-shop: 0px 8px 16px 0px rgba(202, 147, 96, 0.5);
+	--font-sans: var(--font-rubik);
+	--color-primary: #70c05b;
+	--shadow-default: 2px 4px 8px 0px rgba(0, 0, 0, 0.1);
+	--shadow-button-default: 4px 8px 16px 0px rgba(112, 192, 91, 0.2);
+	--shadow-button-secondary: 4px 8px 16px 0px rgba(0, 0, 0, 0.1);
+	--shadow-button-active: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.2);
+	--shadow-article: 4px 8px 16px 0px rgba(255, 102, 51, 0.2);
+	--shadow-card-shop: 0px 8px 16px 0px rgba(202, 147, 96, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
-  /* :root {
+	/* :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   } */
 }
 
 body {
-  background-color: #fbf8ec;
-  color: var(--foreground);
-  font-family: var(--font-rubik), sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+	background-color: #fbf8ec;
+	color: var(--foreground);
+	font-family: var(--font-rubik), sans-serif;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
-.no-ymaps-copyright [class*="copyrights-pane"] {
-  visibility: hidden;
+.no-ymaps-copyright [class*='copyrights-pane'] {
+	visibility: hidden;
 }
 
 /* className="no-ymaps-copyright w-full h-[354px]" */
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes progress {
+	0% {
+		width: 0%;
+	}
+	50% {
+		width: 100%;
+	}
+	100% {
+		width: 0%;
+	}
+}
+
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+
+.animate-progress {
+	animation: progress 2s ease-in-out infinite;
+}
