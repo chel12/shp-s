@@ -37,7 +37,46 @@ const CatalogPage = () => {
 		fetchCategories();
 	}, []);
 
+	const updateOrderInDB = async () => {
+		try {
+			setIsLoading(true);
+			const response = await fetch('api/catalog', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(
+					categories.map((category, index) => ({
+						_id: category._id,
+						order: index + 1,
+						title: category.title,
+						img: category.img,
+						colSpan: category.colSpan,
+						tabletColSpan: category.tabletColSpan,
+						mobileColSpan: category.mobileColSpan,
+					}))
+				),
+			});
+
+			if (!response.ok) throw new Error('Ошибка при обновлении порядка');
+
+			const result = await response.json();
+
+			if (result.success) {
+				console.log('Порядок спешно обновлен в БД');
+			}
+		} catch (error) {
+			console.error('Ошибка при сохранении порядка:', error);
+			setError('Ошибка при сохранении порядка');
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	const handleToggleEditing = async () => {
+		if (isEditing) {
+			await updateOrderInDB();
+		}
 		setIsEditing(!isEditing);
 	};
 
