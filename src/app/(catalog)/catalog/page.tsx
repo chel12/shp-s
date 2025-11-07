@@ -6,9 +6,15 @@ import GridCategoryBlock from '../GridCategoryBlock';
 
 const CatalogPage = () => {
 	const [categories, setCategories] = useState<CatalogProps[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isEditing, setIsEditing] = useState(false);
+	const [draggedCategory, setDraggedCategory] = useState<CatalogProps | null>(
+		null
+	);
+	const [hoveredCategoryId, setHoveredCategoryId] = useState<number | null>(
+		null
+	);
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const isAdmin = true;
 
 	const fetchCategories = async () => {
@@ -34,6 +40,63 @@ const CatalogPage = () => {
 	const handleToggleEditing = async () => {
 		setIsEditing(!isEditing);
 	};
+
+	const handleDragStart = (category: CatalogProps) => {
+		if (isEditing) {
+			setDraggedCategory(category);
+		}
+	};
+
+	const handleDragOver = (e: React.DragEvent, categoryId: number) => {
+		e.preventDefault();
+		if (draggedCategory && draggedCategory._id !== categoryId) {
+			setHoveredCategoryId(categoryId);
+		}
+	};
+
+	const handleDragLeave = () => {
+		setHoveredCategoryId(null);
+	};
+	const handleDrop = (e: React.DragEvent, targetCategoryId: number) => {
+		e.preventDefault();
+		if (!isEditing || !draggedCategory) return;
+		setCategories((prevCategories) => {
+			//индекс перетаскиваемого элемента
+			const draggedIndex = prevCategories.findIndex(
+				(c) => c._id === draggedCategory._id
+			);
+			//индекс на который перетаскиваем
+			const targetIndex = prevCategories.findIndex(
+				(c) => c._id === targetCategoryId
+			);
+			//проверка если ничего не найдёт
+			if (draggedIndex === -1 || targetIndex === -1)
+				return prevCategories;
+			//если ок копируем массив
+			const newCategories = [...prevCategories];
+			//извлекаем нужные элементы по индексу из скопированного массива
+			const draggedItem = newCategories[draggedIndex];
+			const targetItem = newCategories[targetIndex];
+			//размеры сохр элементов
+			const draggedSizes = {
+				mobileColSpan: draggedItem.mobileColSpan,
+				tabletColSpan: draggedItem.tabletColSpan,
+				colSpan: draggedItem.colSpan,
+			};
+			const targetSizes = {
+				mobileColSpan: targetItem.mobileColSpan,
+				tabletColSpan: targetItem.tabletColSpan,
+				colSpan: targetItem.colSpan,
+			};
+			//меняем местами элементы с сохранением размеров
+			newCategories[draggedIndex] = { ...targetItem, ...draggedSizes };
+			newCategories[targetIndex] = { ...draggedItem, ...targetSizes };
+			return newCategories;
+		});
+		setDraggedCategory(null);
+		setHoveredCategoryId(null);
+	};
+
 	const resetLayout = () => {
 		fetchCategories();
 	};
@@ -85,8 +148,20 @@ const CatalogPage = () => {
 						${category.mobileColSpan}
 						${category.tabletColSpan}
 						${category.colSpan}
-						bg-gray-100 rounded overflow-hidden min-h-50`}>
-						<div className="h-full w-full">
+						bg-gray-100 rounded overflow-hidden min-h-50 
+						${isEditing ? 'border-4 border-dashed border-gray-400' : ''}
+						${hoveredCategoryId === category._id ? 'border-3  border-red-800' : ''}`}
+						onDragOver={(e) => handleDragOver(e, category._id)}
+						onDragLeave={handleDragLeave}
+						onDrop={(e) => handleDrop(e, category._id)}>
+						<div
+							className={`h-full w-full ${
+								draggedCategory?._id === category._id
+									? 'opacity-50'
+									: ''
+							}`}
+							draggable={isEditing}
+							onDragStart={() => handleDragStart(category)}>
 							<GridCategoryBlock
 								id={category.id}
 								title={category.title}
