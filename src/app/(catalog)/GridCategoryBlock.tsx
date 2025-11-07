@@ -1,21 +1,14 @@
+import { GridCategoryBlockProps } from '@/types/categoryBlockProps';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-const GridCategoryBlock = ({
-	id,
-	title,
-	img,
-}: {
-	id: number;
-	title: string;
-	img: string;
-}) => {
+const GridCategoryBlock = ({ id, title, img }: GridCategoryBlockProps) => {
 	return (
 		<Link
 			href={`category-${id}`}
 			className="block relative h-full overflow-hidden group min-w-40
-					         md:min-w-[224px] xl:min-w[274px]">
+					         md:min-w-[224px] xl:min-w-[274px]">
 			<Image
 				src={img}
 				alt={title}

@@ -8,6 +8,8 @@ const CatalogPage = () => {
 	const [categories, setCategories] = useState<CatalogProps[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isEditing, setIsEditing] = useState(false);
+	const isAdmin = true;
 
 	const fetchCategories = async () => {
 		try {
@@ -29,6 +31,13 @@ const CatalogPage = () => {
 		fetchCategories();
 	}, []);
 
+	const handleToggleEditing = async () => {
+		setIsEditing(!isEditing);
+	};
+	const resetLayout = () => {
+		fetchCategories();
+	};
+
 	if (isLoading) {
 		return <div className="text-center py-8 ">Загрузка каталога...</div>;
 	}
@@ -47,6 +56,24 @@ const CatalogPage = () => {
 
 	return (
 		<section className="px-[max(12px,calc((100%-1208px)/2))] mx-auto mb-20">
+			{isAdmin && (
+				<div className="flex justify-end mb-4">
+					<button
+						className="border border-(--color-primary) hover:text-white hover:bg-[#ff6633] hover:border-transparent active:shadow-(--shadow-button-active) w-1/2 h-10 rounded p-2 justify-center items-center text-(--color-primary) transition-all duration-300 cursor-pointer select-none"
+						onClick={handleToggleEditing}>
+						{isEditing
+							? 'Закончить редактирование'
+							: 'Изменить расположение'}
+					</button>
+					{isEditing && (
+						<button
+							className="ml-3 p-2 text-xs justify-center items-center active:shadow-(--shadow-button-active) border-none rounded cursor-pointer transition-colors duration-300 bg-[#f3f2f1] hover:shadow-(--shadow-button-secondary)"
+							onClick={resetLayout}>
+							Сбросить
+						</button>
+					)}
+				</div>
+			)}
 			<h1 className="mb-4 md:mb-8 xl:mb-10 flex flex-row text-4xl mb:text-5xl xl:text-[64px] text-[#414141] font-bold">
 				Каталог
 			</h1>
