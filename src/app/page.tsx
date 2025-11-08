@@ -1,24 +1,39 @@
-import Actions from "./(products)/Actions";
-import Articles from "./(articles)/Articles";
-import Maps from "@/components/Maps";
-import NewProducts from "./(products)/NewProducts";
-import Purchases from "./(user)/Purchases";
+import Actions from './(products)/Actions';
+import Articles from './(articles)/Articles';
+import Maps from '@/components/Maps';
+import NewProducts from './(products)/NewProducts';
+import Purchases from './(user)/Purchases';
 
-import SpecialOffers from "@/components/SpecialOffers";
-import Slider from "@/components/Slider/Slider";
+import SpecialOffers from '@/components/SpecialOffers';
+import Slider from '@/components/Slider/Slider';
+import { Suspense } from 'react';
+import { Loader } from '@/components/Loader';
 
 export default function Home() {
-  return (
-    <main className="w-full mx-auto mb-20">
-      <Slider />
-      <div className="px-[max(12px,calc((100%-1208px)/2))] flex flex-col gap-y-20 md:mb-25 xl:mb-30">
-        <Actions />
-        <NewProducts />
-        <Purchases />
-        <SpecialOffers />
-        <Maps />
-        <Articles />
-      </div>
-    </main>
-  );
+	return (
+		<main className="w-full mx-auto mb-20">
+			<Suspense fallback={<Loader text="слайдера" />}>
+				<Slider />
+			</Suspense>
+			<div className="px-[max(12px,calc((100%-1208px)/2))] flex flex-col gap-y-20 md:mb-25 xl:mb-30">
+				{[
+					{ component: <Actions />, text: 'акций' },
+					{ component: <NewProducts />, text: 'новинок' },
+					{ component: <Purchases />, text: 'Ваших покупок' },
+					{
+						component: <SpecialOffers />,
+						text: 'специальных предложений',
+					},
+					{ component: <Maps />, text: 'карт' },
+					{ component: <Articles />, text: 'статей' },
+				].map((item, index) => (
+					<Suspense
+						key={index}
+						fallback={<Loader text={item.text} />}>
+						{item.component}
+					</Suspense>
+				))}
+			</div>
+		</main>
+	);
 }
