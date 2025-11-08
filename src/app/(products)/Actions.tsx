@@ -4,7 +4,7 @@ import { CONFIG } from '../../../config/config';
 
 const Actions = async () => {
 	try {
-		const { items } = await fetchProductsByCategory('actions', {
+		const  items  = await fetchProductsByCategory('actions', {
 			randomLimit: CONFIG.ITEMS_PER_PAGE_MAIN_PRODUCTS,
 		});
 
