@@ -4,7 +4,7 @@ import { CONFIG } from '../../../config/config';
 
 const NewProducts = async () => {
 	try {
-		const  items  = await fetchProductsByCategory('actions', {
+		const { items } = await fetchProductsByCategory('actions', {
 			randomLimit: CONFIG.ITEMS_PER_PAGE_MAIN_PRODUCTS,
 		});
 
@@ -13,7 +13,7 @@ const NewProducts = async () => {
 				title="Новинки"
 				viewAllButton={{ text: 'Все новинки', href: 'new' }}
 				products={items}
-				compact
+				
 			/>
 		);
 	} catch {

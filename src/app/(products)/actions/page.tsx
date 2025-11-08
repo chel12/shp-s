@@ -1,27 +1,30 @@
-import fetchProductsByCategory from "../fetchProducts";
-import GenericListPage from "../GenericListPage";
+import fetchProductsByCategory from '../fetchProducts';
+import GenericListPage from '../GenericListPage';
 
 export const metadata = {
-  title: 'Акции магазина "Северяночка"',
-  description: 'Акционные товары магазина "Северяночка"',
+	title: 'Акции магазина "Северяночка"',
+	description: 'Акционные товары магазина "Северяночка"',
 };
 
 const AllActions = async ({
-  searchParams,
+	searchParams,
 }: {
-  searchParams: Promise<{ page?: string; itemsPerPage?: string }>;
+	searchParams: Promise<{ page?: string; itemsPerPage?: string }>;
 }) => {
-  return (
-    <GenericListPage
-      searchParams={searchParams}
-      props={{
-        fetchData: () => fetchProductsByCategory("actions"),
-        pageTitle: " Все акции",
-        basePath: "/actions",
-        errorMessage: "Ошибка: не удалось загрузить акции",
-      }}
-    />
-  );
+	return (
+		<GenericListPage
+			searchParams={searchParams}
+			props={{
+				fetchData: ({ pagination: { startIdx, perPage } }) =>
+					fetchProductsByCategory('actions', {
+						pagination: { startIdx, perPage },
+					}),
+				pageTitle: ' Все акции',
+				basePath: '/actions',
+				errorMessage: 'Ошибка: не удалось загрузить акции',
+			}}
+		/>
+	);
 };
 
 export default AllActions;

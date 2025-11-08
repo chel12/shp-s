@@ -1,27 +1,30 @@
-import fetchProductsByCategory from "../fetchProducts";
-import GenericListPage from "../GenericListPage";
+import fetchProductsByCategory from '../fetchProducts';
+import GenericListPage from '../GenericListPage';
 
 export const metadata = {
-  title: 'Новинки магазина "Северяночка"',
-  description: 'Новые товары магазина "Северяночка"',
+	title: 'Новинки магазина "Северяночка"',
+	description: 'Новые товары магазина "Северяночка"',
 };
 
 const AllNew = async ({
-  searchParams,
+	searchParams,
 }: {
-  searchParams: Promise<{ page?: string; itemsPerPage?: string }>;
+	searchParams: Promise<{ page?: string; itemsPerPage?: string }>;
 }) => {
-  return (
-    <GenericListPage
-      searchParams={searchParams}
-      props={{
-        fetchData: () => fetchProductsByCategory("new"),
-        pageTitle: " Все новинки",
-        basePath: "/new",
-        errorMessage: "Ошибка: не удалось загрузить новинки",
-      }}
-    />
-  );
+	return (
+		<GenericListPage
+			searchParams={searchParams}
+			props={{
+				fetchData: ({ pagination: { startIdx, perPage } }) =>
+					fetchProductsByCategory('new', {
+						pagination: { startIdx, perPage },
+					}),
+				pageTitle: ' Все новинки',
+				basePath: '/new',
+				errorMessage: 'Ошибка: не удалось загрузить новинки',
+			}}
+		/>
+	);
 };
 
 export default AllNew;
