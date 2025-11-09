@@ -1,5 +1,5 @@
-const fetchProductsByCategory = async (
-	category: string,
+const fetchProductsByTag = async (
+	tag: string,
 	options?: {
 		randomLimit?: number;
 		pagination?: { startIdx: number; perPage: number };
@@ -7,7 +7,7 @@ const fetchProductsByCategory = async (
 ) => {
 	try {
 		const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
-		url.searchParams.append('category', category);
+		url.searchParams.append('tag', tag);
 		if (options?.randomLimit) {
 			url.searchParams.append(
 				'randomLimit',
@@ -26,7 +26,7 @@ const fetchProductsByCategory = async (
 
 		const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
 		if (!res.ok)
-			throw new Error(`Серверная ошибка получения продуктов ${category}`);
+			throw new Error(`Серверная ошибка получения продуктов ${tag}`);
 
 		const data = await res.json();
 
@@ -35,9 +35,9 @@ const fetchProductsByCategory = async (
 			totalCount: data.totalCount || data.length,
 		};
 	} catch (err) {
-		console.error(`Ошибка в компоненте: ${category}`, err);
+		console.error(`Ошибка в компоненте: ${tag}`, err);
 		throw err;
 	}
 };
 
-export default fetchProductsByCategory;
+export default fetchProductsByTag;
