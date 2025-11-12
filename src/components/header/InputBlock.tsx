@@ -4,20 +4,25 @@ import iconSearch from '/public/icons-header/icon-search.svg';
 import Link from 'next/link';
 import iconBurger from '/public/icons-header/icon-burger-menu.svg';
 import { useEffect, useState } from 'react';
+import { SearchProduct } from '@/types/searchProduct';
+import { PATH_TRANSLATIONS } from '../../../utils/pathTranslations';
 
 const InputBlock = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-	const [groupedProducts, setGroupedProducts] = useState([]);
+	const [groupedProducts, setGroupedProducts] = useState<
+		{ category: string; products: SearchProduct[] }[]
+	>([]);
 
 	useEffect(() => {
 		const fetchSearchData = async () => {
 			if (query.length > 1) {
 				try {
 					setIsLoading(true);
-					const response = await fetch(`*api/search?query=${query}`);
+					const response = await fetch(`/api/search?query=${query}`);
 					const data = await response.json();
+					console.log(data);
 					setGroupedProducts(data);
 				} catch (error) {
 					console.error('Не найден продукт или категория', error);
@@ -30,7 +35,7 @@ const InputBlock = () => {
 		};
 
 		const debounceTimer = setTimeout(fetchSearchData, 300);
-		return clearTimeout(debounceTimer);
+		return () => clearTimeout(debounceTimer);
 	}, [query]);
 
 	const handleInputFocus = () => {
@@ -65,62 +70,58 @@ const InputBlock = () => {
 			</div>
 			{isOpen && (
 				<div
-					className="absolute -mt-0.5 left-0 right-0 z-10 max-h-[300px] 
-			overflow-y-auto bg-white rounded-b border-1 border-(--color-primary)
-			border-t-0 shadow-inherit break-words
+					className="absolute -mt-0.5 left-0 right-0 z-100 max-h-[300px] overflow-y-auto bg-white rounded-b border-1 border-(--color-primary) border-t-0 shadow-inherit break-words
 			">
 					{isLoading ? (
 						<div className="p-4 text-center">Загрузка...</div>
 					) : groupedProducts.length > 0 ? (
 						<div className="p-2 flex flex-col gap-2.5">
-							<div className="flex flex-col gap-2.5">
-								<Link
-									href="#"
-									onClick={resetSearch}
-									className="flex items-start gap-x-4
+							{groupedProducts.map((group) => (
+								<div
+									key={group.category}
+									className="flex flex-col gap-2">
+									<Link
+										//encodeURIComponent к строке приобразует
+										href={`/category/${encodeURIComponent(
+											group.category
+										)}`}
+										onClick={resetSearch}
+										className="flex items-start gap-x-4 p-1
 						hover:bg-gray-100 rounded cursor-pointer
 						">
-									<div>Текст ссылки на категорию</div>
-									<Image
-										src={iconBurger}
-										alt="Иконка меню категории"
-										width={24}
-										height={24}
-										className="flex-shrink-0"
-									/>
-								</Link>
-								<ul className="flex flex-col gap-2.5">
-									<li className="p-1 hover:bg-gray-100">
-										<Link
-											href="#"
-											onClick={resetSearch}
-											className="cursor-pointer">
-											Продукт
-										</Link>
-									</li>
-									<li className="p-1 hover:bg-gray-100">
-										<Link
-											href="#"
-											className=" cursor-pointer">
-											Продукт
-										</Link>
-									</li>
-									<li className="p-1 hover:bg-gray-100">
-										<Link
-											href="#"
-											className=" cursor-pointer">
-											Продукт
-										</Link>
-									</li>
-									<li className="p-1 hover:bg-gray-100">
-										<Link
-											href="#"
-											className=" cursor-pointer">
-											Продукт
-										</Link>
-									</li>
-								</ul>
-							</div>
+										<div>
+											{PATH_TRANSLATIONS[
+												group.category
+											] || group.category}
+										</div>
+										<Image
+											src={iconBurger}
+											alt={
+												PATH_TRANSLATIONS[
+													group.category
+												] || group.category
+											}
+											width={24}
+											height={24}
+											className="flex-shrink-0"
+										/>
+									</Link>
+									<ul className="flex flex-col gap-2.5">
+										{group.products.map((product) => (
+											<li
+												key={product.id}
+												className="p-1 hover:bg-gray-100">
+												<Link
+													href={`/product/${product.id}`}
+													onClick={resetSearch}
+													className="cursor-pointer">
+													{product.title}
+												</Link>
+											</li>
+										))}
+									</ul>
+								</div>
+							))}
 						</div>
 					) : query.length > 1 ? (
 						<div className="text-[#8f8f8f] py-2 px-4 ">
