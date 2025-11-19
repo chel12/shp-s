@@ -3,7 +3,7 @@ import Image from 'next/image';
 import iconSearch from '/public/icons-header/icon-search.svg';
 import Link from 'next/link';
 import iconBurger from '/public/icons-header/icon-burger-menu.svg';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SearchProduct } from '@/types/searchProduct';
 import { PATH_TRANSLATIONS } from '../../../utils/pathTranslations';
 
@@ -14,6 +14,23 @@ const InputBlock = () => {
 	const [groupedProducts, setGroupedProducts] = useState<
 		{ category: string; products: SearchProduct[] }[]
 	>([]);
+	const searchRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			//Клик не по тому элементу к которому привязан ref
+			//. !searchRef.current.contains(e.target as Node)
+			if (
+				searchRef.current &&
+				!searchRef.current.contains(e.target as Node)
+			) {
+				setIsOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		return () =>
+			document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
 
 	useEffect(() => {
 		const fetchSearchData = async () => {
@@ -47,7 +64,7 @@ const InputBlock = () => {
 	};
 
 	return (
-		<div className="relative min-w-[261px] flex-grow">
+		<div className="relative min-w-[261px] flex-grow" ref={searchRef}>
 			<div
 				className="raltive rounded border-1 
 			border-(--color-primary) shadow-(--shadow-button-default)
