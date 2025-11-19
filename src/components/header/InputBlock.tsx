@@ -5,7 +5,8 @@ import Link from 'next/link';
 import iconBurger from '/public/icons-header/icon-burger-menu.svg';
 import { useEffect, useRef, useState } from 'react';
 import { SearchProduct } from '@/types/searchProduct';
-import { PATH_TRANSLATIONS } from '../../../utils/pathTranslations';
+import { TRANSLATIONS } from '../../../utils/translations';
+import HighlightText from './HighlightText';
 
 const InputBlock = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -107,16 +108,20 @@ const InputBlock = () => {
 						hover:bg-gray-100 rounded cursor-pointer
 						">
 										<div>
-											{PATH_TRANSLATIONS[
-												group.category
-											] || group.category}
+											<HighlightText
+												text={
+													TRANSLATIONS[
+														group.category
+													] || group.category
+												}
+												highlight={query}
+											/>
 										</div>
 										<Image
 											src={iconBurger}
 											alt={
-												PATH_TRANSLATIONS[
-													group.category
-												] || group.category
+												TRANSLATIONS[group.category] ||
+												group.category
 											}
 											width={24}
 											height={24}
@@ -133,6 +138,10 @@ const InputBlock = () => {
 													onClick={resetSearch}
 													className="cursor-pointer">
 													{product.title}
+													<HighlightText
+														text={product.title}
+														highlight={query}
+													/>
 												</Link>
 											</li>
 										))}
