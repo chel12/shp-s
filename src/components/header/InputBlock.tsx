@@ -71,7 +71,7 @@ const InputBlock = () => {
 			//клиентская навигация без перезагрузки страницы
 			//encodeURIComponent экранирует спец символы
 			router.push(`/search?q=${encodeURIComponent(query)}`);
-			setIsOpen(false);
+			resetSearch();
 		}
 	};
 	return (
@@ -87,6 +87,7 @@ const InputBlock = () => {
 					}}>
 					<input
 						type="text"
+						value={query}
 						placeholder="Найти товар"
 						className="w-full h-10  p-2 outline-none   text-[#8f8f8f] text-base "
 						onFocus={handleInputFocus}
