@@ -10,11 +10,19 @@ export async function GET(request: Request) {
 		const products = (await db
 			.collection('products')
 			.find({
-				//по каким полям ищем
-				//все совпадения, регистра независимый поиск
-				$or: [
-					{ title: { $regex: query, $options: 'i' } },
-					{ description: { $regex: query, $options: 'i' } },
+				$and: [
+					{
+						//по каким полям ищем
+						//все совпадения, регистра независимый поиск
+						$or: [
+							{ title: { $regex: query, $options: 'i' } },
+							{ description: { $regex: query, $options: 'i' } },
+						],
+					},
+					{
+						//исключаем товары с кол-во 0
+						quantity: { $gt: 0 },
+					},
 				],
 			})
 			.project({
