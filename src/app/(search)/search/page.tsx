@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { Loader } from '@/components/Loader';
 import ProductsSection from '@/components/ProductsSection';
 import { ProductCardProps } from '@/types/product';
