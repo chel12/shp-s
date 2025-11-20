@@ -1,7 +1,9 @@
+'use client'
 import { Loader } from '@/components/Loader';
 import ProductsSection from '@/components/ProductsSection';
 import { ProductCardProps } from '@/types/product';
 import { useSearchParams } from 'next/navigation';
+
 import React, { useEffect, useState } from 'react';
 
 const SearchResult = () => {
