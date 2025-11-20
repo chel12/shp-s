@@ -9,7 +9,11 @@ import { TRANSLATIONS } from '../../../utils/translations';
 import HighlightText from './HighlightText';
 import { useRouter } from 'next/navigation';
 
-const InputBlock = () => {
+const InputBlock = ({
+	onFocusChangeAction,
+}: {
+	onFocusChangeAction: (focused: boolean) => void;
+}) => {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -60,6 +64,7 @@ const InputBlock = () => {
 
 	const handleInputFocus = () => {
 		setIsOpen(true);
+		onFocusChangeAction(true);
 	};
 	const resetSearch = () => {
 		setIsOpen(false);
@@ -74,6 +79,11 @@ const InputBlock = () => {
 			resetSearch();
 		}
 	};
+
+	const handleInputBlur = () => {
+		onFocusChangeAction(false);
+	};
+
 	return (
 		<div className="relative min-w-[261px] flex-grow" ref={searchRef}>
 			<div
@@ -93,6 +103,7 @@ const InputBlock = () => {
 						onFocus={handleInputFocus}
 						onChange={(e) => setQuery(e.target.value)}
 						name="search"
+						onBlur={handleInputBlur}
 					/>
 
 					<button
