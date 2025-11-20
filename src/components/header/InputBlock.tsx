@@ -7,8 +7,10 @@ import { useEffect, useRef, useState } from 'react';
 import { SearchProduct } from '@/types/searchProduct';
 import { TRANSLATIONS } from '../../../utils/translations';
 import HighlightText from './HighlightText';
+import { useRouter } from 'next/navigation';
 
 const InputBlock = () => {
+	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
@@ -64,27 +66,46 @@ const InputBlock = () => {
 		setQuery('');
 	};
 
+	const handleSearch = () => {
+		if (query.trim()) {
+			//клиентская навигация без перезагрузки страницы
+			//encodeURIComponent экранирует спец символы
+			router.push(`/search?q=${encodeURIComponent(query)}`);
+			setIsOpen(false);
+		}
+	};
 	return (
 		<div className="relative min-w-[261px] flex-grow" ref={searchRef}>
 			<div
 				className="raltive rounded border-1 
 			border-(--color-primary) shadow-(--shadow-button-default)
 			leading-[150%]">
-				<input
-					type="text"
-					placeholder="Найти товар"
-					className="w-full h-10  p-2 outline-none   text-[#8f8f8f] text-base "
-					onFocus={handleInputFocus}
-					onChange={(e) => setQuery(e.target.value)}
-				/>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						handleSearch();
+					}}>
+					<input
+						type="text"
+						placeholder="Найти товар"
+						className="w-full h-10  p-2 outline-none   text-[#8f8f8f] text-base "
+						onFocus={handleInputFocus}
+						onChange={(e) => setQuery(e.target.value)}
+						name="search"
+					/>
 
-				<Image
-					src={iconSearch}
-					alt="Поиск"
-					width={24}
-					height={24}
-					className="absolute top-2 right-2"
-				/>
+					<button
+						type="submit"
+						className="absolute top-2 right-2
+					w-6 h-6 cursor-pointer">
+						<Image
+							src={iconSearch}
+							alt="Поиск"
+							width={24}
+							height={24}
+						/>
+					</button>
+				</form>
 			</div>
 			{isOpen && (
 				<div
