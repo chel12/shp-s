@@ -32,6 +32,7 @@ const fetchArticles = async (options?: {
 			totalCount: data.totalCount || data.length,
 		};
 	} catch (err) {
+		//тут ошибка выносится на вверх уровень, где уже отловили её
 		console.error(`Ошибка в компоненте статей`, err);
 		throw err;
 	}

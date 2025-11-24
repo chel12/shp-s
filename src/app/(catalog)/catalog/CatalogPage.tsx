@@ -4,6 +4,7 @@ import { CatalogProps } from '@/types/catalog';
 import { useEffect, useState } from 'react';
 import GridCategoryBlock from '../GridCategoryBlock';
 import Loading from './loading';
+import ErrorComponent from '@/components/ErrorComponent';
 
 export const metadata = {
 	title: 'Каталог товаров магазина "Северяночка"',
@@ -19,7 +20,10 @@ const CatalogPage = () => {
 	const [hoveredCategoryId, setHoveredCategoryId] = useState<number | null>(
 		null
 	);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<{
+		error: Error;
+		userMessage: string;
+	} | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const isAdmin = true;
 
@@ -32,8 +36,13 @@ const CatalogPage = () => {
 			const data: CatalogProps[] = await response.json();
 			setCategories(data.sort((a, b) => a.order - b.order));
 		} catch (error) {
-			console.error('Не удалось получить категории:', error);
-			setError('Не удалось получить категории');
+			setError({
+				error:
+					error instanceof Error
+						? error
+						: new Error('Неизвестная ошибка'),
+				userMessage: 'Не удалось загрузить каталог категорий',
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -72,8 +81,13 @@ const CatalogPage = () => {
 				console.log('Порядок спешно обновлен в БД');
 			}
 		} catch (error) {
-			console.error('Ошибка при сохранении порядка:', error);
-			setError('Ошибка при сохранении порядка');
+			setError({
+				error:
+					error instanceof Error
+						? error
+						: new Error('Неизвестная ошибка'),
+				userMessage: 'Не удалось изменить порядок категорий',
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -163,7 +177,12 @@ const CatalogPage = () => {
 	}
 
 	if (error) {
-		throw error;
+		return (
+			<ErrorComponent
+				error={error.error}
+				userMessage={error.userMessage}
+			/>
+		);
 	}
 
 	if (!categories.length) {
