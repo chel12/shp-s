@@ -38,7 +38,8 @@ const Header = () => {
 
 	const handleMouseMove = (e: React.MouseEvent) => {
 		//от утечки
-		if (!searchBlockRef.current || !isCatalogOpen || isSearchFocused) return;
+		if (!searchBlockRef.current || !isCatalogOpen || isSearchFocused)
+			return;
 		//проверка курсора в меню
 		const isInsideMenu = menuRef.current?.contains(e.target as Node);
 		if (isInsideMenu) return;
@@ -69,7 +70,7 @@ const Header = () => {
 			<div className="flex flex-row gap-4 xl:gap-10 py-2 px-4 items-center shadow-(--shadow-default) md:shadow-none">
 				<LogoBlock />
 				<div
-					className="flex items-center"
+					className="flex items-center w-full"
 					onMouseEnter={openMenu}
 					ref={searchBlockRef}>
 					<SearchBlock

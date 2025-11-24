@@ -180,7 +180,12 @@ const CatalogPage = () => {
 				<div className="flex justify-end mb-4">
 					<button
 						onClick={handleToggleEditing}
-						className="border border-(--color-primary) hover:text-white hover:bg-[#ff6633] hover:border-transparent active:shadow-(--shadow-button-active) w-1/2 h-10 rounded p-2 justify-center items-center text-(--color-primary) transition-all duration-300 cursor-pointer select-none">
+						className="text-sm md:text-base border border-(--color-primary) 
+						hover:text-white hover:bg-[#ff6633] 
+						hover:border-transparent active:shadow-(--shadow-button-active)
+						 w-1/2 h-10 rounded p-2 justify-center 
+						 items-center text-(--color-primary) transition-all 
+						 duration-300 cursor-pointer select-none">
 						{isEditing
 							? 'Закончить редактирование'
 							: 'Изменить расположение'}
