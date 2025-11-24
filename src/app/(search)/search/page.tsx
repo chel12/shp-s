@@ -1,4 +1,5 @@
 'use client';
+import ErrorComponent from '@/components/ErrorComponent';
 import { Loader } from '@/components/Loader';
 import ProductsSection from '@/components/ProductsSection';
 import { ProductCardProps } from '@/types/product';
@@ -12,6 +13,10 @@ const SearchResult = () => {
 	const query = searchParams.get('q') || '';
 	const [products, setProducts] = useState<ProductCardProps[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<{
+		error: Error;
+		userMessage: string;
+	} | null>(null);
 
 	useEffect(() => {
 		const fetchSearchResults = async () => {
@@ -23,7 +28,13 @@ const SearchResult = () => {
 				const data = await response.json();
 				setProducts(data);
 			} catch (error) {
-				console.error('Не удалось получить результаты:', error);
+				setError({
+					error:
+						error instanceof Error
+							? error
+							: new Error('Неизвестная ошибка'),
+					userMessage: 'Не удалось загрузить результаты поиска',
+				});
 			} finally {
 				setIsLoading(false);
 			}
@@ -32,7 +43,17 @@ const SearchResult = () => {
 			fetchSearchResults();
 		}
 	}, [query]);
+
 	if (isLoading) return <Loader />;
+
+	if (error) {
+		return (
+			<ErrorComponent
+				error={error.error}
+				userMessage={error.userMessage}
+			/>
+		);
+	}
 	return (
 		<div className="px-[max(12px,calc((100%-1208px)/2))] text-[#414141] my-20">
 			<h1 className="text-2xl xl:text-4xl text-left font-bold mb-6">

@@ -1,6 +1,7 @@
 import fetchProductsByTag from './fetchProducts';
 import ProductsSection from '../../components/ProductsSection';
 import { CONFIG } from '../../../config/config';
+import ErrorComponent from '@/components/ErrorComponent';
 
 const NewProducts = async () => {
 	try {
@@ -13,14 +14,17 @@ const NewProducts = async () => {
 				title="Новинки"
 				viewAllButton={{ text: 'Все новинки', href: 'new' }}
 				products={items}
-				
 			/>
 		);
-	} catch {
+	} catch (error) {
 		return (
-			<div className="text-red-500">
-				Ошибка: не удалось загрузить новинки
-			</div>
+			<ErrorComponent
+				error={
+					//если настоящая ошибка а не ТС ошибка, в строку приводим
+					error instanceof Error ? error : new Error(String(error))
+				}
+				userMessage="Не удалось загрузить новинки"
+			/>
 		);
 	}
 };

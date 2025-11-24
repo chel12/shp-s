@@ -5,6 +5,7 @@ import PaginationWrapper from '@/components/PaginationWrapper';
 import ArticleSection from '../(articles)/ArticlesSection';
 import { ProductCardProps } from '@/types/product';
 import { ArticleCardProps } from '@/types/articles';
+import ErrorComponent from '@/components/ErrorComponent';
 
 const GenericListPage = async ({
 	searchParams,
@@ -50,8 +51,16 @@ const GenericListPage = async ({
 				)}
 			</>
 		);
-	} catch {
-		return <div className="text-red-500">{props.errorMessage}</div>;
+	} catch (error) {
+		return (
+			<ErrorComponent
+				error={
+					//если настоящая ошибка а не ТС ошибка, в строку приводим
+					error instanceof Error ? error : new Error(String(error))
+				}
+				userMessage="Не удалось загрузить статьи"
+			/>
+		);
 	}
 };
 
