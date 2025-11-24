@@ -18,6 +18,7 @@ const InputBlock = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [groupedProducts, setGroupedProducts] = useState<
 		{ category: string; products: SearchProduct[] }[]
 	>([]);
@@ -50,6 +51,7 @@ const InputBlock = ({
 					setGroupedProducts(data);
 				} catch (error) {
 					console.error('Не найден продукт или категория', error);
+					setError('Не найден продукт или категория');
 				} finally {
 					setIsLoading(false);
 				}
@@ -123,7 +125,14 @@ const InputBlock = ({
 				<div
 					className="absolute -mt-0.5 left-0 right-0 z-100 max-h-[300px] overflow-y-auto bg-white rounded-b border-1 border-(--color-primary) border-t-0 shadow-inherit break-words
 			">
-					{isLoading ? (
+					{error ? (
+						<div className="p-2 text-red-500 text-sm">
+							{error}
+							<button
+								onClick={() => setError(null)}
+								className=" text-blue-500 hover:text-blue-700 cursor-pointer"></button>
+						</div>
+					) : isLoading ? (
 						<div className="p-4 text-center">Загрузка...</div>
 					) : groupedProducts.length > 0 ? (
 						<div className="p-2 flex flex-col gap-2.5">

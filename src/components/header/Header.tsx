@@ -5,10 +5,15 @@ import SearchBlock from './SearchBlock';
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Category } from '@/types/categories';
+import ErrorComponent from '../ErrorComponent';
 
 const Header = () => {
 	const [isCatalogOpen, setIsCatalogOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<{
+		error: Error;
+		userMessage: string;
+	} | null>(null);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const searchBlockRef = useRef<HTMLDivElement>(null);
@@ -23,7 +28,13 @@ const Header = () => {
 			const data = await response.json();
 			setCategories(data);
 		} catch (error) {
-			console.error('Ошибка загрузки категорий:', error);
+			setError({
+				error:
+					error instanceof Error
+						? error
+						: new Error('Неизвестная ошибка'),
+				userMessage: 'Не удалось загрузить каталог категорий',
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -85,6 +96,12 @@ const Header = () => {
 					className="hidden md:block absolute top-full left-0 w-full
 			bg-white shadow-(--shadow-catalog-menu) z-50 ">
 					<div className="mx-auto px-4 py-3">
+						{error && (
+							<ErrorComponent
+								error={error.error}
+								userMessage={error.userMessage}
+							/>
+						)}
 						{isLoading ? (
 							<div className="py-2 text-center">Загрузка...</div>
 						) : categories.length ? (
