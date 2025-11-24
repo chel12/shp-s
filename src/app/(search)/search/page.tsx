@@ -5,7 +5,15 @@ import ProductsSection from '@/components/ProductsSection';
 import { ProductCardProps } from '@/types/product';
 import { useSearchParams } from 'next/navigation';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
+
+const SearchPage = () => {
+	return (
+		<Suspense fallback={<Loader />}>
+			<SearchResult />
+		</Suspense>
+	);
+};
 
 const SearchResult = () => {
 	//отловить сеарч параметры
@@ -75,4 +83,4 @@ const SearchResult = () => {
 	);
 };
 
-export default SearchResult;
+export default SearchPage;
