@@ -3,8 +3,8 @@
 import { CatalogProps } from '@/types/catalog';
 import { useEffect, useState } from 'react';
 import GridCategoryBlock from '../GridCategoryBlock';
-import Loading from './loading';
 import ErrorComponent from '@/components/ErrorComponent';
+import { Loader } from '@/components/Loader';
 
 export const metadata = {
 	title: 'Каталог товаров магазина "Северяночка"',
@@ -173,7 +173,7 @@ const CatalogPage = () => {
 	};
 
 	if (isLoading) {
-		return <Loading />;
+		return <Loader />;
 	}
 
 	if (error) {

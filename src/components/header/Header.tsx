@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Category } from '@/types/categories';
 import ErrorComponent from '../ErrorComponent';
+import MiniLoader from '../MiniLoader';
 
 const Header = () => {
 	const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -103,7 +104,7 @@ const Header = () => {
 							/>
 						)}
 						{isLoading ? (
-							<div className="py-2 text-center">Загрузка...</div>
+							<MiniLoader />
 						) : categories.length ? (
 							<div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
 								{categories.map((category) => (
