@@ -14,7 +14,7 @@ const CatalogGrid = ({
 }: CatalogGridProps) => {
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 xl:gap-8">
-			{categories.map((category) => (
+			{categories.map((category, index) => (
 				<div
 					key={category._id}
 					className={`${category.mobileColSpan} ${
@@ -41,9 +41,11 @@ const CatalogGrid = ({
 						draggable={isEditing}
 						onDragStart={() => onDragStartAction(category)}>
 						<GridCategoryBlock
-							id={category.id}
+							slug={category.slug}
 							title={category.title}
 							img={category.img}
+							priority={index < 4}
+							
 						/>
 					</div>
 				</div>
