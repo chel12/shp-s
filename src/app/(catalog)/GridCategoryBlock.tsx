@@ -3,18 +3,26 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-const GridCategoryBlock = ({ id, title, img }: GridCategoryBlockProps) => {
+const GridCategoryBlock = ({
+	slug,
+	title,
+	img,
+	priority = false,
+}: GridCategoryBlockProps) => {
 	return (
 		<Link
-			href={`category-${id}`}
+			href={`category/${slug}`}
 			className="block relative h-full overflow-hidden group min-w-40
 					         md:min-w-[224px] xl:min-w-[274px]">
 			<Image
 				src={img}
 				alt={title}
 				fill
-				sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw,33vw"
+				sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
 				className="object-cover transition-transform group-hover:scale-105"
+				priority={priority}
+				quality={priority ? 90 : 75}
+				loading={priority ? 'eager' : 'lazy'}
 			/>
 			<div
 				className="absolute inset-0 bg-[linear-gradient(180deg,rgba(112,192,91,0)_0%,rgba(112,192,91,0.82)_82.813%)] h-[117px] top-auto
