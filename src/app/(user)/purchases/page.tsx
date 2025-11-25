@@ -17,7 +17,7 @@ const AllPurchases = async ({
 						fetchPurchases({ pagination: { startIdx, perPage } }),
 					pageTitle: ' Все покупки',
 					basePath: '/purchases',
-					errorMessage: 'Ошибка: не удалось загрузить покупки',
+					
 				}}
 			/>
 		</Suspense>

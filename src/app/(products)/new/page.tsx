@@ -24,7 +24,7 @@ const AllNew = async ({
 						}),
 					pageTitle: ' Все новинки',
 					basePath: '/new',
-					errorMessage: 'Ошибка: не удалось загрузить новинки',
+					
 				}}
 			/>
 		</Suspense>
