@@ -11,7 +11,7 @@ import { Loader } from '@/components/Loader';
 
 export default function Home() {
 	return (
-		<main className="w-full mx-auto mb-20">
+		<main className="w-full mx-auto ">
 			<Suspense fallback={<Loader text="слайдера" />}>
 				<Slider />
 			</Suspense>
