@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@iminside/react-yandex-maps": "^1.2.7",
     "dotenv": "^16.5.0",
     "mongodb": "^6.17.0",

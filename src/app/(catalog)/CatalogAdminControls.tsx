@@ -1,4 +1,4 @@
-import { CatalogAdminControlsProps } from '@/types/CatalogAdminControlsProps';
+import { CatalogAdminControlsProps } from '@/types/catalogAdminControlsProps';
 import React from 'react';
 
 const CatalogAdminControls = ({
