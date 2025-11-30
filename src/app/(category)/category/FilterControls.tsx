@@ -49,7 +49,7 @@ const FilterControls = ({
 			: `Фильтры ${activeFilterCount}`;
 
 	return (
-		<>
+		<div className="flex flex-wrap flex-row gap-4">
 			<div
 				className={`h-8 p-2 rounded text-xs flex justify-center items-center duration-300 cursor-not-allowed gap-x-2 ${
 					(activeFilter && activeFilter.length > 0) || hasPriceFilter
@@ -100,7 +100,7 @@ const FilterControls = ({
 						}></Image>
 				</Link>
 			</div>
-		</>
+		</div>
 	);
 };
 

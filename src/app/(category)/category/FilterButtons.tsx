@@ -38,7 +38,7 @@ const FilterButtons = ({ basePath }: { basePath: string }) => {
 		currentFilters.includes(filterKey);
 
 	return (
-		<>
+		<div className="flex flex-wrap flex-row gap-4 items-center">
 			{FILTERS.map((filter) => (
 				<Link
 					key={filter.key}
@@ -51,7 +51,7 @@ const FilterButtons = ({ basePath }: { basePath: string }) => {
 					{filter.label}
 				</Link>
 			))}
-		</>
+		</div>
 	);
 };
 
