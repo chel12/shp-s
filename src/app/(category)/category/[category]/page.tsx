@@ -75,12 +75,7 @@ const CategoryPage = async ({
 						<FilterControls
 							activeFilter={resolvedSearchParams.filter}
 							basePath={`/category/${category}`}
-							searchParams={{
-								page: resolvedSearchParams.page,
-								itemsPerPage: resolvedSearchParams.itemsPerPage,
-								priceFrom,
-								priceTo,
-							}}
+							
 						/>
 					</div>
 

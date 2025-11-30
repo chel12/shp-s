@@ -24,7 +24,10 @@ const ArticleCard = ({ img, title, createdAt, text }: ArticleCardProps) => {
         <p className="text-[#414141] line-clamp-3 text-xs xl:text-base">
           {text}
         </p>
-        <button className="rounded mt-auto w-37.5 h-10 bg-[#E5FFDE] text-base text-[#70C05B] hover:bg-(--color-primary) hover:shadow-(--shadow-button-default) hover:text-white active:shadow-(--shadow-button-active) duration-300 cursor-pointer">
+        <button className="rounded mt-auto w-37.5 h-10 bg-[#E5FFDE] text-base 
+		  text-[#70C05B] hover:bg-(--color-primary) 
+		  hover:shadow-(--shadow-button-default) hover:text-white 
+		  active:shadow-(--shadow-button-active) duration-300 cursor-pointer">
           Подробнее
         </button>
       </div>

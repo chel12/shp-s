@@ -1,23 +1,25 @@
+'use client';
+
 import { FilterControlsProps } from '@/types/filterControlsProps';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
-const FilterControls = ({
-	activeFilter,
-	basePath,
-	searchParams = {},
-}: FilterControlsProps) => {
-	const minPrice = searchParams.priceFrom;
-	const maxPrice = searchParams.priceTo;
+const FilterControls = ({ basePath }: FilterControlsProps) => {
+	const searchParams = useSearchParams();
+
+	const minPrice = searchParams.get('priceFrom');
+	const maxPrice = searchParams.get('priceTo');
+	const activeFilter = searchParams.getAll('filter');
 
 	function buildClearFiltersLink() {
 		const params = new URLSearchParams();
-		if (searchParams.page) {
-			params.set('page', searchParams.page);
+		if (searchParams.get('page')) {
+			params.set('page', searchParams.get('page') || '');
 		}
-		if (searchParams.itemsPerPage) {
-			params.set('itemsPetPage', searchParams.itemsPerPage);
+		if (searchParams.get('itemsPerPage')) {
+			params.set('itemsPetPage', searchParams.get('itemsPerPage') || '');
 		}
 		params.delete('filter');
 		params.delete('priceFrom');
@@ -78,28 +80,25 @@ const FilterControls = ({
 					</Link>
 				</div>
 			)}
-			<div
-				className={`h-8 p-2 rounded text-xs flex justify-center items-center duration-300 gap-x-2 ${
-					(activeFilter && activeFilter.length > 0) || hasPriceFilter
-						? 'bg-(--color-primary) text-white'
-						: 'bg-[#f3f2f1] text-[#606060]'
-				}`}>
-				<Link
-					href={buildClearFiltersLink()}
-					className="flex items-center gap-x-2">
-					Очистить фильтры
-					<Image
-						src="/icons-products/icon-closer.svg"
-						alt="очистить фильтры"
-						width={24}
-						height={24}
-						style={
-							activeFilter && activeFilter.length > 0
-								? {}
-								: { filter: 'brightness(0) invert(1)' }
-						}></Image>
-				</Link>
-			</div>
+			{activeFilterCount > 0 && (
+				<div
+					className="h-8 p-2 rounded text-xs flex justify-center items-center duration-300 
+						gap-x-2  bg-(--color-primary) text-white">
+					<Link
+						href={buildClearFiltersLink()}
+						className="flex items-center gap-x-2">
+						Очистить фильтры
+						<Image
+							src="/icons-products/icon-closer.svg"
+							alt="очистить фильтры"
+							width={24}
+							height={24}
+							style={{
+								filter: 'brightness(0) invert(1)',
+							}}></Image>
+					</Link>
+				</div>
+			)}
 		</div>
 	);
 };
