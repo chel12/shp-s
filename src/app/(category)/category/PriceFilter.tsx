@@ -52,14 +52,15 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 			const data = await response.json();
 			const receivedRange =
 				data.priceRange || CONFIG.FALLBACK_PRICE_RANGE;
+			const roundedRange = {
+				min: Math.floor(Number(receivedRange.min)),
+				max: Math.ceil(Number(receivedRange.max)),
+			};
 			//округление от копеек
-			setPriceRange({
-				min: Math.floor(parseInt(receivedRange.min)),
-				max: Math.ceil(parseInt(receivedRange.max)),
-			});
+			setPriceRange(roundedRange);
 			setInputValues({
-				from: urlPriceFrom || receivedRange.min.toString(),
-				to: urlPriceTo || receivedRange.max.toString(),
+				from: urlPriceFrom || roundedRange.min.toString(),
+				to: urlPriceTo || roundedRange.max.toString(),
 			});
 		} catch (error) {
 			setError({
