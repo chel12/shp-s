@@ -2,20 +2,26 @@ const fetchProductsByCategory = async (
 	category: string,
 	options: {
 		pagination: { startIdx: number; perPage: number };
+		filter?: string | string[];
 	}
 ) => {
+	const { pagination, filter } = options;
+
 	try {
 		const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
 
 		url.searchParams.append('category', category);
-		url.searchParams.append(
-			'startIdx',
-			options.pagination.startIdx.toString()
-		);
-		url.searchParams.append(
-			'perPage',
-			options.pagination.perPage.toString()
-		);
+		url.searchParams.append('startIdx', pagination.startIdx.toString());
+		url.searchParams.append('perPage', pagination.perPage.toString());
+		//если массив перебираем его и добавляем фильтр
+		if (filter) {
+			if (Array.isArray(filter)) {
+				filter.forEach((f) => url.searchParams.append('filter', f));
+			} else {
+				//если не массив, добавляем фильтр
+				url.searchParams.append('filter', filter);
+			}
+		}
 
 		const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
 
