@@ -20,13 +20,46 @@ export async function GET(request: Request) {
 		//отлов фильтров
 		const filters = searchParams.getAll('filter');
 
+		//параметры по цене
+		const priceFrom = searchParams.get('priceFrom');
+		const priceTo = searchParams.get('priceTo');
+		const getPriceRangeOnly =
+			searchParams.get('getPriceRangeOnly') === 'true';
+
 		const query: Filter<ProductCardProps> = {};
+
 		if (!category) {
 			return NextResponse.json(
 				{ message: 'Параметр категории обязателен' },
 				{ status: 400 }
 			);
 		}
+		//запросы цены
+		if (getPriceRangeOnly) {
+			const categoryOnlyQuery: Filter<ProductCardProps> = {};
+			categoryOnlyQuery.categories = { $in: [category] };
+
+			const priceRange = await db
+				.collection<ProductCardProps>('products')
+				.aggregate([
+					{ $match: categoryOnlyQuery },
+					{
+						$group: {
+							_id: null,
+							min: { $min: '$basePrice' },
+							max: { $max: '$basePrice' },
+						},
+					},
+				])
+				.toArray();
+			return NextResponse.json({
+				priceRange: {
+					min: priceRange[0]?.min ?? 0,
+					max: priceRange[0]?.max ?? CONFIG.FALLBACK_PRICE_RANGE,
+				},
+			});
+		}
+
 		if (category) {
 			//выбор продукта в рамках категории
 			query.categories = { $in: [category] };
@@ -43,6 +76,12 @@ export async function GET(request: Request) {
 				query.$and.push({ isNonGMO: true });
 			}
 		}
+		if (priceFrom || priceTo) {
+			query.basePrice = {};
+			if (priceFrom) query.basePrice.$gte = parseInt(priceFrom);
+			if (priceTo) query.basePrice.$lte = parseInt(priceTo);
+		}
+
 		const [totalCount, products] = await Promise.all([
 			db.collection<ProductCardProps>('products').countDocuments(query),
 			db
@@ -54,7 +93,11 @@ export async function GET(request: Request) {
 				.toArray(),
 		]);
 
-		return NextResponse.json({ products, totalCount });
+		return NextResponse.json({
+			products,
+			totalCount,
+			priceRange: { min: 0, max: 0 },
+		});
 	} catch (error) {
 		console.error('Ошибка сервера:', error);
 		return NextResponse.json(

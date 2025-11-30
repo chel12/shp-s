@@ -14,14 +14,17 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	const urlPriceFrom = searchParams.get('priceFrom') || '';
 	const urlPriceTo = searchParams.get('priceTo') || '';
 	const [isLoading, setIsLoading] = useState(true);
+
 	const [error, setError] = useState<{
 		error: Error;
 		userMessage: string;
 	} | null>(null);
+
 	const [inputValues, setInputValues] = useState({
 		from: urlPriceFrom,
 		to: urlPriceTo,
 	});
+
 	const [priceRange, setPriceRange] = useState<PriceRange>(
 		CONFIG.FALLBACK_PRICE_RANGE
 	);
@@ -37,7 +40,7 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 
 			params.set('category', currentCategory);
 			params.set('getPriceRangeOnly', 'true');
-			const response = await fetch(`api/category?${params.toString()}`);
+			const response = await fetch(`/api/category?${params.toString()}`);
 			if (!response.ok)
 				throw new Error(`Ошибка сервера: ${response.status}`);
 			const data = await response.json();
