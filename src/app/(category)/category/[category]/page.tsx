@@ -4,8 +4,7 @@ import React, { Suspense } from 'react';
 import { TRANSLATIONS } from '../../../../../utils/translations';
 import fetchProductsByCategory from '../fetchCategory';
 import FilterButtons from '../FilterButtons';
-import Link from 'next/link';
-import Image from 'next/image';
+import FilterControls from '../FilterControls';
 
 export async function generateMetadata({
 	params,
@@ -43,51 +42,14 @@ const CategoryPage = async ({
 				{TRANSLATIONS[category] || category}
 			</h1>
 			<FilterButtons basePath={`/category/${category}`} />
-			<div className="flex flex-row gap-x-6 mb-6">
-				<div
-					className={`h-8 p-2 rounded text-xs flex justify-center items-center duration-300 cursor-not-allowed gap-x-2 ${
-						!activeFilter || activeFilter.length === 0
-							? 'bg-[#f3f2f1] text-[#606060]'
-							: 'bg-(--color-primary) text-white'
-					}`}>
-					{(() => {
-						const activeFilterCount = activeFilter
-							? Array.isArray(activeFilter)
-								? activeFilter.length
-								: 1
-							: 0;
-						return activeFilterCount === 0
-							? 'Фильтры'
-							: activeFilterCount === 1
-							? 'Фильтр 1'
-							: `Фильтры ${activeFilterCount}`;
-					})()}
-				</div>
-				<div
-					className={`h-8 p-2 rounded text-xs flex justify-center items-center duration-300 gap-x-2 ${
-						!activeFilter || activeFilter.length === 0
-							? 'bg-[#f3f2f1] text-[#606060]'
-							: 'bg-(--color-primary) text-white'
-					}`}>
-					<Link
-						href={buildClearFiltersLink(
-							resolvedSearchParams,
-							`/category/${category}`
-						)}>
-						Очистить фильтры
-					</Link>
-					<Image
-						src="/icons-products/icon-closer.svg"
-						alt="очистить фильтры"
-						width={24}
-						height={24}
-						style={
-							!activeFilter || activeFilter.length === 0
-								? {}
-								: { filter: 'brightness(0) invert(1)' }
-						}></Image>
-				</div>
-			</div>
+			<FilterControls
+				activeFilter={resolvedSearchParams.filter}
+				basePath={`/category/${category}`}
+				searchParams={{
+					page: resolvedSearchParams.page,
+					itemsPerPage: resolvedSearchParams.itemsPerPage,
+				}}
+			/>
 			<Suspense fallback={<Loader />}>
 				<GenericListPage
 					searchParams={Promise.resolve(resolvedSearchParams)}
@@ -106,22 +68,5 @@ const CategoryPage = async ({
 		</div>
 	);
 };
-function buildClearFiltersLink(
-	searchParams: {
-		page?: string;
-		itemsPerPage?: string;
-		filter?: string | string[];
-	},
-	basePath: string
-) {
-	const params = new URLSearchParams();
-	if (searchParams.page) {
-		params.set('page', searchParams.page);
-	}
-	if (searchParams.itemsPerPage) {
-		params.set('itemsPetPage', searchParams.itemsPerPage);
-	}
-	params.delete('filter');
-	return `${basePath}?${params.toString()}`;
-}
+
 export default CategoryPage;
