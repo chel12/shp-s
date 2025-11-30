@@ -1,9 +1,11 @@
 'use client';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { CONFIG } from '../../../../config/config';
 import { PriceFilterProps, PriceRange } from '@/types/priceTypes';
+import ErrorComponent from '@/components/ErrorComponent';
+import MiniLoader from '@/components/MiniLoader';
 
 const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	const router = useRouter();
@@ -11,7 +13,11 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	//из урла берём
 	const urlPriceFrom = searchParams.get('priceFrom') || '';
 	const urlPriceTo = searchParams.get('priceTo') || '';
-
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<{
+		error: Error;
+		userMessage: string;
+	} | null>(null);
 	const [inputValues, setInputValues] = useState({
 		from: urlPriceFrom,
 		to: urlPriceTo,
@@ -19,6 +25,54 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	const [priceRange, setPriceRange] = useState<PriceRange>(
 		CONFIG.FALLBACK_PRICE_RANGE
 	);
+
+	const fetchPriceData = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			//получить категорию чтобы прокинуть в роут
+			const currentCategory = category || searchParams.get('category');
+			if (!currentCategory) return;
+			const params = new URLSearchParams();
+
+			params.set('category', currentCategory);
+			params.set('getPriceRangeOnly', 'true');
+			const response = await fetch(`api/category?${params.toString()}`);
+			if (!response.ok)
+				throw new Error(`Ошибка сервера: ${response.status}`);
+			const data = await response.json();
+			const receivedRange =
+				data.priceRange || CONFIG.FALLBACK_PRICE_RANGE;
+			//округление от копеек
+			setPriceRange({
+				min: Math.floor(parseInt(receivedRange.min)),
+				max: Math.floor(parseInt(receivedRange.max)),
+			});
+			setInputValues({
+				from: urlPriceFrom || receivedRange.min.toString(),
+				to: urlPriceTo || receivedRange.max.toString(),
+			});
+		} catch (error) {
+			setError({
+				error:
+					error instanceof Error
+						? error
+						: new Error('Неизвестная ошибка'),
+				userMessage: 'Не удалось загрузить каталог категорий',
+			});
+			setPriceRange(CONFIG.FALLBACK_PRICE_RANGE);
+			setInputValues({
+				from: CONFIG.FALLBACK_PRICE_RANGE.min.toString(),
+				to: CONFIG.FALLBACK_PRICE_RANGE.max.toString(),
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	}, [category, searchParams, urlPriceFrom, urlPriceTo]);
+
+	useEffect(() => {
+		fetchPriceData();
+	}, [fetchPriceData]);
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
@@ -43,6 +97,18 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 		router.push(`${basePath}?${params.toString()}`);
 	}, [inputValues, priceRange, searchParams, router, basePath]);
 
+	const resetPriceFilter = useCallback(() => {
+		setInputValues({
+			from: priceRange.min.toString(),
+			to: priceRange.max.toString(),
+		});
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('priceFrom');
+		params.delete('priceTo');
+		params.delete('page');
+		router.push(`${basePath}?${params.toString()}`);
+	}, [basePath, priceRange.max, priceRange.min, router, searchParams]);
+
 	const handleInputChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const { name, value } = e.target;
@@ -50,6 +116,17 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 		},
 		[]
 	);
+	if (isLoading) {
+		return <MiniLoader />;
+	}
+	if (error) {
+		return (
+			<ErrorComponent
+				error={error.error}
+				userMessage={error.userMessage}
+			/>
+		);
+	}
 
 	return (
 		<form
@@ -97,7 +174,9 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 				className="bg-[#ff6633] text-white hover:shadow-(--shadow-article)
 			active:shadow-(--shadow-button-active) h-10 rounded justify-center
 			items-center duration-300 cursor-pointer
-			"></button>
+			">
+				Применить
+			</button>
 		</form>
 	);
 };
