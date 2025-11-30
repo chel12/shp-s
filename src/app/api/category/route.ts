@@ -28,6 +28,7 @@ export async function GET(request: Request) {
 			);
 		}
 		if (category) {
+			//выбор продукта в рамках категории
 			query.categories = { $in: [category] };
 		}
 		if (filters.length > 0) {
