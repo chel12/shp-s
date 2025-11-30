@@ -45,7 +45,7 @@ const GenericListPage = async ({
 					/>
 				) : (
 					<ArticleSection
-						title={props.pageTitle}
+						title={props.pageTitle || ''}
 						articles={items as ArticleCardProps[]}
 					/>
 				)}

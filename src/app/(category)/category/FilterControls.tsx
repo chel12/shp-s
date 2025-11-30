@@ -33,9 +33,8 @@ const FilterControls = ({
 			? 'Фильтр 1'
 			: `Фильтры ${activeFilterCount}`;
 
-			
 	return (
-		<div className="flex flex-row gap-x-6 mb-6">
+		<div className="hidden  xl:flex flex-row flex-wrap gap-x-6 gap-y-3 mb-6">
 			<div
 				className={`h-8 p-2 rounded text-xs flex justify-center items-center duration-300 cursor-not-allowed gap-x-2 ${
 					!activeFilter || activeFilter.length === 0
