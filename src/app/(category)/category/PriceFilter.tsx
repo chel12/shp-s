@@ -1,4 +1,7 @@
 'use client';
+
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
@@ -100,6 +103,22 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 		router.push(`${basePath}?${params.toString()}`);
 	}, [inputValues, priceRange, searchParams, router, basePath]);
 
+	//стейт для rc слайдера
+	const sliderValues = [
+		parseInt(inputValues.from) || priceRange.min,
+		parseInt(inputValues.to) || priceRange.max,
+	];
+	//sliders func
+	const handleSliderChange = useCallback((values: number | number[]) => {
+		if (Array.isArray(values)) {
+			setInputValues({
+				from: values[0].toString(),
+				to: values[1].toString(),
+			});
+		}
+	}, []);
+
+	//сброс
 	const resetPriceFilter = useCallback(() => {
 		setInputValues({
 			from: priceRange.min.toString(),
@@ -170,6 +189,36 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 					min={priceRange.min}
 					max={priceRange.max}
 					className="w-[124px] h-10 border border-[#bfbfbf] rounded bg-white py-2 px-4"
+				/>
+			</div>
+			<div className="w-[320px] xl:w-[272px] px-2 mx-auto">
+				<Slider
+					range
+					min={priceRange.min}
+					max={priceRange.max}
+					value={sliderValues}
+					onChange={handleSliderChange}
+					styles={{
+						track: {
+							backgroundColor: '#70c05b',
+							height: 4,
+						},
+						handle: {
+							width: 20,
+							height: 20,
+							backgroundColor: '#70c05b',
+							border: '1px solid #ffffff',
+							borderRadius: '50%',
+							boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+							marginTop: -8,
+							cursor: 'pointer',
+							opacity: 1,
+						},
+						rail: {
+							backgroundColor: '#f0f0f0',
+							height: 4,
+						},
+					}}
 				/>
 			</div>
 			<button
