@@ -55,7 +55,7 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 			//округление от копеек
 			setPriceRange({
 				min: Math.floor(parseInt(receivedRange.min)),
-				max: Math.floor(parseInt(receivedRange.max)),
+				max: Math.ceil(parseInt(receivedRange.max)),
 			});
 			setInputValues({
 				from: urlPriceFrom || receivedRange.min.toString(),

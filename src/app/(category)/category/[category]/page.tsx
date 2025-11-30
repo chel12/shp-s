@@ -69,6 +69,8 @@ const CategoryPage = async ({
 						searchParams={{
 							page: resolvedSearchParams.page,
 							itemsPerPage: resolvedSearchParams.itemsPerPage,
+							priceFrom,
+							priceTo,
 						}}
 					/>
 					<Suspense fallback={<Loader />}>
