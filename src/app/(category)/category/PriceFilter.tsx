@@ -10,7 +10,11 @@ import { PriceFilterProps, PriceRange } from '@/types/priceTypes';
 import ErrorComponent from '@/components/ErrorComponent';
 import MiniLoader from '@/components/MiniLoader';
 
-const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
+const PriceFilter = ({
+	basePath,
+	category,
+	setIsFilterOpenAction,
+}: PriceFilterProps) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	//из урла берём
@@ -87,6 +91,7 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		applyPriceFilter();
+		if (setIsFilterOpenAction) setIsFilterOpenAction(false);
 	};
 
 	const applyPriceFilter = useCallback(() => {
@@ -166,7 +171,7 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="flex flex-col gap-y-10 text-[#414141] mt-10 xl:mt-0">
+			className="flex flex-col gap-y-10 text-[#414141] ">
 			<div className="flex flex-row justify-between items-center">
 				<p className="text-black text-base">Цена</p>
 				<button

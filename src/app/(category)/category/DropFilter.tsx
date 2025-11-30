@@ -49,7 +49,11 @@ function DropFilter({
 				</div>
 				<FilterButtons basePath={basePath} />
 				<FilterControls basePath={basePath} />
-				<PriceFilter basePath={basePath} category={category} />
+				<PriceFilter
+					basePath={basePath}
+					category={category}
+					setIsFilterOpenAction={setIsFilterOpen}
+				/>
 			</div>
 		</>
 	);
