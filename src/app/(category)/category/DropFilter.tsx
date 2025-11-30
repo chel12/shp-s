@@ -1,6 +1,9 @@
 'use client';
 import Image from 'next/image';
 import { useState } from 'react';
+import FilterButtons from './FilterButtons';
+import FilterControls from './FilterControls';
+import PriceFilter from './PriceFilter';
 
 function DropFilter({
 	basePath,
@@ -44,6 +47,9 @@ function DropFilter({
 						/>
 					</button>
 				</div>
+				<FilterButtons basePath={basePath} />
+				<FilterControls basePath={basePath} />
+				<PriceFilter basePath={basePath} category={category} />
 			</div>
 		</>
 	);
