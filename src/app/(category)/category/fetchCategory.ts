@@ -5,9 +5,10 @@ const fetchProductsByCategory = async (
 		filter?: string | string[];
 		priceFrom?: string;
 		priceTo?: string;
+		inStock?: boolean;
 	}
 ) => {
-	const { pagination, filter, priceFrom, priceTo } = options;
+	const { pagination, filter, priceFrom, priceTo, inStock } = options;
 
 	try {
 		const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
@@ -30,6 +31,9 @@ const fetchProductsByCategory = async (
 		}
 		if (priceTo) {
 			url.searchParams.append('priceTo', priceTo);
+		}
+		if (inStock !== undefined) {
+			url.searchParams.append('inStock', inStock.toString());
 		}
 
 		const res = await fetch(url.toString(), { next: { revalidate: 3600 } });

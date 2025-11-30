@@ -31,6 +31,7 @@ const CategoryPage = async ({
 		filter?: string | string[];
 		priceFrom?: string;
 		priceTo?: string;
+		inStock?: string;
 	}>;
 	params: Promise<{ category: string }>;
 }) => {
@@ -40,6 +41,7 @@ const CategoryPage = async ({
 	//получаем активные фильтры
 	const priceFrom = resolvedSearchParams.priceFrom;
 	const priceTo = resolvedSearchParams.priceTo;
+	const inStock = resolvedSearchParams.inStock === 'true';
 
 	return (
 		<div className="px-[max(12px,calc((100%-1208px)/2))] flex flex-col mx-auto">
@@ -81,6 +83,7 @@ const CategoryPage = async ({
 										filter: activeFilter,
 										priceFrom,
 										priceTo,
+										inStock,
 									}),
 
 								basePath: `/category/${category}`,

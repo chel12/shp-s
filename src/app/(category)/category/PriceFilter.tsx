@@ -16,12 +16,15 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 	//из урла берём
 	const urlPriceFrom = searchParams.get('priceFrom') || '';
 	const urlPriceTo = searchParams.get('priceTo') || '';
-	const [isLoading, setIsLoading] = useState(true);
+	const urlInStock = searchParams.get('inStock') === 'true';
 
+	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<{
 		error: Error;
 		userMessage: string;
 	} | null>(null);
+
+	const [inStock, setInStock] = useState(urlInStock);
 
 	const [inputValues, setInputValues] = useState({
 		from: urlPriceFrom,
@@ -100,8 +103,17 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 		if (fromValue > toValue) [fromValue, toValue] = [toValue, fromValue];
 		params.set('priceFrom', fromValue.toString());
 		params.set('priceTo', toValue.toString());
+		params.set('inStock', inStock.toString());
 		router.push(`${basePath}?${params.toString()}`);
-	}, [inputValues, priceRange, searchParams, router, basePath]);
+	}, [inputValues, priceRange, searchParams, router, basePath, inStock]);
+
+	//функция "в наличии"
+	const handleInStockChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setInStock(e.target.checked);
+		},
+		[]
+	);
 
 	//стейт для rc слайдера
 	const sliderValues = [
@@ -220,6 +232,37 @@ const PriceFilter = ({ basePath, category }: PriceFilterProps) => {
 						},
 					}}
 				/>
+			</div>
+			<div className="flex items-center gap-2">
+				<label className="relative inline-flex items-center cursor-pointer">
+					<input
+						type="checkbox"
+						id="inStock"
+						checked={inStock}
+						onChange={handleInStockChange}
+						className="sr-only peer"
+					/>
+					<div className="w-[46px] h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#70c05b] transition-colors duration-200">
+						<div
+							className={`
+                absolute top-0.5 left-0
+                w-5 h-5
+                border-[0.5px] border-[rgba(0,0,0,0.04)]
+                rounded-full
+                shadow-[0px_1px_1px_rgba(0,0,0,0.08),0px_2px_6px_rgba(0,0,0,0.15)]
+                bg-white
+                transition-transform duration-300
+                ${
+					inStock
+						? 'transform translate-x-6'
+						: 'transform translate-x-0'
+				}
+              `}></div>
+					</div>
+					<span className="ml-2 text-sm text-[#414141]">
+						В наличии
+					</span>
+				</label>
 			</div>
 			<button
 				type="submit"
