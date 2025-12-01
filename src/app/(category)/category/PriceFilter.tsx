@@ -1,14 +1,14 @@
 'use client';
 
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
-import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { CONFIG } from '../../../../config/config';
 import { PriceFilterProps, PriceRange } from '@/types/priceTypes';
 import ErrorComponent from '@/components/ErrorComponent';
 import MiniLoader from '@/components/MiniLoader';
+import PriceFilterHeader from './PriceFilterHeader';
+import PriceInputs from './PriceInputs';
+import PriceRangeSlider from './PriceRangeSlider';
 
 const PriceFilter = ({
 	basePath,
@@ -127,13 +127,11 @@ const PriceFilter = ({
 		parseInt(inputValues.to) || priceRange.max,
 	];
 	//sliders func
-	const handleSliderChange = useCallback((values: number | number[]) => {
-		if (Array.isArray(values)) {
-			setInputValues({
-				from: values[0].toString(),
-				to: values[1].toString(),
-			});
-		}
+	const handleSliderChange = useCallback((values: [number, number]) => {
+		setInputValues({
+			from: values[0].toString(),
+			to: values[1].toString(),
+		});
 	}, []);
 
 	//сброс
@@ -149,13 +147,6 @@ const PriceFilter = ({
 		router.push(`${basePath}?${params.toString()}`);
 	}, [basePath, priceRange.max, priceRange.min, router, searchParams]);
 
-	const handleInputChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const { name, value } = e.target;
-			setInputValues((prev) => ({ ...prev, [name]: value }));
-		},
-		[]
-	);
 	if (isLoading) {
 		return <MiniLoader />;
 	}
@@ -172,75 +163,27 @@ const PriceFilter = ({
 		<form
 			onSubmit={handleSubmit}
 			className="flex flex-col gap-y-10 text-[#414141] ">
-			<div className="flex flex-row justify-between items-center">
-				<p className="text-black text-base">Цена</p>
-				<button
-					type="button"
-					onClick={resetPriceFilter}
-					className="text-xs rounded bg-[#f3f2f1] h-8 p-2 hover:bg-(--color-primary) 
-		  hover:shadow-(--shadow-button-default) hover:text-white 
-		  active:shadow-(--shadow-button-active) duration-300 cursor-pointer">
-					Очистить
-				</button>
-			</div>
-			<div className="flex flex-row items-center justify-between gap-2">
-				<input
-					type="number"
-					name="from"
-					placeholder={`${priceRange.min}`}
-					value={inputValues.from}
-					onChange={handleInputChange}
-					min={priceRange.min}
-					max={priceRange.max}
-					className="w-[124px] h-10 border border-[#bfbfbf] rounded bg-white py-2 px-4"
-				/>
-				<Image
-					src="/icons-products/icon-line.svg"
-					alt="линия разделитель полей"
-					width={24}
-					height={24}
-				/>
-				<input
-					type="number"
-					name="to"
-					placeholder={`${priceRange.max}`}
-					value={inputValues.to}
-					onChange={handleInputChange}
-					min={priceRange.min}
-					max={priceRange.max}
-					className="w-[124px] h-10 border border-[#bfbfbf] rounded bg-white py-2 px-4"
-				/>
-			</div>
-			<div className="w-[320px] xl:w-[272px] px-2 mx-auto">
-				<Slider
-					range
-					min={priceRange.min}
-					max={priceRange.max}
-					value={sliderValues}
-					onChange={handleSliderChange}
-					styles={{
-						track: {
-							backgroundColor: '#70c05b',
-							height: 4,
-						},
-						handle: {
-							width: 20,
-							height: 20,
-							backgroundColor: '#70c05b',
-							border: '1px solid #ffffff',
-							borderRadius: '50%',
-							boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-							marginTop: -8,
-							cursor: 'pointer',
-							opacity: 1,
-						},
-						rail: {
-							backgroundColor: '#f0f0f0',
-							height: 4,
-						},
-					}}
-				/>
-			</div>
+			<PriceFilterHeader onResetAction={resetPriceFilter} />
+			<PriceInputs
+				from={inputValues.from}
+				to={inputValues.to}
+				min={priceRange.min}
+				max={priceRange.max}
+				onFromChangeAction={(value: string) =>
+					setInputValues((prev) => ({ ...prev, from: value }))
+				}
+				onToChangeAction={(value: string) =>
+					setInputValues((prev) => ({ ...prev, to: value }))
+				}
+			/>
+
+			<PriceRangeSlider
+				min={priceRange.min}
+				max={priceRange.max}
+				values={sliderValues}
+				onChangeAction={handleSliderChange}
+			/>
+
 			<div className="flex items-center gap-2">
 				<label className="relative inline-flex items-center cursor-pointer">
 					<input
