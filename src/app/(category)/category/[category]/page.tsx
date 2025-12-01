@@ -55,7 +55,7 @@ const CategoryPage = async ({
 				basePath={`/category/${category}`}
 				category={category}
 			/>
-			<div className=" hidden xl:flex flex-wrap gap-4 mb-10 items-center">
+			<div className=" hidden xl:flex">
 				<FilterButtons basePath={`/category/${category}`} />
 			</div>
 
@@ -71,11 +71,10 @@ const CategoryPage = async ({
 					/>
 				</div>
 				<div className="flex flex-col">
-					<div className="hidden  xl:flex flex-row flex-wrap gap-x-6 gap-y-3">
+					<div className="hidden  xl:flex">
 						<FilterControls
 							activeFilter={resolvedSearchParams.filter}
 							basePath={`/category/${category}`}
-							
 						/>
 					</div>
 
