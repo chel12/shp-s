@@ -1,12 +1,5 @@
+import { PriceInputsProps } from '@/types/priceInputsProps';
 import Image from 'next/image';
-interface PriceInputsProps {
-	from: string;
-	to: string;
-	min: number;
-	max: number;
-	onFromChangeAction: (value: string) => void;
-	onToChangeAction: (value: string) => void;
-}
 
 const PriceInputs = ({
 	from,

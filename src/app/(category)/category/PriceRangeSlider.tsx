@@ -1,13 +1,6 @@
+import { PriceRangeSliderProps } from '@/types/priceRangeSliderProps';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import React from 'react';
-
-interface PriceRangeSliderProps {
-	min: number;
-	max: number;
-	values: [number, number] | number[];
-	onChangeAction: (values: [number, number]) => void;
-}
 
 const PriceRangeSlider = ({
 	min,
