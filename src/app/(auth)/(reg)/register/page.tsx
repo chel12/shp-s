@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import PhoneInput from '../PhoneInput';
+import PersonInput from '../PersonInput';
 
 const initialFormData = {
 	phone: '+7',
@@ -80,6 +81,18 @@ function RegisterPage() {
 							<PhoneInput
 								value={formData.phone}
 								onChangeAction={handleChange}
+							/>
+							<PersonInput
+								id="surname"
+								label="Фамилия"
+								value={formData.surname}
+								onChange={handleChange}
+							/>
+							<PersonInput
+								id="firstName"
+								label="Имя"
+								value={formData.firstName}
+								onChange={handleChange}
 							/>
 							Имя Фамилия Пароль Повторить пароль
 						</div>
