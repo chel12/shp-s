@@ -10,6 +10,7 @@ import DateInput from '../DateInput';
 import SelectRegion from '../SelectRegion';
 import SelectCity from '../SelectCity';
 import GenderSelect from '../GenderSelect';
+import CardInput from '../CardInput';
 
 const initialFormData = {
 	phone: '+7',
@@ -147,6 +148,27 @@ const RegisterPage = () => {
 								}
 							/>
 						</div>
+					</div>
+
+					<h2 className="text-lg font-bold text-center mb-6 mt-10">
+						Необязательные поля
+					</h2>
+					<div className="w-full flex flex-row flex-wrap justify-center gap-x-8 gap-y-4">
+						<div className="flex flex-col w-65 gap-y-4">
+							<CardInput
+								value={formData.card}
+								onChangeAction={handleChange}
+								disabled={formData.hasCard}
+							/>
+							<CheckboxCard
+								checked={formData.hasCard}
+								onChangeAction={handleChange}
+							/>
+						</div>
+						<EmailInput
+							value={formData.email}
+							onChangeAction={handleChange}
+						/>
 					</div>
 				</form>
 			</div>
