@@ -9,6 +9,7 @@ import PasswordInput from '../PasswordInput';
 import DateInput from '../DateInput';
 import SelectRegion from '../SelectRegion';
 import SelectCity from '../SelectCity';
+import GenderSelect from '../GenderSelect';
 
 const initialFormData = {
 	phone: '+7',
@@ -135,6 +136,15 @@ const RegisterPage = () => {
 							<SelectCity
 								value={formData.location}
 								onChangeAction={handleChange}
+							/>
+							<GenderSelect
+								value={formData.gender}
+								onChangeAction={(value) =>
+									setFormData((prev) => ({
+										...prev,
+										gender: value,
+									}))
+								}
 							/>
 						</div>
 					</div>
