@@ -48,7 +48,7 @@ const RegisterPage = () => {
 	const handleSubmit = () => {
 		//
 	};
-
+	console.log(formData);
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center bg-[#fcd5bacc] min-h-screen text-[#414141]">
 			<div className="bg-white rounded shadow-(--shadow-auth-form) w-full max-w-[687px] max-h-[100vh] overflow-y-auto">
@@ -118,7 +118,7 @@ const RegisterPage = () => {
 						</div>
 						<div className="flex flex-col gap-y-4 items-start">
 							<DateInput
-								id="birthdayDate"
+								
 								value={formData.birthdayDate}
 								onChangeAction={(value) =>
 									setFormData((prev) => ({

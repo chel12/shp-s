@@ -4,14 +4,14 @@ import { ChangeEvent, useState } from 'react';
 import { formStyles } from '../styles';
 import Tooltip from './Tooltip';
 import { validateBirthDate } from '../../../../utils/validation/validateBirthDate';
+import Image from 'next/image';
 
 interface DateInputProps {
-	id: string;
 	value: string;
 	onChangeAction: (value: string) => void;
 }
 
-const DateInput = ({ id, value, onChangeAction }: DateInputProps) => {
+const DateInput = ({ value, onChangeAction }: DateInputProps) => {
 	const [showTooltip, setShowTooltip] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -42,17 +42,35 @@ const DateInput = ({ id, value, onChangeAction }: DateInputProps) => {
 		const formatted = formatDate(e.target.value);
 		handleDateChange(formatted);
 	};
+	//кастом календарь
+	const handleCalendarClick = () => {
+		const tempInput = document.createElement('input');
+		tempInput.type = 'date';
+		tempInput.max = new Date().toISOString().split('Т')[0];
+
+		tempInput.onchange = (e) => {
+			const target = e.target as HTMLInputElement;
+			if (target.value) {
+				const [year, month, day] = target.value.split('-');
+				const formatted = `${day}.${month}.${year}`;
+				handleDateChange(formatted);
+			}
+			document.body.removeChild(tempInput);
+		};
+		document.body.appendChild(tempInput);
+		tempInput.showPicker();
+	};
 
 	return (
 		<>
-			<div className="relative">
-				<label htmlFor={id} className={formStyles.label}>
+			<div>
+				<label htmlFor="birthdayDate" className={formStyles.label}>
 					Дата рождения
 				</label>
 
 				<div className="relative">
 					<input
-						id={id}
+						id="birthdayDate"
 						type="text"
 						value={value}
 						onChange={handleInputChange}
@@ -62,6 +80,20 @@ const DateInput = ({ id, value, onChangeAction }: DateInputProps) => {
 						onFocus={() => setShowTooltip(true)}
 						onBlur={() => setShowTooltip(false)}
 					/>
+					<button
+						type="button"
+						onClick={handleCalendarClick}
+						className="absolute right-2 top-1/2 transform -translate-y-1/2
+						cursor-pointer
+						"
+						aria-label="Установить дату рождения">
+						<Image
+							src="/icons-auth/icon-date.svg"
+							width={24}
+							height={24}
+							alt="Календарь"
+						/>
+					</button>
 				</div>
 				{showTooltip && error && <Tooltip text={error} />}
 			</div>
