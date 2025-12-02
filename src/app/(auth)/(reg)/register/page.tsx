@@ -12,6 +12,7 @@ import SelectCity from '../SelectCity';
 import GenderSelect from '../GenderSelect';
 import CardInput from '../CardInput';
 import CheckboxCard from '../CheckboxCard';
+import EmailInput from '../EmailInput';
 
 const initialFormData = {
 	phone: '+7',
@@ -182,10 +183,10 @@ const RegisterPage = () => {
 								onChangeAction={handleChange}
 							/>
 						</div>
-						{/* <EmailInput
+						<EmailInput
 							value={formData.email}
 							onChangeAction={handleChange}
-						/> */}
+						/>
 					</div>
 				</form>
 			</div>
