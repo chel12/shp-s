@@ -7,6 +7,7 @@ import PhoneInput from '../PhoneInput';
 import PersonInput from '../PersonInput';
 import PasswordInput from '../PasswordInput';
 import DateInput from '../DateInput';
+import SelectRegion from '../SelectRegion';
 
 const initialFormData = {
 	phone: '+7',
@@ -118,7 +119,6 @@ const RegisterPage = () => {
 						</div>
 						<div className="flex flex-col gap-y-4 items-start">
 							<DateInput
-								
 								value={formData.birthdayDate}
 								onChangeAction={(value) =>
 									setFormData((prev) => ({
@@ -126,6 +126,10 @@ const RegisterPage = () => {
 										birthdayDate: value,
 									}))
 								}
+							/>
+							<SelectRegion
+								value={formData.location}
+								onChangeAction={handleChange}
 							/>
 						</div>
 					</div>
