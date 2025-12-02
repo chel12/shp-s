@@ -52,6 +52,8 @@ const RegisterPage = () => {
 	) => {
 		const { id, type } = e.target;
 		const value = type === 'checkbox' ? e.target.checked : e.target.value;
+
+		//если была ошибка при отправке, то делаем её пустой строкой
 		if (invalidFormMessage) {
 			setInvalidFormMessage('');
 		}
@@ -69,8 +71,19 @@ const RegisterPage = () => {
 		setFormData((prev) => ({ ...prev, [id]: value }));
 	};
 
-	const handleSubmit = () => {
-		//
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsLoading(true);
+		setError(null);
+		setInvalidFormMessage('');
+		const validation = validateRegisterForm(formData);
+		if (!validation.isValid) {
+			setInvalidFormMessage(
+				validation.errorMessage || 'Заполните все поля корректно'
+			);
+			setIsLoading(false);
+			return;
+		}
 	};
 
 	const isFormValid = () => validateRegisterForm(formData).isValid;
@@ -193,6 +206,9 @@ const RegisterPage = () => {
 							onChangeAction={handleChange}
 						/>
 					</div>
+					{invalidFormMessage && (
+						<div></div>
+					)}
 					<RegFormFooter isFormValid={isFormValid()} />
 				</form>
 			</div>
