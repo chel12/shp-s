@@ -54,7 +54,7 @@ const PasswordInput = ({
 	};
 
 	return (
-		<div >
+		<div className="relative">
 			<label htmlFor={id} className={formStyles.label}>
 				{label}
 			</label>

@@ -13,6 +13,8 @@ import GenderSelect from '../GenderSelect';
 import CardInput from '../CardInput';
 import CheckboxCard from '../CheckboxCard';
 import EmailInput from '../EmailInput';
+import RegFormFooter from '../RegFormFooter';
+import { validateRegisterForm } from '../../../../../utils/validation/form';
 
 const initialFormData = {
 	phone: '+7',
@@ -70,7 +72,10 @@ const RegisterPage = () => {
 	const handleSubmit = () => {
 		//
 	};
+
+	const isFormValid = () => validateRegisterForm(formData).isValid;
 	console.log(formData);
+
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center bg-[#fcd5bacc] min-h-screen text-[#414141]">
 			<div className="bg-white rounded shadow-(--shadow-auth-form) w-full max-w-[687px] max-h-[100vh] overflow-y-auto">
@@ -188,6 +193,7 @@ const RegisterPage = () => {
 							onChangeAction={handleChange}
 						/>
 					</div>
+					<RegFormFooter isFormValid={isFormValid()} />
 				</form>
 			</div>
 		</div>
