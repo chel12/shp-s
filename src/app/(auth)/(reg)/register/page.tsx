@@ -8,6 +8,7 @@ import PersonInput from '../PersonInput';
 import PasswordInput from '../PasswordInput';
 import DateInput from '../DateInput';
 import SelectRegion from '../SelectRegion';
+import SelectCity from '../SelectCity';
 
 const initialFormData = {
 	phone: '+7',
@@ -128,6 +129,10 @@ const RegisterPage = () => {
 								}
 							/>
 							<SelectRegion
+								value={formData.region}
+								onChangeAction={handleChange}
+							/>
+							<SelectCity
 								value={formData.location}
 								onChangeAction={handleChange}
 							/>
