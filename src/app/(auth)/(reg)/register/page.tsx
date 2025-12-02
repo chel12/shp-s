@@ -11,6 +11,7 @@ import SelectRegion from '../SelectRegion';
 import SelectCity from '../SelectCity';
 import GenderSelect from '../GenderSelect';
 import CardInput from '../CardInput';
+import CheckboxCard from '../CheckboxCard';
 
 const initialFormData = {
 	phone: '+7',
@@ -35,6 +36,7 @@ const RegisterPage = () => {
 	} | null>(null);
 	const [formData, setFormData] = useState(initialFormData);
 	const [showPassword, setShowPassword] = useState(false);
+	const [invalidFormMessage, setInvalidFormMessage] = useState('');
 	const router = useRouter();
 
 	const handleClose = () => {
@@ -45,7 +47,22 @@ const RegisterPage = () => {
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
-		const { id, value } = e.target;
+		const { id, type } = e.target;
+		const value = type === 'checkbox' ? e.target.checked : e.target.value;
+		if (invalidFormMessage) {
+			setInvalidFormMessage('');
+		}
+
+		//проверка если данные карты заполнены и юзер нажал "нет карты"  нужно всё очистить и заблокировать
+		if (id === 'hasCard' && value === true) {
+			setFormData((prev) => ({
+				...prev,
+				hasCard: true,
+				card: '',
+			}));
+
+			return;
+		}
 		setFormData((prev) => ({ ...prev, [id]: value }));
 	};
 
@@ -165,10 +182,10 @@ const RegisterPage = () => {
 								onChangeAction={handleChange}
 							/>
 						</div>
-						<EmailInput
+						{/* <EmailInput
 							value={formData.email}
 							onChangeAction={handleChange}
-						/>
+						/> */}
 					</div>
 				</form>
 			</div>
