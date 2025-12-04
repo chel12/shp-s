@@ -61,7 +61,6 @@ const CategoryPage = async ({
 
 			<div className="flex flex-row gap-x-10 justify-between">
 				<div className="hidden xl:flex flex-col w-[272px] gap-y-10">
-					Сайдбар
 					<div className="h-11 bg-[#f3f2f1] rounded text-base font-bold text-[#414141] flex items-center p-2.5">
 						Фильтр
 					</div>
@@ -72,10 +71,7 @@ const CategoryPage = async ({
 				</div>
 				<div className="flex flex-col">
 					<div className="hidden  xl:flex">
-						<FilterControls
-					
-							basePath={`/category/${category}`}
-						/>
+						<FilterControls basePath={`/category/${category}`} />
 					</div>
 
 					<Suspense fallback={<Loader />}>

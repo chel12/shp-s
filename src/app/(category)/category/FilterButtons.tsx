@@ -10,16 +10,12 @@ const FILTERS = [
 ];
 
 const FilterButtons = ({ basePath }: { basePath: string }) => {
-	//достать из урла после "?"
 	const searchParams = useSearchParams();
-	//получить всё filter?="" будет массивом
 	const currentFilters = searchParams.getAll('filter');
 
 	const buildFilterLink = (filterKey: string) => {
-		//функция как тоггл фильтров
-		//копию урла делаем
 		const params = new URLSearchParams(searchParams.toString());
-		//проверка активен или нет
+
 		if (currentFilters.includes(filterKey)) {
 			params.delete('filter');
 			currentFilters
@@ -28,9 +24,9 @@ const FilterButtons = ({ basePath }: { basePath: string }) => {
 		} else {
 			params.append('filter', filterKey);
 		}
-		//ну и пагинацию скидываем чтобы в начало фильтров бекнуться
+
 		params.delete('page');
-		//возвращаем обновлённый урл
+
 		return `${basePath}?${params.toString()}`;
 	};
 
@@ -38,7 +34,7 @@ const FilterButtons = ({ basePath }: { basePath: string }) => {
 		currentFilters.includes(filterKey);
 
 	return (
-		<div className="flex flex-wrap flex-row gap-4 items-center">
+		<div className="flex flex-row flex-wrap gap-4 items-center mb-10 ">
 			{FILTERS.map((filter) => (
 				<Link
 					key={filter.key}

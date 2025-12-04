@@ -15,6 +15,8 @@ import CheckboxCard from '../CheckboxCard';
 import EmailInput from '../EmailInput';
 import RegFormFooter from '../RegFormFooter';
 import { validateRegisterForm } from '../../../../../utils/validation/form';
+import { Loader } from '@/components/Loader';
+import ErrorComponent from '@/components/ErrorComponent';
 
 const initialFormData = {
 	phone: '+7',
@@ -88,7 +90,14 @@ const RegisterPage = () => {
 
 	const isFormValid = () => validateRegisterForm(formData).isValid;
 	console.log(formData);
-
+	if (isLoading) return <Loader />;
+	if (error)
+		return (
+			<ErrorComponent
+				error={error.error}
+				userMessage={error.userMessage}
+			/>
+		);
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center bg-[#fcd5bacc] min-h-screen text-[#414141]">
 			<div className="bg-white rounded shadow-(--shadow-auth-form) w-full max-w-[687px] max-h-[100vh] overflow-y-auto">
@@ -207,7 +216,9 @@ const RegisterPage = () => {
 						/>
 					</div>
 					{invalidFormMessage && (
-						<div></div>
+						<div className="text-red-500 text-center my-4 p-4 bg-red-50 rounded">
+							{invalidFormMessage}
+						</div>
 					)}
 					<RegFormFooter isFormValid={isFormValid()} />
 				</form>
