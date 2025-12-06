@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PasswordInput from '../../_components/PasswordInput';
 import { validateRegisterForm } from '../../../../../utils/validation/form';
 import { Loader } from '@/components/Loader';
 import ErrorComponent from '@/components/ErrorComponent';
 import PhoneInput from '../../_components/PhoneInput';
-import SuccessModal from '../_components/SuccessModal';
 import PersonInput from '../_components/PersonInput';
 import DateInput from '../_components/DateInput';
 import SelectRegion from '../_components/SelectRegion';
@@ -19,6 +18,9 @@ import RegFormFooter from '../_components/RegFormFooter';
 import { initialRegFormData } from '@/constants/regFormData';
 import { RegFormData } from '@/types/regFormData';
 import { AuthFormLayout } from '../../_components/AuthFormLayout';
+import { useRegFormContext } from '@/app/contexts/RegFormContext';
+import { useRouter } from 'next/navigation';
+import VerificationMethodModal from '../_components/VerificationMethodModal';
 
 const RegisterPage = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +33,15 @@ const RegisterPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [invalidFormMessage, setInvalidFormMessage] = useState('');
 	const [isSuccess, setIsSuccess] = useState(false);
+	const { setRegFormData } = useRegFormContext();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (isSuccess && !registerForm.email) {
+			router.replace('/verify/verify-phone');
+		}
+	}, [isSuccess, registerForm.email, router]);
+
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
@@ -72,20 +83,14 @@ const RegisterPage = () => {
 		try {
 			const [day, month, year] = registerForm.birthdayDate.split('.');
 			const formattedBirthdayDate = new Date(`${year}-${month}-${day}`);
+
 			const userData = {
 				...registerForm,
 				phone: registerForm.phone.replace(/\D/g, ''),
-				birthdayDate: formattedBirthdayDate,
+				birthdayDate: formattedBirthdayDate.toISOString(),
 			};
-			const res = await fetch('/api/register', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(userData),
-			});
-			if (!res.ok) {
-				const data = await res.json();
-				throw new Error(data.message || 'Ошибка регистрации');
-			}
+			//когда данные готовы, кидаем в контекст/нужны в  betterAuth
+			setRegFormData(userData);
 			setIsSuccess(true);
 		} catch (error) {
 			setError({
@@ -110,7 +115,7 @@ const RegisterPage = () => {
 				userMessage={error.userMessage}
 			/>
 		);
-	if (isSuccess) return <SuccessModal />;
+	if (isSuccess && registerForm.email) return <VerificationMethodModal />;
 	return (
 		<AuthFormLayout variant="register">
 			<h1 className="text-2xl font-bold text-center mb-10">

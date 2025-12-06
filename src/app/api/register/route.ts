@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 			surname,
 			firstName,
 			password: hashedPassword,
-			birthdayDate,
+			birthdayDate: new Date(birthdayDate),
 			region,
 			location,
 			gender,
