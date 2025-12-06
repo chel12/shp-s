@@ -1,4 +1,3 @@
-
 import VerifyEmail from '@/app/(auth)/(reg)/_components/VerifyEmail';
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
@@ -6,7 +5,7 @@ import { MongoClient } from 'mongodb';
 import { Resend } from 'resend';
 
 const client = new MongoClient(process.env.DELIVERY_SHOP_DB_URL!);
-const db = client.db('delivery-shop');
+const db = client.db('deliveryshop');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({

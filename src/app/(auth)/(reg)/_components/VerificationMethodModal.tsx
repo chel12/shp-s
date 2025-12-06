@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export default function VerificationMethodModal() {
 	const { regFormData } = useRegFormContext();
-	const { phone, email } = regFormData;
+	const { phoneNumber, email } = regFormData;
 
 	const iconContainerStyles = `
     p-3 mb-4 rounded-full bg-[#FFF2ED] 
@@ -40,7 +40,7 @@ export default function VerificationMethodModal() {
 								По SMS на телефон
 							</span>
 							<span className="text-sm text-gray-500 mt-1">
-								+{phone}
+								+{phoneNumber}
 							</span>
 							<div className="absolute top-0 right-0 -mt-2 -mr-2">
 								<span className="flex h-4 w-4">

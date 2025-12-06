@@ -86,7 +86,7 @@ const RegisterPage = () => {
 
 			const userData = {
 				...registerForm,
-				phone: registerForm.phone.replace(/\D/g, ''),
+				phoneNumber: registerForm.phoneNumber.replace(/\D/g, ''),
 				birthdayDate: formattedBirthdayDate.toISOString(),
 			};
 			//когда данные готовы, кидаем в контекст/нужны в  betterAuth
@@ -131,7 +131,7 @@ const RegisterPage = () => {
 				<div className="w-full flex flex-row flex-wrap justify-center gap-x-8 gap-y-4">
 					<div className="flex flex-col gap-y-4 items-start">
 						<PhoneInput
-							value={registerForm.phone}
+							value={registerForm.phoneNumber}
 							onChangeAction={handleChange}
 						/>
 						<PersonInput
@@ -141,9 +141,9 @@ const RegisterPage = () => {
 							onChange={handleChange}
 						/>
 						<PersonInput
-							id="firstName"
+							id="name"
 							label="Имя"
-							value={registerForm.firstName}
+							value={registerForm.name}
 							onChange={handleChange}
 						/>
 						<PasswordInput

@@ -1,7 +1,7 @@
 export interface RegFormData {
-	phone: string;
+	phoneNumber: string;
 	surname: string;
-	firstName: string;
+	name: string;
 	password: string;
 	confirmPassword: string;
 	birthdayDate: string;

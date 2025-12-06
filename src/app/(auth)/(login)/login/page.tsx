@@ -12,7 +12,7 @@ import { AuthFormLayout } from '../../_components/AuthFormLayout';
 import PasswordInput from '../../_components/PasswordInput';
 
 const initialFormData = {
-	phone: '+7',
+	phoneNumber: '+7',
 	password: '',
 };
 
@@ -43,7 +43,7 @@ const LoginPage = () => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					phone: formData.phone.replace(/\D/g, ''),
+					phoneNumber: formData.phoneNumber.replace(/\D/g, ''),
 					password: formData.password,
 				}),
 			});
@@ -89,7 +89,7 @@ const LoginPage = () => {
 				<div className="w-full flex flex-row flex-wrap justify-center gap-x-8 gap-y-4">
 					<div className="flex flex-col gap-y-4 items-start">
 						<PhoneInput
-							value={formData.phone}
+							value={formData.phoneNumber}
 							onChangeAction={handleChange}
 						/>
 						<PasswordInput
@@ -107,10 +107,10 @@ const LoginPage = () => {
 				<button
 					type="submit"
 					disabled={
-						!(formData.phone && formData.password) || isLoading
+						!(formData.phoneNumber && formData.password) || isLoading
 					}
 					className={`${buttonStyles.base} ${
-						formData.phone && formData.password
+						formData.phoneNumber && formData.password
 							? buttonStyles.active
 							: buttonStyles.inactive
 					}`}>
