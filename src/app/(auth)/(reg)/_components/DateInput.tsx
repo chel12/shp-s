@@ -1,10 +1,11 @@
 'use client';
 
 import { ChangeEvent, useState } from 'react';
-import { formStyles } from '../styles';
-import Tooltip from './Tooltip';
-import { validateBirthDate } from '../../../../utils/validation/validateBirthDate';
+import Tooltip from '../../_components/Tooltip';
+
 import Image from 'next/image';
+import { validateBirthDate } from '../../../../../utils/validation/validateBirthDate';
+import { formStyles } from '../../styles';
 
 interface DateInputProps {
 	value: string;

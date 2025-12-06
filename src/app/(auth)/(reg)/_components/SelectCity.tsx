@@ -1,37 +1,38 @@
 'use client';
 
 import { ChangeEvent } from 'react';
-import { formStyles } from '../styles';
-import { regions } from '@/data/regions';
-import Image from 'next/image';
 
-interface SelectRegionProps {
+
+import Image from 'next/image';
+import { cities } from '@/data/cities';
+import { formStyles } from '../../styles';
+
+interface SelectCityProps {
 	value: string;
 	onChangeAction: (e: ChangeEvent<HTMLSelectElement>) => void;
 }
-
-const SelectRegion = ({ value, onChangeAction }: SelectRegionProps) => {
+const SelectCity = ({ value, onChangeAction }: SelectCityProps) => {
 	return (
 		<div>
-			<label htmlFor="region" className={formStyles.label}>
-				Регион
+			<label htmlFor="location" className={formStyles.label}>
+				Город
 			</label>
 			<div className="relative">
 				<select
 					value={value}
-					id="region"
+					id="location"
 					onChange={onChangeAction}
 					className={`${formStyles.input} appearance-none pr-8 cursor-pointer`}>
-					{regions.map((region) => (
-						<option key={region.value}>{region.label}</option>
+					{cities.map((city) => (
+						<option key={city.value}>{city.label}</option>
 					))}
 				</select>
 				<div
 					className="absolute right-2 top-2 transform -transform-y-1/2 
-				pointer-events-none">
+					pointer-events-none">
 					<Image
 						src="/icons-products/icon-arrow-right.svg"
-						alt="Выберите регион"
+						alt="Выберите Город"
 						width={24}
 						height={24}
 						className="rotate-90"
@@ -42,4 +43,4 @@ const SelectRegion = ({ value, onChangeAction }: SelectRegionProps) => {
 	);
 };
 
-export default SelectRegion;
+export default SelectCity;
