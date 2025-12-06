@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import PhoneInput from '../PhoneInput';
 import PersonInput from '../PersonInput';
-import PasswordInput from '../PasswordInput';
+import PasswordInput from '../../PasswordInput';
 import DateInput from '../DateInput';
 import SelectRegion from '../SelectRegion';
 import SelectCity from '../SelectCity';
@@ -18,6 +17,7 @@ import { validateRegisterForm } from '../../../../../utils/validation/form';
 import { Loader } from '@/components/Loader';
 import ErrorComponent from '@/components/ErrorComponent';
 import SuccessModal from '../SuccessModal';
+import PhoneInput from '../../PhoneInput';
 
 const initialFormData = {
 	phone: '+7',
@@ -97,7 +97,7 @@ const RegisterPage = () => {
 				phone: formData.phone.replace(/\D/g, ''),
 				birthdayDate: formattedBirthdayDate,
 			};
-			const res = await fetch('api/register', {
+			const res = await fetch('/api/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(userData),

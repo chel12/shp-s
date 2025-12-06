@@ -1,8 +1,8 @@
 'use client';
 
 import { ChangeEvent } from 'react';
-import { formStyles } from '../styles';
 import { InputMask } from '@react-input/mask';
+import { formStyles } from './styles';
 
 interface PhoneInputProps {
 	value: string;
