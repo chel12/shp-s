@@ -104,7 +104,7 @@ const RegisterPage = () => {
 			});
 			if (!res.ok) {
 				const data = await res.json();
-				throw new Error(data.error || 'Ошибка регистрации');
+				throw new Error(data.message || 'Ошибка регистрации');
 			}
 			setIsSuccess(true);
 		} catch (error) {
