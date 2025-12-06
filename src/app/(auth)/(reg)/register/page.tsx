@@ -90,9 +90,12 @@ const RegisterPage = () => {
 		}
 
 		try {
+			const [day, month, year] = formData.birthdayDate.split('.');
+			const formattedBirthdayDate = new Date(`${year}-${month}-${day}`);
 			const userData = {
 				...formData,
 				phone: formData.phone.replace(/\D/g, ''),
+				birthdayDate: formattedBirthdayDate,
 			};
 			const res = await fetch('api/register', {
 				method: 'POST',
@@ -250,7 +253,10 @@ const RegisterPage = () => {
 							{invalidFormMessage}
 						</div>
 					)}
-					<RegFormFooter isFormValid={isFormValid()} />
+					<RegFormFooter
+						isFormValid={isFormValid()}
+						isLoading={isLoading}
+					/>
 				</form>
 			</div>
 		</div>
