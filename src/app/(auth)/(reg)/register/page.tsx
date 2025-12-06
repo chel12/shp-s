@@ -17,6 +17,7 @@ import RegFormFooter from '../RegFormFooter';
 import { validateRegisterForm } from '../../../../../utils/validation/form';
 import { Loader } from '@/components/Loader';
 import ErrorComponent from '@/components/ErrorComponent';
+import SuccessModal from '../SuccessModal';
 
 const initialFormData = {
 	phone: '+7',
@@ -42,6 +43,7 @@ const RegisterPage = () => {
 	const [formData, setFormData] = useState(initialFormData);
 	const [showPassword, setShowPassword] = useState(false);
 	const [invalidFormMessage, setInvalidFormMessage] = useState('');
+	const [isSuccess, setIsSuccess] = useState(false);
 	const router = useRouter();
 
 	const handleClose = () => {
@@ -86,6 +88,33 @@ const RegisterPage = () => {
 			setIsLoading(false);
 			return;
 		}
+
+		try {
+			const userData = {
+				...formData,
+				phone: formData.phone.replace(/\D/g, ''),
+			};
+			const res = await fetch('api/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(userData),
+			});
+			if (!res.ok) {
+				const data = await res.json();
+				throw new Error(data.error || 'Ошибка регистрации');
+			}
+			setIsSuccess(true);
+		} catch (error) {
+			setError({
+				error:
+					error instanceof Error
+						? error
+						: new Error('Неизвестная ошибка'),
+				userMessage: 'Ошибка регистрации. Попробуйте снова',
+			});
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const isFormValid = () => validateRegisterForm(formData).isValid;
@@ -98,6 +127,7 @@ const RegisterPage = () => {
 				userMessage={error.userMessage}
 			/>
 		);
+	if (isSuccess) return <SuccessModal />;
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center bg-[#fcd5bacc] min-h-screen text-[#414141]">
 			<div className="bg-white rounded shadow-(--shadow-auth-form) w-full max-w-[687px] max-h-[100vh] overflow-y-auto">
