@@ -24,7 +24,8 @@
     "rc-slider": "^11.1.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "resend": "^6.5.2"
+    "resend": "^6.5.2",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

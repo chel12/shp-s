@@ -20,6 +20,7 @@ export async function POST(request: Request) {
 		//иначе true
 		return NextResponse.json({
 			exists: true,
+			userName: user.name,
 		});
 	} catch (error) {
 		console.error('Ошибка проверки телефона:', error);
