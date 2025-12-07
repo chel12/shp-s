@@ -12,7 +12,6 @@ import { MailWarning, PhoneOff } from 'lucide-react';
 import { UnverifiedEmail } from './_components/UnverifiedEmail';
 import { AuthMethodSelector } from './_components/AuthMethodSelector';
 
-
 const EnterLoginPage = () => {
 	const [login, setLogin] = useState('');
 	const [loginType, setLoginType] = useState<'email' | 'phone'>('email');
@@ -37,7 +36,13 @@ const EnterLoginPage = () => {
 		setLogin(value);
 		setError(null);
 	};
-
+	const handleForgotPassword = () => {
+		if (loginType === 'phone') {
+			router.replace(`/phone-pass-reset`);
+		} else {
+			router.replace('/forgot-password');
+		}
+	};
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
@@ -245,11 +250,12 @@ const EnterLoginPage = () => {
 						className={`${formStyles.loginLink} w-auto px-2`}>
 						Регистрация
 					</Link>
-					<Link
-						href="/forgot-password"
-						className="h-8 text-[#414141] hover:text-black w-30 flex items-center justify-center duration-300">
+					<button
+						onClick={handleForgotPassword}
+						className="h-8 text-[#414141] hover:text-black w-30 flex 
+						items-center justify-center duration-300 cursor-pointer">
 						Забыли пароль?
-					</Link>
+					</button>
 				</div>
 			</form>
 		</AuthFormLayout>
