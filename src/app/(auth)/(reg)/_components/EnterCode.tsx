@@ -8,7 +8,6 @@ import { buttonStyles } from '../../styles';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import useTimer from '@/hooks/useTimer';
-import { AuthFormLayout } from '../../_components/AuthFormLayout';
 import { LoadingContent } from './LoadingContent';
 import OTPResendCode from '../../_components/OTPResendButton';
 
@@ -115,9 +114,9 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 	};
 	if (isLoading) {
 		return (
-			<AuthFormLayout>
+		
 				<LoadingContent title={'Проверяем код...'} />
-			</AuthFormLayout>
+			
 		);
 	}
 
