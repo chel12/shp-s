@@ -78,7 +78,7 @@ const ProfilePage = () => {
 						<div className="p-6 md:p-8">
 							<div className="flex items-center justify-center mb-6">
 								<div className="bg-primary text-white px-3 py-1 rounded-full text-sm flex items-center">
-									{!isPhoneRegistration ? (
+									{isPhoneRegistration ? (
 										<>
 											<Phone className="h-4 w-4 mr-1" />
 											<span>
