@@ -16,9 +16,25 @@ const Profile = () => {
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	//если мобилка чтобы ui изменить
 	const [isMobile, setIsMobile] = useState(false);
+	//для аватарки
+	const [avatarSrc, setAvatarSrc] = useState<string>('');
+	const [lastUpdate, setLastUpdate] = useState(Date.now());
+
 	//реф для закрытия при клике вне меню
 	const menuRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
+
+	useEffect(() => {
+		setLastUpdate(Date.now());
+	}, [user]);
+
+	useEffect(() => {
+		if (user?.id) {
+			setAvatarSrc(`/api/auth/avatar/${user.id}?t=${lastUpdate}`);
+		} else if (user?.gender) {
+			setAvatarSrc(getAvatarByGender(user.gender));
+		}
+	}, [user, lastUpdate]);
 
 	useEffect(() => {
 		checkAuth();
@@ -31,7 +47,7 @@ const Profile = () => {
 		window.addEventListener('resize', checkMobile);
 		return () => window.removeEventListener('resize', checkMobile);
 	}, []);
-	
+
 	//закрытие меню вне клика на нём
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -60,6 +76,12 @@ const Profile = () => {
 		} finally {
 			setIsLoggingOut(false);
 			setIsMenuOpen(false);
+		}
+	};
+
+	const handleAvatarError = () => {
+		if (user?.gender) {
+			setAvatarSrc(getAvatarByGender(user.gender));
 		}
 	};
 
@@ -93,10 +115,11 @@ const Profile = () => {
 				className="flex items-center gap-2.5 cursor-pointer"
 				onClick={toggleMenu}>
 				<Image
-					src={getAvatarByGender(user?.gender)}
+					src={avatarSrc || getAvatarByGender(user?.gender)}
 					alt="Ваш профиль"
 					width={40}
 					height={40}
+					onError={handleAvatarError}
 					className="min-w-10 min-h-10 md:block xl:block rounded-full object-cover"
 				/>
 				<p className="hidden xl:block cursor-pointer p-2.5">
