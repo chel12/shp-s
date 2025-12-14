@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '../../../../../utils/api-routes';
 import { CONFIG } from '../../../../../config/config';
+import { getShortDecimalId } from '../../../../../utils/admin/shortDecimalId';
+import { calculateAge } from '../../../../../utils/admin/calculateAge';
 
 interface UserFilter {
 	region?: string;

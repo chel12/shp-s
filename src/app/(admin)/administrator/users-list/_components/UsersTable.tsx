@@ -1,4 +1,7 @@
 import { UserData } from '@/types/userData';
+import TableRow from './TableRow';
+import { getShortDecimalId } from '../../../../../../utils/admin/shortDecimalId';
+import { calculateAge } from '../../../../../../utils/admin/calculateAge';
 
 interface UsersTableProps {
 	users: UserData[];
