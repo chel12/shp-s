@@ -12,6 +12,7 @@ import ProfileAvatar from '../_components/ProfileAvatar';
 import LocationSection from '../_components/LocationSection';
 import ProfileEmail from '../_components/ProfileEmail';
 import ProfilePhoneSetting from '../_components/ProfilePhone/ProfilePhoneSetting';
+import ProfilePassword from '../_components/ProfilePassword';
 
 const ProfilePage = () => {
 	const { user, isAuth, checkAuth } = useAuthStore();
@@ -93,6 +94,9 @@ const ProfilePage = () => {
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<ProfileEmail />
 						<ProfilePhoneSetting />
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<ProfilePassword />
 					</div>
 					<SecuritySection />
 				</div>
