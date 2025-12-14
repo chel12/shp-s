@@ -16,7 +16,7 @@ export const SuccessChangeEmail = ({
 	return (
 		<div className="space-y-6 flex flex-col items-center">
 			<div className="flex flex-col items-center text-center space-y-4">
-				<div className="p-3 bg-(--color-primary) rounded-full">
+				<div className="p-3 bg-primary rounded-full">
 					<MailCheck className="h-8 w-8 text-white" />
 				</div>
 				<div className="space-y-2">

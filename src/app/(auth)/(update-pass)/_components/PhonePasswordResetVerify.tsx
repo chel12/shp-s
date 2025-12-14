@@ -136,7 +136,8 @@ export const PhonePasswordResetVerify = ({
 				</p>
 
 				{error && (
-					<div className="p-3 bg-red-100 text-red-700 rounded text-sm 
+					<div
+						className="p-3 bg-red-100 text-red-700 rounded text-sm 
 					text-center">
 						{error}
 					</div>
@@ -156,7 +157,7 @@ export const PhonePasswordResetVerify = ({
 				<button
 					type="button"
 					onClick={onBackAction}
-					className="text-(--color-primary) hover:underline text-sm mx-auto 
+					className="text-primary hover:underline text-sm mx-auto 
 					cursor-pointer">
 					Изменить номер телефона
 				</button>
@@ -185,7 +186,8 @@ export const PhonePasswordResetVerify = ({
 							/>
 						</div>
 
-						<div className="w-full flex flex-row flex-wrap justify-center 
+						<div
+							className="w-full flex flex-row flex-wrap justify-center 
 						gap-x-8 gap-y-4 relative">
 							<div className="flex flex-col items-start relative">
 								<PasswordInput

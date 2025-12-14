@@ -86,7 +86,7 @@ export const DeleteAccountVerificationStep = ({
 					<button
 						onClick={onResend}
 						disabled={!canResend}
-						className="text-[#414141] hover:text-black text-sm underline duration-300 cursor-pointer disabled:opacity-50">
+						className="text-main-text hover:text-black text-sm underline duration-300 cursor-pointer disabled:opacity-50">
 						{canResend
 							? 'Отправить код повторно'
 							: `Повторить отправку через: ${timeLeft} сек`}

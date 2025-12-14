@@ -13,7 +13,7 @@ const SearchInput = ({
 	return (
 		<div
 			className="raltive rounded border-1 
-			border-(--color-primary) shadow-(--shadow-button-default)
+			border-primary shadow-(--shadow-button-default)
 			leading-[150%]">
 			<form
 				onSubmit={(e) => {
@@ -25,7 +25,7 @@ const SearchInput = ({
 					value={query}
 					placeholder="Найти товар"
 					className="w-full h-10  p-2 outline-none   text-[#8f8f8f] text-base 
-					caret-(--color-primary)
+					caret-primary
 					"
 					onFocus={handleInputFocus}
 					onChange={(e) => setQuery(e.target.value)}

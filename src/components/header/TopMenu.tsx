@@ -23,7 +23,7 @@ const TopMenu = () => {
 					<IconMenuMob isCatalogPage={isCatalogPage} />
 					<span
 						className={
-							isCatalogPage ? 'text-[#ff6633]' : 'text-[#414141]'
+							isCatalogPage ? 'text-[#ff6633]' : 'text-main-text'
 						}>
 						Каталог
 					</span>

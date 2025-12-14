@@ -47,12 +47,10 @@ const SecuritySection: React.FC = () => {
 		setShowDeleteConfirm(false);
 	};
 
-	
-
 	return (
 		<>
 			<div className="border-t pt-8">
-				<h2 className="text-2xl font-bold text-[#414141] mb-6">
+				<h2 className="text-2xl font-bold text-main-text mb-6">
 					Безопасность
 				</h2>
 				{error && (

@@ -1,5 +1,4 @@
-import CloseButton from "./CloseButton";
-
+import CloseButton from './CloseButton';
 
 type AuthFormVariant = 'register' | 'default';
 
@@ -10,8 +9,9 @@ export const AuthFormLayout = ({
 	children: React.ReactNode;
 	variant?: AuthFormVariant;
 }) => (
-	<div className="absolute inset-0 z-100 flex items-center justify-center 
-	bg-[#fcd5bacc] min-h-screen text-[#414141] py-10 px-3 backdrop-blur-sm">
+	<div
+		className="absolute inset-0 z-100 flex items-center justify-center 
+	bg-[#fcd5bacc] min-h-screen text-main-text py-10 px-3 backdrop-blur-sm">
 		<div
 			className={`${
 				variant === 'register' ? 'max-w-[687px]' : 'max-w-105'
