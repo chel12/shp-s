@@ -80,8 +80,6 @@ const EnterPasswordContent = () => {
 					throw new Error(data.message || 'Ошибка при входе');
 				}
 
-	
-
 				login();
 
 				router.replace('/');
@@ -94,17 +92,25 @@ const EnterPasswordContent = () => {
 					},
 					{
 						onSuccess: () => {
-				//login в сторе zustand вызывает получение данных из БД
+							//login в сторе zustand вызывает получение данных из БД
 							login();
 							router.replace('/');
 						},
 						onError: (ctx) => {
-							setError(ctx.error?.message || 'Ошибка при входе');
+							if (
+								ctx.error?.message.includes(
+									'Invalid email or password'
+								)
+							) {
+								setError('Неверный пароль');
+							} else {
+								setError(
+									ctx.error?.message || 'Ошибка при входе'
+								);
+							}
 						},
 					}
 				);
-
-				router.replace('/');
 			}
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
