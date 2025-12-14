@@ -12,7 +12,6 @@ import { LoadingContent } from './LoadingContent';
 import OTPResendCode from '../../_components/OTPResendButton';
 import { CONFIG } from '../../../../../config/config';
 
-
 export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 	const [code, setCode] = useState('');
 	const [error, setError] = useState('');
@@ -64,8 +63,27 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 				throw new Error(errorData.error || 'Ошибка установки пароля');
 			}
 			//теперь надо вызвать метод обнов пользователя  из betterAuthCLient
+			// После установки пароля, обновляем дополнительные поля пользователя
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const updateData: any = {
+				name: regFormData.name, // если name есть в regFormData
+				phoneNumber: phoneNumber, // телефон уже верифицирован
+			};
+
+			// Добавляем только те поля, которые определены в additionalFields
+			if (regFormData.surname) updateData.surname = regFormData.surname;
+			if (regFormData.birthdayDate)
+				updateData.birthdayDate = regFormData.birthdayDate;
+			if (regFormData.region) updateData.region = regFormData.region;
+			if (regFormData.location)
+				updateData.location = regFormData.location;
+			if (regFormData.gender) updateData.gender = regFormData.gender;
+			if (regFormData.card) updateData.card = regFormData.card;
+			if (regFormData.hasCard !== undefined)
+				updateData.hasCard = regFormData.hasCard;
+
 			const { error: updateError } =
-				await authClient.updateUser(regFormData);
+				await authClient.updateUser(updateData);
 			//если там ошибка то на верх её прокинуть
 			if (updateError) throw updateError;
 			//если всё чётко то го на страницу авторизации
@@ -112,11 +130,7 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 		}
 	};
 	if (isLoading) {
-		return (
-		
-				<LoadingContent title={'Проверяем код...'} />
-			
-		);
+		return <LoadingContent title={'Проверяем код...'} />;
 	}
 
 	return (
