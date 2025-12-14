@@ -7,6 +7,8 @@ import { MongoClient } from 'mongodb';
 import { Resend } from 'resend';
 import { CONFIG } from '../../config/config';
 import EmailChangeVerification from '@/app/(user-profile)/_components/EmailChangeVerification';
+import DeleteVerify from '@/app/(auth)/(reg)/_components/DeleteVerify';
+import { deleteUserAvatarFromGridFS } from '../../utils/deleteUserAvatar';
 
 const client = new MongoClient(process.env.DELIVERY_SHOP_DB_URL!);
 const db = client.db('deliveryshop');
@@ -113,6 +115,30 @@ export const auth = betterAuth({
 						verificationUrl: url,
 					}),
 				});
+			},
+		},
+		deleteUser: {
+			enabled: true,
+			sendDeleteAccountVerification: async ({
+				user,
+				url,
+			}: {
+				user: { email: string; name: string };
+				url: string;
+			}) => {
+				await resend.emails.send({
+					from: 'Северяночка <onboarding@resend.dev>',
+					to: user.email,
+					subject: 'Удаление аккаунта',
+					react: DeleteVerify({
+						username: user.name,
+						verifyUrl: url,
+					}),
+				});
+			},
+			//юзер удалился? так удали его аватр из БД!
+			afterDelete: async (user) => {
+				await deleteUserAvatarFromGridFS(user.id);
 			},
 		},
 		additionalFields: {
