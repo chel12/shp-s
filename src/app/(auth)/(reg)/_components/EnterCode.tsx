@@ -64,26 +64,15 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 			}
 			//теперь надо вызвать метод обнов пользователя  из betterAuthCLient
 			// После установки пароля, обновляем дополнительные поля пользователя
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const updateData: any = {
-				name: regFormData.name, // если name есть в regFormData
-				phoneNumber: phoneNumber, // телефон уже верифицирован
-			};
 
-			// Добавляем только те поля, которые определены в additionalFields
-			if (regFormData.surname) updateData.surname = regFormData.surname;
-			if (regFormData.birthdayDate)
-				updateData.birthdayDate = regFormData.birthdayDate;
-			if (regFormData.region) updateData.region = regFormData.region;
-			if (regFormData.location)
-				updateData.location = regFormData.location;
-			if (regFormData.gender) updateData.gender = regFormData.gender;
-			if (regFormData.card) updateData.card = regFormData.card;
-			if (regFormData.hasCard !== undefined)
-				updateData.hasCard = regFormData.hasCard;
-
+			let userDataToUpdate = { ...regFormData };
+			if (verifyData.user.phoneNumberVerified) {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { email, ...rest } = userDataToUpdate;
+				userDataToUpdate = rest as typeof regFormData;
+			}
 			const { error: updateError } =
-				await authClient.updateUser(updateData);
+				await authClient.updateUser(userDataToUpdate);
 			//если там ошибка то на верх её прокинуть
 			if (updateError) throw updateError;
 			//если всё чётко то го на страницу авторизации
