@@ -1,13 +1,14 @@
 import { useAuthStore } from '@/store/authStore';
 
 import { formStyles, profileStyles } from '@/app/(auth)/styles';
-import { Mail, Edit, AlertCircle } from 'lucide-react';
+import { Mail, Edit } from 'lucide-react';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { CONFIG } from '../../../../config/config';
 import { AuthFormLayout } from '@/app/(auth)/_components/AuthFormLayout';
 
 import { authClient } from '@/lib/auth-client';
 import { SuccessChangeEmail } from './SuccessChangeEmail';
+import AlertMessage from './AlerMessage';
 
 const ProfileEmail = () => {
 	//переключение кнопок
@@ -66,22 +67,7 @@ const ProfileEmail = () => {
 		try {
 			//если зареган по телефону
 			if (isPhoneRegistered) {
-				const response = await fetch('/api/auth/update-email', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email, userId: user.id }),
-				});
-
-				const data = await response.json();
-
-				if (!response.ok) {
-					setError(data.error);
-					return;
-				}
-				//обнова данных юзера
-				await fetchUserData();
-				alert('Email успешно обновлен!');
-				setIsEditing(false);
+				await updateEmailDirectly();
 			} else {
 				//если почта то методы беттер ауф
 				const response = await authClient.changeEmail({
@@ -117,9 +103,28 @@ const ProfileEmail = () => {
 			setIsSaving(false);
 		}
 	};
+
 	{
 		/*сообщение об успешной операции тем кто по емаил зареган*/
 	}
+	const updateEmailDirectly = async () => {
+		const response = await fetch('/api/auth/update-email', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email, userId: user?.id }),
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			setError(data.error);
+			return;
+		}
+		//обнова данных юзера
+		await fetchUserData();
+		alert('Email успешно обновлен!');
+		setIsEditing(false);
+	};
 	if (showSuccess) {
 		return (
 			<AuthFormLayout>
@@ -157,42 +162,6 @@ const ProfileEmail = () => {
 					</div>
 				)}
 			</div>
-			{/*когда нет почты и состояние не редактируется*/}
-			{hasNoEmail && !isEditing && (
-				<div className="flex items-center bg-amber-50 text-amber-700 px-3 py-2 rounded-lg mb-3">
-					<AlertCircle className="h-4 w-4 mr-2" />
-					<span className="text-sm">
-						Рекомендуем добавить email для получения уведомлений
-					</span>
-				</div>
-			)}
-			{/*когда зареган по телефону и происходит редактирование */}
-			{isEditing && isPhoneRegistered && (
-				<div className="flex items-center bg-green-50 text-primary px-3 py-2 rounded-lg mb-3">
-					<AlertCircle className="h-4 w-4 mr-2" />
-					<span className="text-sm">
-						Вы можете изменить email без подтверждения, так как были
-						зарегистрированы по телефону
-					</span>
-				</div>
-			)}
-			{/*зареган по емаил и в состояние редакирования*/}
-			{isEditing && !isPhoneRegistered && (
-				<div className="flex items-center bg-orange-50 text-[#ff6633] px-3 py-2 rounded-lg mb-3">
-					<AlertCircle className="h-4 w-4 mr-2" />
-					<span className="text-sm">
-						Для смены email потребуется подтверждение на прежнем и
-						новом адресах.
-					</span>
-				</div>
-			)}
-
-			{error && (
-				<div className="flex items-center bg-red-50 text-red-700 px-3 py-2 rounded-lg mb-3">
-					<AlertCircle className="h-4 w-4 mr-2" />
-					<span className="text-sm">{error}</span>
-				</div>
-			)}
 
 			<div className={profileStyles.inputContainer}>
 				<input
@@ -206,6 +175,55 @@ const ProfileEmail = () => {
 				/>
 				<Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
 			</div>
+			{/*когда нет почты и состояние не редактируется*/}
+			{hasNoEmail && !isEditing && (
+				<AlertMessage
+					type="warning"
+					message="Рекомендуем добавить email для получения уведомлений"
+				/>
+				// <div className="flex items-center bg-amber-50 text-amber-700 px-3 py-2 rounded mt-3">
+				// 	<AlertCircle className="h-4 w-4 mr-2" />
+				// 	<span className="text-sm">
+				// 		Рекомендуем добавить email для получения уведомлений
+				// 	</span>
+				// </div>
+			)}
+			{/*когда зареган по телефону и происходит редактирование */}
+			{isEditing && isPhoneRegistered && (
+				<AlertMessage
+					type="success"
+					message="Вы можете изменить email без подтверждения, так как были зарегистрированы по телефону"
+				/>
+				// <div className="flex items-center bg-green-50 text-primary px-3 py-2 rounded mt-3">
+				// 	<AlertCircle className="h-4 w-4 mr-2" />
+				// 	<span className="text-sm">
+				// 		Вы можете изменить email без подтверждения, так как были
+				// 		зарегистрированы по телефону
+				// 	</span>
+				// </div>
+			)}
+			{/*зареган по емаил и в состояние редакирования*/}
+			{isEditing && !isPhoneRegistered && (
+				<AlertMessage
+					type="success"
+					message="Для смены email потребуется подтверждение на прежнем и новом адресах."
+				/>
+				// <div className="flex items-center bg-orange-50 text-[#ff6633] px-3 py-2 rounded mt-3">
+				// 	<AlertCircle className="h-4 w-4 mr-2" />
+				// 	<span className="text-sm">
+				// 		Для смены email потребуется подтверждение на прежнем и
+				// 		новом адресах.
+				// 	</span>
+				// </div>
+			)}
+
+			{error && (
+				<AlertMessage type="error" message={error} />
+				// <div className="flex items-center bg-red-50 text-red-700 px-3 py-2 rounded mt-3">
+				// 	<AlertCircle className="h-4 w-4 mr-2" />
+				// 	<span className="text-sm">{error}</span>
+				// </div>
+			)}
 		</div>
 	);
 };

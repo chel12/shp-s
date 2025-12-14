@@ -10,20 +10,19 @@ import { useRouter } from 'next/navigation';
 import useTimer from '@/hooks/useTimer';
 import { LoadingContent } from './LoadingContent';
 import OTPResendCode from '../../_components/OTPResendButton';
+import { CONFIG } from '../../../../../config/config';
 
-const MAX_ATTEMPTS = 3;
-const TIMEOUT_PERIOD = 180;
 
 export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 	const [code, setCode] = useState('');
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-	const [attemptsLeft, setAttemptsLeft] = useState(MAX_ATTEMPTS);
+	const [attemptsLeft, setAttemptsLeft] = useState(CONFIG.MAX_ATTEMPTS);
 	const { regFormData } = useRegFormContext();
 	//timeLeft - сколько осталось времени
 	//canResend - можно отправлять или нет
 	//startTimer - старт таймера
-	const { timeLeft, canResend, startTimer } = useTimer(TIMEOUT_PERIOD);
+	const { timeLeft, canResend, startTimer } = useTimer(CONFIG.TIMEOUT_PERIOD);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -47,7 +46,7 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 
 			if (verifyError) throw verifyError;
 
-			setAttemptsLeft(MAX_ATTEMPTS);
+			setAttemptsLeft(CONFIG.MAX_ATTEMPTS);
 			//ещё и пароль надо проверять(с макета)
 			const passwordResponse = await fetch('/api/auth/set-password', {
 				method: 'POST',
@@ -98,7 +97,7 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 					onSuccess: () => {
 						startTimer();
 						setError('');
-						setAttemptsLeft(MAX_ATTEMPTS);
+						setAttemptsLeft(CONFIG.MAX_ATTEMPTS);
 					},
 					onError: (ctx) => {
 						setError(
