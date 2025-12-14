@@ -14,20 +14,7 @@
 
 import { create } from 'zustand';
 import { authClient } from '@/lib/auth-client';
-
-type UserData = {
-	id: string;
-	name: string;
-	surname: string;
-	email: string;
-	phoneNumber: string;
-	emailVerified: boolean;
-	phoneNumberVerified: boolean;
-	gender: string;
-	birthdayDate?: string;
-	location?: string;
-	region?: string;
-} | null;
+import { UserData } from '@/types/userData';
 
 type AuthState = {
 	isAuth: boolean;

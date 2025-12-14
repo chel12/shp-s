@@ -16,7 +16,7 @@ export function getCustomSessionToken(
 	cookieHeader: string | null
 ): string | null {
 	const cookies = (cookieHeader || '').split(';').map((c) => c.trim());
-	
+
 	return cookies.find((c) => c.startsWith('session='))?.split('=')[1] || null;
 }
 //быстрая проверка есть ли сессия в бд или нет, данные о сессии не возвращает
@@ -50,6 +50,7 @@ export async function getUserById(userId: string) {
 		birthdayDate: user.birthdayDate,
 		location: user.location,
 		region: user.region,
+		card: user.card,
 	};
 }
 
