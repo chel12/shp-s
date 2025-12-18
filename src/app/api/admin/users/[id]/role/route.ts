@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { ObjectId } from 'mongodb';
+import { getDB } from '../../../../../../../utils/api-routes';
 
 export async function POST(
 	request: NextRequest,

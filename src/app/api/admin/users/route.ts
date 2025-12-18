@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 			filter.region = managerRegion;
 			filter.location = managerLocation;
 		}
-
+		//1 по возрастанию, -1 по убыванию
 		const sortOptions: { [key: string]: 1 | -1 } = {};
 		sortOptions[sortBy] = sortDirection === 'asc' ? 1 : -1;
 		//получаем всех зеверей

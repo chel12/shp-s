@@ -17,7 +17,9 @@ const UsersList = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalUsers, setTotalUsers] = useState(0);
 	const [totalPages, setTotalPages] = useState(0);
+	//сортировка по чему
 	const [sortBy, setSortBy] = useState('createdAt');
+	//направление сортировки 
 	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<{
@@ -42,10 +44,13 @@ const UsersList = () => {
 	};
 	//сортировка
 	const handleSort = (field: string) => {
+		//приходит поле по которому происходит сортировка
+		//переключатель (тоглер)
 		const newDirection =
 			sortBy === field && sortDirection === 'desc' ? 'asc' : 'desc';
 		setSortBy(field);
 		setSortDirection(newDirection);
+		//возврат на первую страницу
 		setCurrentPage(1);
 	};
 

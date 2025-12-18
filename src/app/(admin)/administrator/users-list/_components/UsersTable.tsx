@@ -2,6 +2,7 @@ import { UserData } from '@/types/userData';
 import TableRow from './TableRow';
 import { getShortDecimalId } from '../../../../../../utils/admin/shortDecimalId';
 import { calculateAge } from '../../../../../../utils/admin/calculateAge';
+import TableHeader from './TableHeader';
 
 interface UsersTableProps {
 	users: UserData[];
@@ -23,7 +24,7 @@ const UsersTable = ({
 	onSort,
 }: UsersTableProps) => {
 	let sortedUsers = users;
-
+	//сортировка по айди
 	if (sortBy === 'id') {
 		sortedUsers = [...users].sort((a, b) => {
 			const decimalA = parseInt(getShortDecimalId(a.id));
@@ -34,7 +35,7 @@ const UsersTable = ({
 				: decimalB - decimalA;
 		});
 	}
-
+	//сортировка возраст
 	if (sortBy === 'age') {
 		sortedUsers = [...users].sort((a, b) => {
 			const ageA = parseInt(calculateAge(a.birthdayDate).toString());
