@@ -35,7 +35,7 @@ const ProductCard = ({
 		? basePrice
 		: calculatePriceByCard(finalPrice, cardDiscountPercent);
 
-	const ratingValue = rating?.rate || 5;
+	const ratingValue = rating?.average ?? 5.0;
 
 	return (
 		<div className="relative flex flex-col justify-between w-40 rounded overflow-hidden bg-white md:w-[224px] xl:w-[272px] h-[349px] align-top p-0 hover:shadow-(--shadow-article) duration-300">
