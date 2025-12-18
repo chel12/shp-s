@@ -37,15 +37,19 @@ export async function GET(request: NextRequest) {
 			filter.region = managerRegion;
 			filter.location = managerLocation;
 		}
+		//смещение (кол-во юзеров для игнора)
+		const offset = (page - 1) * limit;
 		//1 по возрастанию, -1 по убыванию
 		const sortOptions: { [key: string]: 1 | -1 } = {};
 		sortOptions[sortBy] = sortDirection === 'asc' ? 1 : -1;
 		//получаем всех зеверей
 		const users = await db
-			.collection('user')
-			.find(filter)
-			.sort(sortOptions)
-			.toArray();
+			.collection('user') //обращаемся к коллекции
+			.find(filter) //ищем по фильтру
+			.sort(sortOptions) //примянем сортировку
+			.skip(offset) // с какого пользователя извлекаем
+			.limit(limit) //какое кол-во
+			.toArray(); //превратить в массив
 		//общее кол-во зверей
 		const totalCount = await db.collection('user').countDocuments(filter);
 
@@ -78,6 +82,7 @@ export async function GET(request: NextRequest) {
 		return NextResponse.json({
 			users: formattedUsers,
 			totalCount,
+			totalPages: Math.ceil(totalCount / limit),
 		});
 	} catch (error) {
 		console.error('Ошибка при загрузке пользователей:', error);

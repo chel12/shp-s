@@ -3,6 +3,7 @@ import TableRow from './TableRow';
 import { getShortDecimalId } from '../../../../../../utils/admin/shortDecimalId';
 import { calculateAge } from '../../../../../../utils/admin/calculateAge';
 import TableHeader from './TableHeader';
+import Pagination from './Pagination';
 
 interface UsersTableProps {
 	users: UserData[];
@@ -56,6 +57,11 @@ const UsersTable = ({
 					<TableRow key={user.id} user={user} />
 				))}
 			</div>
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onPageChange={onPageChange}
+			/>
 		</div>
 	);
 };
