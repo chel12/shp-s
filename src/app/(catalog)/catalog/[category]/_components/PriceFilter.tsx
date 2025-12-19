@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { CONFIG } from '../../../../config/config';
+
 import { PriceFilterProps, PriceRange } from '@/types/priceTypes';
 import MiniLoader from '@/components/MiniLoader';
 import ErrorComponent from '@/components/ErrorComponent';
@@ -10,6 +10,7 @@ import PriceFilterHeader from './PriceFilterHeader';
 import PriceInputs from './PriceInputs';
 import PriceRangeSlider from './PriceRangeSlider';
 import InStockToggle from './inStockToggle';
+import { CONFIG } from '../../../../../../config/config';
 
 const PriceFilter = ({
 	basePath,

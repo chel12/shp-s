@@ -1,3 +1,4 @@
+
 import { PriceInputsProps } from '@/types/priceInputsProps';
 import Image from 'next/image';
 
