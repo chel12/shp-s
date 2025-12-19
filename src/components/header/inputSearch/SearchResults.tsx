@@ -21,7 +21,7 @@ const SearchResults = ({
 					<div key={group.category} className="flex flex-col gap-2">
 						<Link
 							//encodeURIComponent к строке приобразует
-							href={`/category/${encodeURIComponent(
+							href={`/catalog/${encodeURIComponent(
 								group.category
 							)}`}
 							onClick={resetSearch}
@@ -54,10 +54,11 @@ const SearchResults = ({
 									key={product.id}
 									className="p-1 hover:bg-gray-100">
 									<Link
-										href={`/product/${product.id}`}
+										href={`/catalog/${encodeURIComponent(
+											group.category
+										)}/${product.id}?desc=${encodeURIComponent(product.title.substring(0, 50))}`}
 										onClick={resetSearch}
 										className="cursor-pointer">
-										{product.title}
 										<HighlightText
 											text={product.title}
 											highlight={query}

@@ -1,13 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import iconToRight from '/public/icons-products/icon-arrow-right.svg';
 import { TRANSLATIONS } from '../../utils/translations';
 
 const Breadcrumbs = () => {
+
 	const pathname = usePathname();
+
+	const searchParams = useSearchParams();
 
 	if (pathname === '/' || pathname === '/search') return null;
 
@@ -15,11 +18,29 @@ const Breadcrumbs = () => {
 		.split('/')
 		.filter((segment) => segment !== '');
 
+	const productDesc = searchParams.get('desc');
+
 	const breadcrumbs = pathSegments.map((segment, index) => {
+		
 		const href = '/' + pathSegments.slice(0, index + 1).join('/');
+
+		let label = TRANSLATIONS[segment] || segment;
+
+		if (
+			index === pathSegments.length - 1 &&
+			productDesc &&
+			pathSegments.includes('catalog') &&
+			pathSegments.length >= 3
+		) {
+			label = productDesc;
+		}
+
 		return {
-			label: TRANSLATIONS[segment] || segment,
-			href,
+			label,
+			href:
+				index === pathSegments.length - 1
+					? `${href}?desc=${productDesc}`
+					: href,
 			isLast: index === pathSegments.length - 1,
 		};
 	});
