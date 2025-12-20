@@ -8,7 +8,6 @@ import PriceFilter from './_components/PriceFilter';
 import FilterControls from './_components/FilterControls';
 import fetchProductsByCategory from './fetchCategory';
 
-
 export async function generateMetadata({
 	params,
 }: {
@@ -52,12 +51,9 @@ const CategoryPage = async ({
 			mb-8 md:mb-10 xl:mb-15 max-w-[336px] md:max-w-max leading-[150%]">
 				{TRANSLATIONS[category] || category}
 			</h1>
-			<DropFilter
-				basePath={`/category/${category}`}
-				category={category}
-			/>
+			<DropFilter basePath={`/catalog/${category}`} category={category} />
 			<div className=" hidden xl:flex">
-				<FilterButtons basePath={`/category/${category}`} />
+				<FilterButtons basePath={`/catalog/${category}`} />
 			</div>
 
 			<div className="flex flex-row gap-x-10 justify-between">
@@ -66,13 +62,13 @@ const CategoryPage = async ({
 						Фильтр
 					</div>
 					<PriceFilter
-						basePath={`/category/${category}`}
+						basePath={`/catalog/${category}`}
 						category={category}
 					/>
 				</div>
 				<div className="flex flex-col">
 					<div className="hidden  xl:flex">
-						<FilterControls basePath={`/category/${category}`} />
+						<FilterControls basePath={`/catalog/${category}`} />
 					</div>
 
 					<Suspense fallback={<Loader />}>
