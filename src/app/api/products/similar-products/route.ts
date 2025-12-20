@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 					//фильтр по условиям
 					$match: {
 						categories: { $in: [category] },
-						id: { $ne: productId }, //искл текущ товар
+						id: { $ne: parseInt(productId) }, //искл текущ товар
 					},
 				},
 				{ $sample: { size: limit } }, //выбор случайных продуктов и лимит их
