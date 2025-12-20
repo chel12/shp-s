@@ -12,9 +12,8 @@ const ImagesBlock = ({ product }: { product: ProductCardProps }) => {
 						<Image
 							src={product.img}
 							alt={`${product.title} - миниатюра ${index + 1}`}
-							width={64}
-							height={86}
-							className="w-full h-full object-cover"
+							fill
+							className=" object-cover"
 							sizes="64px"
 						/>
 					</div>

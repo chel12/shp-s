@@ -48,7 +48,7 @@ const ProductPageContent = ({
 							alt="Избранное"
 							width={24}
 							height={24}
-							className="select-none"
+							className="select-none w-6 h-6"
 						/>
 						<p className="text-sm">В избранное</p>
 					</button>
