@@ -8,6 +8,7 @@ import ImagesBlock from './_components/ImagesBlock';
 import ProductOffer from './_components/ProductOffer';
 import CartButton from './_components/CartButton';
 import Bonuses from './_components/Bonuses';
+import DiscountMessage from './_components/DiscountMessage';
 
 interface ProductPageContentProps {
 	product: ProductCardProps;
@@ -62,6 +63,11 @@ const ProductPageContent = ({
 						/>
 						<CartButton />
 						<Bonuses bonus={bonusesAmount} />
+						<DiscountMessage
+							productId={productId.toString()}
+							productTitle={product.title}
+							currentPrice={discountedPrice.toString()}
+						/>
 					</div>
 				</div>
 				<div>
