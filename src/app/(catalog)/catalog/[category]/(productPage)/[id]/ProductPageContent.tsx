@@ -13,6 +13,8 @@ import AdditionalInfo from './_components/AdditionalInfo';
 import SimilarProducts from './_components/SimilarProducts';
 import SameBrandProducts from './_components/SameBrandProducts';
 import RatingDistribution from './_components/RatingDistribution';
+import ReviewsWrapper from './_components/ReviewsWrapper';
+import Actions from '@/app/(products)/Actions';
 
 interface ProductPageContentProps {
 	product: ProductCardProps;
@@ -90,8 +92,10 @@ const ProductPageContent = ({
 							averageRating={product.rating.rate}
 							distribution={product.rating.distribution}
 						/>
+						<ReviewsWrapper productId={productId} />
 					</div>
 				</div>
+				<Actions randomLimit={6} mobileItemsLimit={6} />
 			</div>
 		</div>
 	);
