@@ -21,5 +21,7 @@ export const TRANSLATIONS: Record<string, string> = {
   "user-profile":"Личный кабинет",
   "administrator":"Панель управления",
   "user-list":"Список пользователей",
-
+	"product":"Продукт",
+	"products":"Продукты",
+	"add-product":"Добавить товар",
 };
