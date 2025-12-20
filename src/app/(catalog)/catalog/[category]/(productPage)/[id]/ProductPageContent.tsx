@@ -11,6 +11,7 @@ import Bonuses from './_components/Bonuses';
 import DiscountMessage from './_components/DiscountMessage';
 import AdditionalInfo from './_components/AdditionalInfo';
 import SimilarProducts from './_components/SimilarProducts';
+import SameBrandProducts from './_components/SameBrandProducts';
 
 interface ProductPageContentProps {
 	product: ProductCardProps;
@@ -76,8 +77,9 @@ const ProductPageContent = ({
 							weight={0}
 						/>
 					</div>
-						<SimilarProducts currentProduct={product} />
+					<SimilarProducts currentProduct={product} />
 				</div>
+				<SameBrandProducts currentProduct={product} />
 				<div>
 					<h2 className="text-2xl xl:text-4xl text-left font-bold text-main-text mb-4 md:mb-8 xl:mb-10">
 						Отзывы
