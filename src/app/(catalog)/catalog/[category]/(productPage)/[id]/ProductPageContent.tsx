@@ -10,6 +10,7 @@ import CartButton from './_components/CartButton';
 import Bonuses from './_components/Bonuses';
 import DiscountMessage from './_components/DiscountMessage';
 import AdditionalInfo from './_components/AdditionalInfo';
+import SimilarProducts from './_components/SimilarProducts';
 
 interface ProductPageContentProps {
 	product: ProductCardProps;
@@ -75,6 +76,7 @@ const ProductPageContent = ({
 							weight={0}
 						/>
 					</div>
+						<SimilarProducts currentProduct={product} />
 				</div>
 				<div>
 					<h2 className="text-2xl xl:text-4xl text-left font-bold text-main-text mb-4 md:mb-8 xl:mb-10">
