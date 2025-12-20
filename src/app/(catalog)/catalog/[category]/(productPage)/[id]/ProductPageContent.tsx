@@ -4,6 +4,10 @@ import { CONFIG } from '../../../../../../../config/config';
 import StarRating from '@/components/StarRating';
 import { getReviewsWord } from '../../../../../../../utils/reviewsWord';
 import ShareButton from './_components/ShareButton';
+import ImagesBlock from './_components/ImagesBlock';
+import ProductOffer from './_components/ProductOffer';
+import CartButton from './_components/CartButton';
+import Bonuses from './_components/Bonuses';
 
 interface ProductPageContentProps {
 	product: ProductCardProps;
