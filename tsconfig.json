@@ -28,6 +28,6 @@
 		"**/*.tsx",
 		".next/types/**/*.ts",
 		"src/app/api/auth/set-password"
-	],
+, "src/app/api/delete-product"	],
 	"exclude": ["node_modules"]
 }

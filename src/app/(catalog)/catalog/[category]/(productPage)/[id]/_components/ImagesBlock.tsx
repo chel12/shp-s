@@ -10,7 +10,9 @@ const ImagesBlock = ({ product }: { product: ProductCardProps }) => {
 						key={index}
 						className="relative bg-white w-16 h-[37px] xl:h-[86px] flex items-center justify-center overflow-hidden shrink-0">
 						<Image
-							src={product.img}
+							//обман кеша и рис будет актуален
+							//Кеш бастер называется приём
+							src={`${product.img}?t=${Date.now()}`}
 							alt={`${product.title} - миниатюра ${index + 1}`}
 							fill
 							className=" object-cover"
