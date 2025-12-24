@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { CONFIG } from '../../config/config';
 import { debounce } from '../../utils/debounce';
 import Pagination from './Pagination';
@@ -12,6 +13,7 @@ function getItemsPerPageByWidth(contentType?: string) {
 	if (contentType === 'article') {
 		return width < 640 ? 1 : 3;
 	}
+
 	if (contentType === 'category') {
 		return width < 768 ? 8 : 6;
 	}
@@ -20,7 +22,8 @@ function getItemsPerPageByWidth(contentType?: string) {
 	if (width < 1280) return 3;
 	return 4;
 }
-const PaginationWrapper = ({
+
+function PaginationWrapperContent({
 	totalItems,
 	currentPage,
 	basePath,
@@ -30,7 +33,7 @@ const PaginationWrapper = ({
 	currentPage: number;
 	basePath: string;
 	contentType?: string;
-}) => {
+}) {
 	let initialItemsPerPage;
 
 	if (contentType === 'article') {
@@ -70,16 +73,41 @@ const PaginationWrapper = ({
 
 		return () => window.removeEventListener('resize', handleResize);
 	}, [itemsPerPage, searchParams, basePath, router, contentType]);
+
 	return (
-		<>
-			<Pagination
+		<Pagination
+			totalItems={totalItems}
+			currentPage={currentPage}
+			basePath={basePath}
+			itemsPerPage={itemsPerPage}
+			searchQuery={searchParams.toString()}
+		/>
+	);
+}
+
+const PaginationWrapper = ({
+	totalItems,
+	currentPage,
+	basePath,
+	contentType,
+}: {
+	totalItems: number;
+	currentPage: number;
+	basePath: string;
+	contentType?: string;
+}) => {
+	return (
+		<Suspense
+			fallback={
+				<div className="h-8 bg-gray-200 animate-pulse rounded"></div>
+			}>
+			<PaginationWrapperContent
 				totalItems={totalItems}
 				currentPage={currentPage}
 				basePath={basePath}
-				itemsPerPage={itemsPerPage}
-				searchQuery={searchParams.toString()}
+				contentType={contentType}
 			/>
-		</>
+		</Suspense>
 	);
 };
 
