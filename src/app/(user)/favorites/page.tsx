@@ -3,31 +3,12 @@ import { Loader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { TRANSLATIONS } from '../../../../utils/translations';
 
-import { headers } from 'next/headers';
-import {
-	getCustomSessionToken,
-	getValidCustomSession,
-} from '../../../../utils/auth-helpers';
-
 import fetchFavorites from './fetchFavorites';
 import DropFilter from '@/components/filterComponents/DropFilter';
 import FilterButtons from '@/components/filterComponents/FilterButtons';
 import PriceFilter from '@/components/filterComponents/PriceFilter';
 import FilterControls from '@/components/filterComponents/FilterControls';
-
-//чтобы остался серверным, через токен достаём для этого
-async function getServerUserId() {
-	try {
-		const headersList = await headers();
-		const cookies = headersList.get('cookie');
-		const sessionToken = getCustomSessionToken(cookies);
-		if (!sessionToken) return null;
-		const session = await getValidCustomSession(sessionToken);
-		return session?.userId || null;
-	} catch {
-		return null;
-	}
-}
+import { getServerUserId } from '../../../../utils/getServerUserId';
 
 const FavoritesPage = async ({
 	searchParams,
@@ -53,7 +34,10 @@ const FavoritesPage = async ({
 
 	return (
 		<div className="px-[max(12px,calc((100%-1208px)/2))] flex flex-col mx-auto">
-			<h1 className="ml-3 xl:ml-0 text-4xl md:text-5xl text-left font-bold text-main-text mb-8 md:mb-10 xl:mb-15 max-w-[336px] md:max-w-max leading-[150%]">
+			<h1
+				className="ml-3 xl:ml-0 text-4xl md:text-5xl xl:text-[64px] text-left 
+			font-bold text-main-text mb-8 md:mb-10 xl:mb-15 max-w-[336px] 
+			md:max-w-max leading-[150%]">
 				{TRANSLATIONS[category] || category}
 			</h1>
 			<DropFilter

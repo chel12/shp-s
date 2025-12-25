@@ -1,18 +1,19 @@
 'use client';
 
-import Image from 'next/image';
-import iconCart from '/public/icons-header/icon-cart.svg';
 import IconMenuMob from '../svg/IconMenuMob';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import IconBox from '../svg/IconBox';
 import IconHeart from '../svg/IconHeart';
+import IconCart from '../svg/IconCart';
 
 const TopMenu = () => {
 	const pathname = usePathname();
 	const isCatalogPage = pathname === '/catalog';
 	const isFavoritePage = pathname === '/favorites';
+	const isCartPage = pathname === '/cart';
+
 	const { user } = useAuthStore();
 
 	const isManagerOrAdmin = user?.role === 'manager' || user?.role === 'admin';
@@ -22,7 +23,7 @@ const TopMenu = () => {
 			<li>
 				<Link
 					href="/catalog"
-					className="flex flex-col items-center gap-2.5 md:hidden w-11 cursor-pointer">
+					className="flex flex-col items-center gap-2.5 md:hidden w-11">
 					<IconMenuMob isCatalogPage={isCatalogPage} />
 					<span
 						className={
@@ -37,7 +38,7 @@ const TopMenu = () => {
 				<li>
 					<Link
 						href="/favorites"
-						className="flex flex-col items-center gap-2.5 w-11 cursor-pointer">
+						className="flex flex-col items-center gap-2.5 w-11 ">
 						<IconHeart isActive={isFavoritePage} variant="orange" />
 						<span
 							className={
@@ -61,15 +62,18 @@ const TopMenu = () => {
 				</span>
 			</li>
 			{!isManagerOrAdmin && (
-				<li className="flex flex-col items-center gap-2.5 w-11 cursor-pointer">
-					<Image
-						src={iconCart}
-						alt="Корзина"
-						width={24}
-						height={24}
-						className="object-contain w-6 h-6"
-					/>
-					<span className="text-main-text">Корзина</span>
+				<li className="flex flex-col items-center gap-2.5 w-11 ">
+					<Link
+						href="/cart"
+						className="flex flex-col items-center gap-2.5 w-11">
+						<IconCart isActive={isCartPage} />
+					</Link>
+					<span
+						className={
+							isCartPage ? 'text-[#ff6633]' : 'text-main-text'
+						}>
+						Корзина
+					</span>
 				</li>
 			)}
 		</ul>

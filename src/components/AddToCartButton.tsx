@@ -1,11 +1,9 @@
 'use client';
-
 import { addToCartAction } from '@/actions/addToCartActions';
-import CartActionMessage from '@/components/CartActionMessage';
-import Image from 'next/image';
 import { useState } from 'react';
+import CartActionMessage from './CartActionMessage';
 
-const CartButton = ({ productId }: { productId: string }) => {
+const AddToCartButton = ({ productId }: { productId: string }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState<{
 		success: boolean;
@@ -37,17 +35,10 @@ const CartButton = ({ productId }: { productId: string }) => {
 		<div className="relative">
 			<form action={handleSubmit}>
 				<button
+					type="submit"
 					disabled={isLoading}
-					className="mb-2 h-10 md:h-15 w-full bg-[#ff6633] text-white text-base md:text-2xl p-4 flex justify-center items-center rounded hover:shadow-article active:shadow-button-active duration-300 cursor-pointer relative">
-					<Image
-						src="/icons-products/icon-shopping-cart.svg"
-						alt="Корзина"
-						width={32}
-						height={32}
-						className="absolute left-4"
-					/>
-
-					<p className="text-center">В корзину</p>
+					className="absolute border bottom-2 left-2 right-2 border-primary hover:text-white hover:bg-[#ff6633] hover:border-transparent active:shadow-(--shadow-button-active) h-10 rounded justify-center items-center text-primary transition-all duration-300 cursor-pointer select-none">
+					В корзину
 				</button>
 			</form>
 			{message && (
@@ -60,4 +51,4 @@ const CartButton = ({ productId }: { productId: string }) => {
 	);
 };
 
-export default CartButton;
+export default AddToCartButton;

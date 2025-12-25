@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 //проверяем куки
 export async function middleware(request: NextRequest) {
 	//защищенные пути
-	const protectedPaths = ['/profile', '/administrator'];
+	const protectedPaths = ['/profile', '/administrator', '/cart', '/favorite'];
 	const isProtectedPath = protectedPaths.some((path) =>
 		request.nextUrl.pathname.startsWith(path)
 	);
