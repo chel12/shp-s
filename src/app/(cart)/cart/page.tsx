@@ -7,6 +7,16 @@ import {
 import { Loader } from '@/components/Loader';
 import { ProductCardProps } from '@/types/product';
 import { CONFIG } from '../../../../config/config';
+import {
+	getOrderCartAction,
+	getUserBonusesAction,
+	removeMultipleOrderItemsAction,
+	updateOrderItemQuantityAction,
+} from '@/actions/orderAction';
+import { useCartStore } from '@/store/cartStore';
+import CartHeader from './_components/CartHeader';
+import CartControls from './_components/CartControls';
+import CartSummary from './_components/CartSummary';
 
 const CartPage = () => {
 	// Состояние для отслеживания выбранных товаров (массив ID товаров)

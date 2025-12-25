@@ -2,6 +2,7 @@
 
 import { addToCartAction } from '@/actions/addToCartActions';
 import CartActionMessage from '@/components/CartActionMessage';
+import { useCartStore } from '@/store/cartStore';
 import Image from 'next/image';
 import { useState } from 'react';
 

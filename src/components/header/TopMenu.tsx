@@ -7,16 +7,23 @@ import { useAuthStore } from '@/store/authStore';
 import IconBox from '../svg/IconBox';
 import IconHeart from '../svg/IconHeart';
 import IconCart from '../svg/IconCart';
+import { useCartStore } from '@/store/cartStore';
+import { useEffect } from 'react';
 
 const TopMenu = () => {
 	const pathname = usePathname();
 	const isCatalogPage = pathname === '/catalog';
 	const isFavoritePage = pathname === '/favorites';
 	const isCartPage = pathname === '/cart';
-
 	const { user } = useAuthStore();
-
+	const { totalItems, fetchCart } = useCartStore();
 	const isManagerOrAdmin = user?.role === 'manager' || user?.role === 'admin';
+	//при изменение юзера
+	useEffect(() => {
+		if (user && !isManagerOrAdmin) {
+			fetchCart();
+		}
+	}, [user, isManagerOrAdmin, fetchCart]);
 
 	return (
 		<ul className="flex flex-row gap-x-6 items-end">
@@ -61,19 +68,26 @@ const TopMenu = () => {
 					Заказы
 				</span>
 			</li>
+
 			{!isManagerOrAdmin && (
-				<li className="flex flex-col items-center gap-2.5 w-11 ">
+				<li className="relative flex flex-col items-center gap-2.5 w-11 ">
 					<Link
 						href="/cart"
 						className="flex flex-col items-center gap-2.5 w-11">
 						<IconCart isActive={isCartPage} />
+
+						{totalItems > 0 && (
+							<span className="absolute -top-2 right-0 bg-[#ff6633] text-white text-[9px] rounded w-4 h-4 flex items-center justify-center py-0.5 px-1">
+								{totalItems > 99 ? '99+' : totalItems}
+							</span>
+						)}
+						<span
+							className={
+								isCartPage ? 'text-[#ff6633]' : 'text-main-text'
+							}>
+							Корзина
+						</span>
 					</Link>
-					<span
-						className={
-							isCartPage ? 'text-[#ff6633]' : 'text-main-text'
-						}>
-						Корзина
-					</span>
 				</li>
 			)}
 		</ul>

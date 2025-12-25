@@ -2,6 +2,7 @@
 import { addToCartAction } from '@/actions/addToCartActions';
 import { useState } from 'react';
 import CartActionMessage from './CartActionMessage';
+import { useCartStore } from '@/store/cartStore';
 
 const AddToCartButton = ({ productId }: { productId: string }) => {
 	const [isLoading, setIsLoading] = useState(false);
