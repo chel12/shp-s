@@ -55,12 +55,14 @@ export const useFavorites = () => {
 		if (response.ok) {
 			if (isCurrentlyFavorite) {
 				setFavorites((prev) => prev.filter((id) => id !== productId));
+				//удаление из избранного
 			} else {
 				setFavorites((prev) => [...prev, productId]);
+				//добавление в избранное
 			}
 		}
 	};
-
+	//вспомогалка для проверки в избранном товар или нет
 	const isFavorite = (productId: string) => favorites.includes(productId);
 
 	return {

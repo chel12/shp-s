@@ -2,21 +2,23 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FormEvent, useCallback, useEffect, useState, Suspense } from 'react';
-import { CONFIG } from '../../../../../../config/config';
 import { PriceFilterProps, PriceRange } from '@/types/priceTypes';
 import MiniLoader from '@/components/MiniLoader';
 import ErrorComponent from '@/components/ErrorComponent';
 import PriceFilterHeader from './PriceFilterHeader';
 import PriceInputs from './PriceInputs';
 import PriceRangeSlider from './PriceRangeSlider';
-import InStockToggle from './inStockToggle';
+import InStockToggle from './InStockToggle';
+import { CONFIG } from '../../../config/config';
 
-
-function PriceFilterContent({
-	basePath,
-	category,
-	setIsFilterOpenAction,
-}: PriceFilterProps) {
+function PriceFilterContent(props: PriceFilterProps) {
+	const {
+		basePath,
+		category,
+		setIsFilterOpenAction,
+		apiEndpoint = '/category',
+		userId,
+	} = props;
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const urlPriceFrom = searchParams.get('priceFrom') || '';
@@ -50,7 +52,13 @@ function PriceFilterContent({
 			params.set('category', currentCategory);
 			params.set('getPriceRangeOnly', 'true');
 
-			const response = await fetch(`/api/category?${params.toString()}`);
+			if (userId) {
+				params.set('userId', userId);
+			}
+
+			const response = await fetch(
+				`/api/${apiEndpoint}?${params.toString()}`
+			);
 
 			if (!response.ok)
 				throw new Error(`Ошибка сервера: ${response.status}`);
@@ -86,7 +94,7 @@ function PriceFilterContent({
 		} finally {
 			setIsLoading(false);
 		}
-	}, [category, searchParams, urlPriceFrom, urlPriceTo]);
+	}, [apiEndpoint, category, searchParams, urlPriceFrom, urlPriceTo, userId]);
 
 	useEffect(() => {
 		fetchPriceData();
@@ -156,7 +164,7 @@ function PriceFilterContent({
 		router.push(`${basePath}?${params.toString()}`);
 	}, [basePath, priceRange.max, priceRange.min, router, searchParams]);
 
-	if (isLoading) {
+	if (isLoading || isNaN(priceRange.min) || isNaN(priceRange.max)) {
 		return <MiniLoader />;
 	}
 
@@ -205,18 +213,10 @@ function PriceFilterContent({
 	);
 }
 
-const PriceFilter = ({
-	basePath,
-	category,
-	setIsFilterOpenAction,
-}: PriceFilterProps) => {
+const PriceFilter = (props: PriceFilterProps) => {
 	return (
 		<Suspense fallback={<MiniLoader />}>
-			<PriceFilterContent
-				basePath={basePath}
-				category={category}
-				setIsFilterOpenAction={setIsFilterOpenAction}
-			/>
+			<PriceFilterContent {...props} />
 		</Suspense>
 	);
 };
