@@ -1,7 +1,6 @@
 import { ProductCardProps } from '@/types/product';
 import { CONFIG } from '../../../../../../../config/config';
 import StarRating from '@/components/StarRating';
-import { getReviewsWord } from '../../../../../../../utils/reviewsWord';
 import ShareButton from './_components/ShareButton';
 import ImagesBlock from './_components/ImagesBlock';
 import ProductOffer from './_components/ProductOffer';
@@ -19,6 +18,7 @@ import {
 	calculateFinalPrice,
 	calculatePriceByCard,
 } from '../../../../../../../utils/calcPrices';
+import { getFullEnding } from '../../../../../../../utils/getWordEnding';
 
 interface ProductPageContentProps {
 	product: ProductCardProps;
@@ -55,7 +55,7 @@ const ProductPageContent = ({
 					<StarRating rating={product.rating.rate || 5} />
 					<p className="text-sm underline">
 						{product.rating.count || 0}{' '}
-						{getReviewsWord(product.rating.count || 0)}
+						{`отзыв${getFullEnding(product.rating.count || 0)}`}
 					</p>
 				</div>
 				<ShareButton title={product.title} />

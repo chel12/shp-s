@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/authStore';
-import { formStyles, profileStyles } from '@/app/(auth)/styles';
+import { formStyles, profileStyles } from '@/app/styles';
 import { CreditCard, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { InputMask } from '@react-input/mask';

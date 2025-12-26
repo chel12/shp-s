@@ -4,7 +4,7 @@ import { ChangeEvent } from 'react';
 
 import Image from 'next/image';
 import { cities } from '@/data/cities';
-import { formStyles } from '../../styles';
+import { formStyles } from '../../../styles';
 
 interface SelectCityProps {
 	value: string;

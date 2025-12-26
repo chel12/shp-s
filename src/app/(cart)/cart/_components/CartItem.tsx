@@ -10,6 +10,13 @@ import {
 import { formatPrice } from '../../../../../utils/formatPrice';
 
 import { CartItemProps } from '@/types/cart';
+import Tooltip from '@/components/Tooltip';
+import CartSkeletons from './CartSkeletons';
+import SelectionCheckbox from './SelectionCheckbox';
+import ProductImage from './ProductImage';
+import PriceDisplay from './PriceDisplay';
+import DiscountBadge from './DiscountBadge';
+import QuantitySelector from './QuantitySelector';
 
 const CartItem = memo(function CartItem({
 	item,
@@ -22,6 +29,7 @@ const CartItem = memo(function CartItem({
 	// Убрал из state quantity альтернативу в виде || 1
 	const [quantity, setQuantity] = useState(item.quantity);
 	const [isUpdating, setIsUpdating] = useState(false);
+	//тултип для показа предела кол-ва
 	const [showTooltip, setShowTooltip] = useState(false);
 
 	const handleQuantityChange = async (newQuantity: number) => {
@@ -29,7 +37,7 @@ const CartItem = memo(function CartItem({
 		if (!productData) return;
 
 		const maxQuantity = productData.quantity;
-
+		//если колво больше чем на складе показывает туултип и блокирует
 		if (newQuantity > maxQuantity) {
 			setShowTooltip(true);
 			setTimeout(() => setShowTooltip(false), 3000);
@@ -37,14 +45,14 @@ const CartItem = memo(function CartItem({
 		}
 
 		setIsUpdating(true);
-		const previousQuantity = quantity;
+		const previousQuantity = quantity; //сохран пред знач для возможности отката
 		setQuantity(newQuantity);
 
 		try {
-			onQuantityUpdate(item.productId, newQuantity);
+			onQuantityUpdate(item.productId, newQuantity); //работает с экшеном
 		} catch (error) {
 			console.error('Ошибка обновления количества:', error);
-			setQuantity(previousQuantity);
+			setQuantity(previousQuantity); //если ошибка то откат
 		} finally {
 			setIsUpdating(false);
 		}
@@ -53,19 +61,19 @@ const CartItem = memo(function CartItem({
 	if (!productData) {
 		return <CartSkeletons />;
 	}
-
+	//расчет цены
 	const priceWithDiscount = calculateFinalPrice(
 		productData?.basePrice || 0,
 		productData?.discountPercent || 0
 	);
-
+	//финал цена
 	const finalPrice = hasLoyaltyCard
 		? calculatePriceByCard(priceWithDiscount, CONFIG.CARD_DISCOUNT_PERCENT)
 		: priceWithDiscount;
 
-	const totalFinalPrice = finalPrice * quantity;
-	const totalPriceWithoutCard = priceWithDiscount * quantity;
-	const isOutOfStock = productData?.quantity === 0;
+	const totalFinalPrice = finalPrice * quantity; //общ стоимость
+	const totalPriceWithoutCard = priceWithDiscount * quantity; //без учета скидки по карте лояльности
+	const isOutOfStock = productData?.quantity === 0; //отсутствует ли товар на складе
 	const hasDiscount = productData ? productData.discountPercent > 0 : false;
 
 	return (
@@ -105,7 +113,7 @@ const CartItem = memo(function CartItem({
 								isOutOfStock={isOutOfStock}
 							/>
 
-							{hasDiscount && (
+							{hasDiscount && ( //оранжевая лейба скидок
 								<DiscountBadge
 									discountPercent={
 										productData.discountPercent

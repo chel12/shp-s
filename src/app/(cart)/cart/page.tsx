@@ -17,6 +17,8 @@ import { useCartStore } from '@/store/cartStore';
 import CartHeader from './_components/CartHeader';
 import CartControls from './_components/CartControls';
 import CartSummary from './_components/CartSummary';
+import CartItem from './_components/CartItem';
+import BonusesSection from './_components/BonusesSection';
 
 const CartPage = () => {
 	// Состояние для отслеживания выбранных товаров (массив ID товаров)
@@ -289,7 +291,9 @@ const CartPage = () => {
 	}
 
 	return (
-		<div className="px-[max(12px,calc((100%-1208px)/2))] md:px-[max(16px,calc((100%-1208px)/2))] text-main-text mx-auto">
+		<div
+			className="px-[max(12px,calc((100%-1208px)/2))] md:px-[max(16px,calc((100%-1208px)/2))]
+		 text-main-text mx-auto">
 			<CartHeader itemCount={visibleCartItems.length} />
 
 			<CartControls
@@ -304,13 +308,13 @@ const CartPage = () => {
 				<div className="flex flex-col gap-y-6">
 					{visibleCartItems.map((item) => (
 						<CartItem
-							key={item.productId}
-							item={item}
-							productData={productsData[item.productId]}
-							isSelected={selectedItems.includes(item.productId)}
-							onSelectionChange={handleItemSelection}
-							onQuantityUpdate={handleQuantityUpdate}
-							hasLoyaltyCard={hasLoyaltyCard}
+							key={item.productId} //уник ключ
+							item={item} //элемент массива
+							productData={productsData[item.productId]} //данные продукта
+							isSelected={selectedItems.includes(item.productId)} //только рендер включенных продуктов
+							onSelectionChange={handleItemSelection} //изменение рендера продуктов
+							onQuantityUpdate={handleQuantityUpdate} //изменение кол-во товаров
+							hasLoyaltyCard={hasLoyaltyCard} //есть карта или нет
 						/>
 					))}
 				</div>

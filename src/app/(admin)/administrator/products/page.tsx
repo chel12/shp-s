@@ -1,4 +1,4 @@
-import { buttonStyles } from '@/app/(auth)/styles';
+import { buttonStyles } from '@/app/styles';
 import Link from 'next/link';
 
 const AdminProducts = () => {
@@ -9,7 +9,6 @@ const AdminProducts = () => {
 			</h1>
 
 			<div className="grid gap-4">
-				
 				<Link
 					href="/administrator/products/add-product"
 					className={`${buttonStyles.active} [&&]:justify-start px-4 py-2 w-full md:w-1/2`}>

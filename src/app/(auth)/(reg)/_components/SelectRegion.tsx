@@ -3,7 +3,7 @@
 import { ChangeEvent } from 'react';
 import { regions } from '@/data/regions';
 import Image from 'next/image';
-import { formStyles } from '../../styles';
+import { formStyles } from '../../../styles';
 
 interface SelectRegionProps {
 	value: string;

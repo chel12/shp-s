@@ -5,6 +5,7 @@ import { CONFIG } from '../../config/config';
 import { formatPrice } from '../../utils/formatPrice';
 import { getServerUserId } from '../../utils/getServerUserId';
 import { CartItem } from '@/types/cart';
+import { getFullEnding } from '../../utils/getWordEnding';
 
 export async function addToCartAction(
 	productId: string
