@@ -1,12 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import {
-	calculateFinalPrice,
-	calculatePriceByCard,
-} from '../../../../utils/calcPrices';
 import { Loader } from '@/components/Loader';
 import { ProductCardProps } from '@/types/product';
-import { CONFIG } from '../../../../config/config';
 import {
 	getOrderCartAction,
 	getUserBonusesAction,
@@ -16,9 +11,9 @@ import {
 import { useCartStore } from '@/store/cartStore';
 import CartHeader from './_components/CartHeader';
 import CartControls from './_components/CartControls';
-import CartSummary from './_components/CartSummary';
 import CartItem from './_components/CartItem';
-import BonusesSection from './_components/BonusesSection';
+import { usePricing } from '@/hooks/usePricing';
+import CartSidebar from './_components/CartSidebar';
 
 const CartPage = () => {
 	// Состояние для отслеживания выбранных товаров (массив ID товаров)
@@ -45,12 +40,42 @@ const CartPage = () => {
 		(item) => !removedItems.includes(item.productId)
 	);
 
-	// Добавил уже после урока. Фильтруем товары в наличии для расчетов цен Добавлена переменная availableCartItems, которая фильтрует visibleCartItems, оставляя только товары в наличии. Все расчеты цен (totalPrice, totalMaxPrice, totalDiscount, totalBonuses) теперь используют availableCartItems вместо visibleCartItems
+	// Добавил уже после урока.
+	// Фильтруем товары в наличии для расчетов цен Добавлена переменная availableCartItems,
+	// которая фильтрует visibleCartItems, оставляя только товары в наличии.
+	//  Все расчеты цен (totalPrice, totalMaxPrice, totalDiscount, totalBonuses)
+	// теперь используют availableCartItems вместо visibleCartItems
 	const availableCartItems = visibleCartItems.filter((item) => {
 		const product = productsData[item.productId];
 		return product && product.quantity > 0;
 	});
-
+	const pricingData = usePricing({
+		availableCartItems,
+		productsData,
+		hasLoyaltyCard,
+		bonusesCount,
+		useBonuses,
+	});
+	const {
+		totalPrice,
+		totalMaxPrice,
+		totalDiscount,
+		finalPrice,
+		totalBonuses,
+		isMinimumReached,
+	} = pricingData;
+	const commonSidebarProps = {
+		bonusesCount,
+		useBonuses,
+		onUseBonusesChange: setUseBonuses,
+		totalPrice,
+		visibleCartItems,
+		totalMaxPrice,
+		totalDiscount,
+		finalPrice,
+		totalBonuses,
+		isMinimumReached,
+	};
 	// Асинхронная функция загрузки данных корзины и товаров
 	const fetchCartAndProducts = async () => {
 		setIsCartLoading(true); // Включаем индикатор загрузки
@@ -182,93 +207,6 @@ const CartPage = () => {
 		[]
 	);
 
-	// Расчет общей стоимости ВСЕХ товаров в корзине
-	const totalPrice = availableCartItems.reduce((total, item) => {
-		const product = productsData[item.productId];
-		if (!product) return total; // Пропускаем если данные товара не загружены
-
-		// Рассчитываем цену с учетом скидки на товар
-		const priceWithDiscount = calculateFinalPrice(
-			product.basePrice,
-			product.discountPercent || 0
-		);
-
-		// Применяем скидку по карте лояльности, если у пользователя есть карта
-		const finalPrice = hasLoyaltyCard
-			? calculatePriceByCard(
-					priceWithDiscount,
-					CONFIG.CARD_DISCOUNT_PERCENT
-				)
-			: priceWithDiscount;
-
-		return total + finalPrice * item.quantity; // Суммируем с учетом количества
-	}, 0);
-
-	// Расчет общей максимальной цены (базовые цены без скидок по карте лояльности)
-	const totalMaxPrice = availableCartItems.reduce((total, item) => {
-		const product = productsData[item.productId];
-		if (!product) return total;
-
-		const priceWithDiscount = calculateFinalPrice(
-			product.basePrice,
-			product.discountPercent || 0
-		);
-
-		return total + priceWithDiscount * item.quantity;
-	}, 0);
-
-	// Расчет общей суммы скидки (разница между ценой без карты и ценой с картой)
-	const totalDiscount = availableCartItems.reduce((total, item) => {
-		const product = productsData[item.productId];
-		if (!product) return total;
-
-		const priceWithDiscount = calculateFinalPrice(
-			product.basePrice,
-			product.discountPercent || 0
-		);
-
-		const finalPrice = hasLoyaltyCard
-			? calculatePriceByCard(
-					priceWithDiscount,
-					CONFIG.CARD_DISCOUNT_PERCENT
-				)
-			: priceWithDiscount;
-
-		// Скидка = (цена без карты - цена с картой) * количество
-		const itemDiscount = (priceWithDiscount - finalPrice) * item.quantity;
-
-		return total + itemDiscount;
-	}, 0);
-
-	// Максимальное количество бонусов, которые можно использовать (не более 30% от суммы и не более доступных бонусов)
-	const maxBonusUse = Math.min(
-		bonusesCount,
-		Math.floor((totalPrice * CONFIG.MAX_BONUSES_PERCENT) / 100)
-	);
-
-	// Итоговая цена с учетом использованных бонусов (не может быть отрицательной)
-	const finalPrice = useBonuses
-		? Math.max(0, totalPrice - maxBonusUse) // Используем бонусы, но не меньше 0
-		: totalPrice; // Без использования бонусов
-
-	// Расчет общего количества бонусов, которые будут начислены за покупку
-	const totalBonuses = availableCartItems.reduce((total, item) => {
-		const product = productsData[item.productId];
-		if (!product) return total;
-
-		const priceWithDiscount = calculateFinalPrice(
-			product.basePrice,
-			product.discountPercent || 0
-		);
-		// Начисляем бонусы в процентах от цены товара (из конфига)
-		const bonuses = priceWithDiscount * (CONFIG.BONUSES_PERCENT / 100);
-
-		return total + Math.round(bonuses) * item.quantity; // Округляем и умножаем на количество
-	}, 0);
-
-	// Проверка достижения минимальной суммы заказа (1000 рублей)
-	const isMinimumReached = finalPrice >= 1000;
-
 	// Проверка, выбраны ли все товары в корзине
 	// true если есть выбранные товары и их количество равно общему количеству видимых товаров
 	const isAllSelected =
@@ -319,23 +257,7 @@ const CartPage = () => {
 					))}
 				</div>
 
-				<div className="flex flex-col gap-y-6 md:w-[255px] xl:w-[272px]">
-					<BonusesSection
-						bonusesCount={bonusesCount}
-						useBonuses={useBonuses}
-						onUseBonusesChange={setUseBonuses}
-						totalPrice={totalPrice}
-					/>
-
-					<CartSummary
-						visibleCartItems={visibleCartItems}
-						totalMaxPrice={totalMaxPrice}
-						totalDiscount={totalDiscount}
-						finalPrice={finalPrice}
-						totalBonuses={totalBonuses}
-						isMinimumReached={isMinimumReached}
-					/>
-				</div>
+				<CartSidebar {...commonSidebarProps} />
 			</div>
 		</div>
 	);

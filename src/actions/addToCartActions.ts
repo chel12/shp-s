@@ -70,6 +70,7 @@ export async function addToCartAction(
 
 		let loyaltyPrice: number | undefined;
 		let loyaltyDiscountApplied = false;
+
 		//если есть карта лояльности
 		if (hasLoyaltyCard) {
 			const cardDiscountPercent = CONFIG.CARD_DISCOUNT_PERCENT;
@@ -80,10 +81,13 @@ export async function addToCartAction(
 				) / 100;
 			loyaltyDiscountApplied = true;
 		}
+		const productQuantity = product.quantity || 0;
+		const initialQuantity = productQuantity > 0 ? 1 : 0;
+
 		//новый элемент корзины
 		const newCartItem: CartItem = {
 			productId,
-			quantity: 1,
+			quantity: initialQuantity,
 			addedAt: new Date(),
 		};
 
