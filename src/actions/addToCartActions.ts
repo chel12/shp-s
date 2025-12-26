@@ -1,11 +1,9 @@
 'use server';
 import { getDB } from '../../utils/api-routes';
 import { ObjectId } from 'mongodb';
-import { CONFIG } from '../../config/config';
-import { formatPrice } from '../../utils/formatPrice';
 import { getServerUserId } from '../../utils/getServerUserId';
 import { CartItem } from '@/types/cart';
-import { getFullEnding } from '../../utils/getWordEnding';
+
 
 export async function addToCartAction(
 	productId: string
@@ -42,13 +40,6 @@ export async function addToCartAction(
 			return { success: false, message: 'Продукт не найден' };
 		}
 
-		const discountPercent = product.discountPercent || 0;
-		const basePrice = product.basePrice || 0;
-		//цена со скидкой
-		const priceWithDiscount =
-			Math.round(basePrice * (1 - discountPercent / 100) * 100) / 100;
-		//проверка карты лояльности
-		const hasLoyaltyCard = user.card && user.card !== '';
 		//текущие товары в корзине юзера получаем и пихаем в массив
 		const cartItems: CartItem[] = user.cart || [];
 
@@ -59,28 +50,10 @@ export async function addToCartAction(
 		if (existingItem) {
 			return {
 				success: false,
-				message:
-					'Товар уже в корзине. Изменить его количество можно на странице корзины',
+				message: '',
 			};
 		}
-		//калькуляция бонусов
-		const calculatedBonuses = Math.round(
-			(priceWithDiscount * CONFIG.BONUSES_PERCENT) / 100
-		);
 
-		let loyaltyPrice: number | undefined;
-		let loyaltyDiscountApplied = false;
-
-		//если есть карта лояльности
-		if (hasLoyaltyCard) {
-			const cardDiscountPercent = CONFIG.CARD_DISCOUNT_PERCENT;
-			//финал цена с картой
-			loyaltyPrice =
-				Math.round(
-					priceWithDiscount * (1 - cardDiscountPercent / 100) * 100
-				) / 100;
-			loyaltyDiscountApplied = true;
-		}
 		const productQuantity = product.quantity || 0;
 		const initialQuantity = productQuantity > 0 ? 1 : 0;
 
@@ -100,32 +73,10 @@ export async function addToCartAction(
 				{ $set: { cart: newCartItems } }
 			);
 
-		let successMessage = 'Товар добавлен в корзину';
-
-		if (loyaltyDiscountApplied && loyaltyPrice) {
-			const discountAmount = priceWithDiscount - loyaltyPrice;
-			const cardDiscountPercent = CONFIG.CARD_DISCOUNT_PERCENT;
-			successMessage += ` (скидка по карте -${cardDiscountPercent}%: -${formatPrice(discountAmount)} ₽)`;
-		}
-
-		const bonusWord = `${`бонус${getFullEnding(calculatedBonuses)}`}`;
-
-		successMessage += `. При покупке Вы получите ${calculatedBonuses} ${bonusWord}.`;
-
-		const result: {
-			success: boolean;
-			message: string;
-			loyaltyPrice?: number;
-		} = {
+		return {
 			success: true,
-			message: successMessage,
+			message: '',
 		};
-
-		if (hasLoyaltyCard && loyaltyPrice) {
-			result.loyaltyPrice = loyaltyPrice;
-		}
-
-		return result;
 	} catch {
 		return { success: false, message: 'Ошибка сервера' };
 	}
