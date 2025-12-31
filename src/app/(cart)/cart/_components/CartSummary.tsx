@@ -3,15 +3,28 @@ import { formatPrice } from '../../../../../utils/formatPrice';
 import Bonuses from '@/app/(catalog)/catalog/[category]/(productPage)/[id]/_components/Bonuses';
 import { CartSummaryProps } from '../../../../types/cart';
 import { getFullEnding } from '../../../../../utils/getWordEnding';
+import { useCartStore } from '@/store/cartStore';
+import { CONFIG } from '../../../../../config/config';
 
-const CartSummary = ({
-	visibleCartItems,
-	totalMaxPrice,
-	totalDiscount,
-	finalPrice,
-	totalBonuses,
-	isMinimumReached,
-}: CartSummaryProps) => {
+const CartSummary = ({}: CartSummaryProps) => {
+	const { pricing, cartItems, hasLoyaltyCard } = useCartStore();
+	const visibleCartItems = cartItems.filter((item) => item.quantity > 0);
+	const {
+		totalPrice,
+		totalMaxPrice,
+		totalDiscount,
+		finalPrice,
+		totalBonuses,
+		maxBonusUse,
+		isMinimumReached,
+	} = pricing;
+
+	//расчёт сколько можно списать бонусов
+	const usedBonuses = Math.min(
+		maxBonusUse,
+		Math.floor((totalPrice * CONFIG.MAX_BONUSES_PERCENT) / 100)
+	);
+
 	return (
 		<>
 			<div className="flex flex-col gap-y-2.5 pb-6 border-b-2 border-[#f3f2f1]">

@@ -1,19 +1,24 @@
 import { create } from 'zustand';
 import { CartItem } from '../types/cart';
-
-interface CartState {
-	cartItems: CartItem[];
-	totalItems: number;
-	isLoading: boolean;
-	fetchCart: () => Promise<void>; //загрузка корзины сервера
-	updateCart: (items: CartItem[]) => void;
-	clearCart: () => void;
-}
+import { CartState, PricingState } from '@/types/storeStates';
 
 export const useCartStore = create<CartState>((set) => ({
 	cartItems: [],
 	totalItems: 0,
 	isLoading: false,
+	pricing: {
+		totalPrice: 0,
+		totalMaxPrice: 0,
+		totalDiscount: 0,
+		finalPrice: 0,
+		maxBonusUse: 0,
+		totalBonuses: 0,
+		isMinimumReached: false,
+	},
+	hasLoyaltyCard: false,
+	useBonuses: false,
+	isCheckout: false,
+	isOrdered: false,
 
 	fetchCart: async () => {
 		try {
@@ -54,5 +59,25 @@ export const useCartStore = create<CartState>((set) => ({
 			cartItems: [],
 			totalItems: 0,
 		});
+	},
+
+	updatePricing: (pricing: PricingState) => {
+		set({ pricing });
+	},
+	//карта лояльности
+	setHasLoyaltyCard: (hasLoyaltyCard: boolean) => {
+		set({ hasLoyaltyCard });
+	},
+	//бонусы есть ли тогглер
+	setUseBonuses: (useBonuses: boolean) => {
+		set({ useBonuses });
+	},
+
+	setIsCheckout: (isCheckout: boolean) => {
+		set({ isCheckout });
+	},
+
+	setIsOrdered: (isOrdered: boolean) => {
+		set({ isOrdered });
 	},
 }));

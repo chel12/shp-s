@@ -6,14 +6,7 @@ export interface CartItem {
 	addedAt: Date;
 }
 
-export interface CartSummaryProps {
-	visibleCartItems: CartItem[];
-	totalMaxPrice: number;
-	totalDiscount: number;
-	finalPrice: number;
-	totalBonuses: number;
-	isMinimumReached: boolean;
-}
+export interface CartSummaryProps {}
 
 export interface CartItemProps {
 	item: {
@@ -25,7 +18,6 @@ export interface CartItemProps {
 	isSelected: boolean;
 	onSelectionChange: (productId: string, isSelected: boolean) => void;
 	onQuantityUpdate: (productId: string, newQuantity: number) => void;
-	hasLoyaltyCard: boolean;
 }
 
 export interface OrderCartItem {

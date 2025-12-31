@@ -24,16 +24,19 @@ const CartPage = () => {
 	}>({});
 	// Состояние для количества доступных бонусов пользователя
 	const [bonusesCount, setBonusesCount] = useState<number>(0);
-	// Состояние, указывающее есть ли у пользователя карта лояльности
-	const [hasLoyaltyCard, setHasLoyaltyCard] = useState<boolean>(false);
 	// Состояние для отслеживания удаленных товаров (чтобы скрыть их из интерфейса без немедленного удаления из store)
 	const [removedItems, setRemovedItems] = useState<string[]>([]);
 	// Состояние загрузки данных корзины (показывает индикатор загрузки)
 	const [isCartLoading, setIsCartLoading] = useState(true);
-	// Флаг использования бонусов для оплаты заказа
-	const [useBonuses, setUseBonuses] = useState<boolean>(false);
-	// Получение данных корзины и функции обновления из глобального состояния (Zustand store)
-	const { cartItems, updateCart } = useCartStore();
+
+	const {
+		cartItems,
+		updateCart,
+		hasLoyaltyCard,
+		setHasLoyaltyCard,
+		useBonuses,
+	} = useCartStore();
+
 	// Фильтруем удаленные товары - показываем только те, что не в списке удаленных
 	// Это оптимистичное обновление UI до подтверждения удаления с сервера
 	const visibleCartItems = cartItems.filter(
@@ -49,33 +52,14 @@ const CartPage = () => {
 		const product = productsData[item.productId];
 		return product && product.quantity > 0;
 	});
-	const pricingData = usePricing({
+
+	usePricing({
 		availableCartItems,
 		productsData,
 		hasLoyaltyCard,
 		bonusesCount,
 		useBonuses,
 	});
-	const {
-		totalPrice,
-		totalMaxPrice,
-		totalDiscount,
-		finalPrice,
-		totalBonuses,
-		isMinimumReached,
-	} = pricingData;
-	const commonSidebarProps = {
-		bonusesCount,
-		useBonuses,
-		onUseBonusesChange: setUseBonuses,
-		totalPrice,
-		visibleCartItems,
-		totalMaxPrice,
-		totalDiscount,
-		finalPrice,
-		totalBonuses,
-		isMinimumReached,
-	};
 	// Асинхронная функция загрузки данных корзины и товаров
 	const fetchCartAndProducts = async () => {
 		setIsCartLoading(true); // Включаем индикатор загрузки
@@ -251,13 +235,12 @@ const CartPage = () => {
 							productData={productsData[item.productId]} //данные продукта
 							isSelected={selectedItems.includes(item.productId)} //только рендер включенных продуктов
 							onSelectionChange={handleItemSelection} //изменение рендера продуктов
-							onQuantityUpdate={handleQuantityUpdate} //изменение кол-во товаров
-							hasLoyaltyCard={hasLoyaltyCard} //есть карта или нет
+							onQuantityUpdate={handleQuantityUpdate}
 						/>
 					))}
 				</div>
 
-				<CartSidebar {...commonSidebarProps} />
+				<CartSidebar />
 			</div>
 		</div>
 	);
