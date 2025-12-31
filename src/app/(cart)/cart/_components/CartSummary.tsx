@@ -5,9 +5,28 @@ import { CartSummaryProps } from '../../../../types/cart';
 import { getFullEnding } from '../../../../../utils/getWordEnding';
 import { useCartStore } from '@/store/cartStore';
 import { CONFIG } from '../../../../../config/config';
+import { useState } from 'react';
+import { CartItemWithPrice } from '@/types/order';
+import {
+	calculateFinalPrice,
+	calculatePriceByCard,
+} from '../../../../../utils/calcPrices';
+import { createOrderAction } from '@/actions/orderDelivery';
+import OrderSuccessMessage from './OrderSuccessMessage';
 
-const CartSummary = ({}: CartSummaryProps) => {
-	const { pricing, cartItems, hasLoyaltyCard } = useCartStore();
+const CartSummary = ({ deliveryData, productsData = {} }: CartSummaryProps) => {
+	const [isProcessing, setIsProcessing] = useState(false);
+	//номер заказа
+	const [orderNumber, setOrderNumber] = useState<string | null>(null);
+	const {
+		pricing,
+		cartItems,
+		hasLoyaltyCard,
+		isCheckout,
+		setIsCheckout,
+		isOrdered,
+		setIsOrdered,
+	} = useCartStore();
 	const visibleCartItems = cartItems.filter((item) => item.quantity > 0);
 	const {
 		totalPrice,
@@ -24,6 +43,116 @@ const CartSummary = ({}: CartSummaryProps) => {
 		maxBonusUse,
 		Math.floor((totalPrice * CONFIG.MAX_BONUSES_PERCENT) / 100)
 	);
+	const handleCashPayment = async () => {
+		//проверка что данные пришли
+		if (!deliveryData) {
+			console.error('Данные доставки не заполнены');
+			return;
+		}
+		//устанавливаем состояние загрузки
+		setIsProcessing(true);
+
+		try {
+			//установка товаров корзины со всеми ценами
+			const cartItemsWithPrices: CartItemWithPrice[] =
+				visibleCartItems.map((item) => {
+					//получаем продукт
+					const product = productsData[item.productId];
+
+					if (!product) {
+						return {
+							productId: item.productId,
+							quantity: item.quantity,
+							price: 0,
+						};
+					}
+					//расчет цены с скидкой
+					const priceWithDiscount = calculateFinalPrice(
+						product.basePrice,
+						product.discountPercent || 0
+					);
+					//итог цена для каждого товара
+					const finalPrice = hasLoyaltyCard
+						? calculatePriceByCard(
+								priceWithDiscount,
+								CONFIG.CARD_DISCOUNT_PERCENT
+							)
+						: priceWithDiscount;
+					//возвращаем обработанный обьект товара
+					return {
+						productId: item.productId,
+						quantity: item.quantity,
+						price: finalPrice,
+						basePrice: product.basePrice,
+						discountPercent: product.discountPercent || 0,
+						hasLoyaltyDiscount: hasLoyaltyCard,
+					};
+				});
+			//создаём заказ с оплатой. серв экшен будет стучать в апи роут
+			const result = await createOrderAction({
+				finalPrice, //итоговая сумма заказа
+				totalBonuses, //кол-во начисляемых бонусов
+				usedBonuses, //кол-во использванных бонусов
+				totalDiscount, //общая сумма скидки
+				deliveryAddress: deliveryData.address, //адресс доставки
+				deliveryTime: deliveryData.time, //время доставки
+				cartItems: cartItemsWithPrices, //товары с рассчит ценами
+				totalPrice: totalMaxPrice, //общая сумма без скидок
+				paymentMethod: 'cash_on_delivery', //метод оплаты при получение или онлайн
+			});
+
+			setOrderNumber(result.orderNumber); //сохр номер заказа
+			setIsOrdered(true);
+		} catch (error: unknown) {
+			console.error('Ошибка при создании заказа:', error);
+			const errorMessage =
+				error instanceof Error
+					? error.message
+					: 'Произошла неизвестная ошибка';
+			alert(`Ошибка при оформлении заказа: ${errorMessage}`);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
+
+	const handleOnlinePayment = () => {
+		if (!deliveryData) {
+			console.error('Данные доставки не заполнены');
+			return;
+		}
+		console.log('Оплата на сайте');
+	};
+	//проверка валидности пришли ли данные
+	const isFormValid = (): boolean => {
+		if (!deliveryData) {
+			return false;
+		}
+
+		const { address, time } = deliveryData;
+
+		// Проверяем обязательные поля адреса
+		const isAddressValid = Boolean(
+			address.city?.trim() &&
+			address.street?.trim() &&
+			address.house?.trim()
+		);
+
+		// Проверяем время доставки
+		const isTimeValid = Boolean(time.date?.trim() && time.timeSlot?.trim());
+
+		// Используем отфильтрованные товары
+		const isValidForm =
+			isAddressValid &&
+			isTimeValid &&
+			isMinimumReached && //есть ли минимальая цена заказа
+			visibleCartItems.length > 0;
+
+		return isValidForm;
+	};
+	//можно ли продолжать оплату. проверка: загрузка прошла? данные есть?
+	const canProceedWithPayment = (): boolean => {
+		return isFormValid() && !isProcessing;
+	};
 
 	return (
 		<>
@@ -59,18 +188,57 @@ const CartSummary = ({}: CartSummaryProps) => {
 							Минимальная сумма заказа 1000р
 						</div>
 					)}
+					{!isCheckout ? (
+						<button
+							onClick={() => setIsCheckout(true)}
+							disabled={
+								!isMinimumReached ||
+								visibleCartItems.length === 0
+							}
+							className={`p-3 rounded mx-auto w-full text-2xl cursor-pointer ${
+								isMinimumReached && visibleCartItems.length > 0
+									? buttonStyles.active
+									: buttonStyles.inactive
+							}`}>
+							Оформить заказ
+						</button>
+					) : (
+						<div className="flex flex-col gap-3">
+							{!isOrdered ? (
+								<>
+									<button
+										disabled={!canProceedWithPayment()}
+										onClick={handleOnlinePayment}
+										className={`rounded w-full text-xl h-15 items-center justify-center ${
+											canProceedWithPayment()
+												? buttonStyles.active
+												: buttonStyles.inactive
+										}`}>
+										{isProcessing
+											? 'Обработка...'
+											: 'Оплатить на сайте'}
+									</button>
 
-					<button
-						disabled={
-							!isMinimumReached || visibleCartItems.length === 0
-						}
-						className={`p-3 rounded mx-auto w-full text-2xl cursor-pointer ${
-							isMinimumReached && visibleCartItems.length > 0
-								? buttonStyles.active
-								: buttonStyles.inactive
-						}`}>
-						Оформить заказ
-					</button>
+									<button
+										disabled={!canProceedWithPayment()}
+										onClick={handleCashPayment}
+										className={`h-10 rounded w-full text-base items-center justify-center duration-300 ${
+											canProceedWithPayment()
+												? 'bg-primary hover:shadow-button-default active:shadow-button-active text-white cursor-pointer'
+												: 'bg-gray-300 text-gray-500 cursor-not-allowed'
+										}`}>
+										{isProcessing
+											? 'Оформление...'
+											: 'Оплатить при получении'}
+									</button>
+								</>
+							) : (
+								<OrderSuccessMessage
+									orderNumber={orderNumber}
+								/>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		</>

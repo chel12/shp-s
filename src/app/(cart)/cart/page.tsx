@@ -14,6 +14,8 @@ import CartControls from './_components/CartControls';
 import CartItem from './_components/CartItem';
 import { usePricing } from '@/hooks/usePricing';
 import CartSidebar from './_components/CartSidebar';
+import CheckoutForm from './_components/CheckoutForm';
+import { DeliveryAddress, DeliveryTime } from '@/types/order';
 
 const CartPage = () => {
 	// Состояние для отслеживания выбранных товаров (массив ID товаров)
@@ -28,6 +30,25 @@ const CartPage = () => {
 	const [removedItems, setRemovedItems] = useState<string[]>([]);
 	// Состояние загрузки данных корзины (показывает индикатор загрузки)
 	const [isCartLoading, setIsCartLoading] = useState(true);
+	//для заголовка
+	const [title, setTitle] = useState<string>('Корзина');
+
+	const [deliveryData, setDeliveryData] = useState<{
+		address: DeliveryAddress;
+		time: DeliveryTime;
+		isValid: boolean;
+	} | null>(null);
+
+	const handleFormDataChange = useCallback(
+		(data: {
+			address: DeliveryAddress;
+			time: DeliveryTime;
+			isValid: boolean;
+		}) => {
+			setDeliveryData(data);
+		},
+		[]
+	);
 
 	const {
 		cartItems,
@@ -35,7 +56,14 @@ const CartPage = () => {
 		hasLoyaltyCard,
 		setHasLoyaltyCard,
 		useBonuses,
+		isCheckout,
+		isOrdered,
 	} = useCartStore();
+
+	const sidebarProps = {
+		deliveryData,
+		productsData,
+	};
 
 	// Фильтруем удаленные товары - показываем только те, что не в списке удаленных
 	// Это оптимистичное обновление UI до подтверждения удаления с сервера
@@ -111,7 +139,10 @@ const CartPage = () => {
 			setIsCartLoading(false); // Выключаем индикатор загрузки в любом случае
 		}
 	};
-
+	//смена заголовка
+	useEffect(() => {
+		setTitle(isCheckout ? 'Доставка' : 'Корзина');
+	}, [isCheckout]);
 	useEffect(() => {
 		fetchCartAndProducts();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -216,31 +247,43 @@ const CartPage = () => {
 		<div
 			className="px-[max(12px,calc((100%-1208px)/2))] md:px-[max(16px,calc((100%-1208px)/2))]
 		 text-main-text mx-auto">
-			<CartHeader itemCount={visibleCartItems.length} />
-
-			<CartControls
-				isAllSelected={isAllSelected}
-				selectedItemsCount={selectedItems.length}
-				onSelectAll={selectAllItems}
-				onDeselectAll={deselectAllItems}
-				onRemoveSelected={handleRemoveSelected}
-			/>
+			<CartHeader itemCount={visibleCartItems.length} title={title} />
 
 			<div className="flex flex-col md:flex-row gap-8 xl:gap-x-15">
-				<div className="flex flex-col gap-y-6">
-					{visibleCartItems.map((item) => (
-						<CartItem
-							key={item.productId} //уник ключ
-							item={item} //элемент массива
-							productData={productsData[item.productId]} //данные продукта
-							isSelected={selectedItems.includes(item.productId)} //только рендер включенных продуктов
-							onSelectionChange={handleItemSelection} //изменение рендера продуктов
-							onQuantityUpdate={handleQuantityUpdate}
-						/>
-					))}
+				<div
+					className={`flex-1 ${isOrdered ? 'pointer-events-none opacity-50' : ''}`}>
+					{!isCheckout ? (
+						<>
+							<CartControls
+								isAllSelected={isAllSelected}
+								selectedItemsCount={selectedItems.length}
+								onSelectAll={selectAllItems}
+								onDeselectAll={deselectAllItems}
+								onRemoveSelected={handleRemoveSelected}
+							/>
+							<div className="flex flex-col gap-y-6">
+								{visibleCartItems.map((item) => (
+									<CartItem
+										key={item.productId} //уник ключ
+										item={item} //элемент массива
+										productData={
+											productsData[item.productId]
+										} //данные продукта
+										isSelected={selectedItems.includes(
+											item.productId
+										)} //только рендер включенных продуктов
+										onSelectionChange={handleItemSelection} //изменение рендера продуктов
+										onQuantityUpdate={handleQuantityUpdate}
+									/>
+								))}
+							</div>
+						</>
+					) : (
+						<CheckoutForm onFormDataChange={handleFormDataChange} />
+					)}
 				</div>
 
-				<CartSidebar />
+				<CartSidebar {...sidebarProps} />
 			</div>
 		</div>
 	);

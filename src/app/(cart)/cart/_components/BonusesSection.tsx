@@ -4,7 +4,7 @@ import { getFullEnding } from '../../../../../utils/getWordEnding';
 import { useCartStore } from '@/store/cartStore';
 
 const BonusesSection = () => {
-	const { pricing, useBonuses, setUseBonuses } = useCartStore();
+	const { pricing, isOrdered, useBonuses, setUseBonuses } = useCartStore();
 	const { totalPrice, maxBonusUse } = pricing;
 	if (maxBonusUse <= 0) return null;
 
@@ -13,7 +13,7 @@ const BonusesSection = () => {
 			<div className="flex flex-row items-center gap-x-2.5">
 				<InStockToggle
 					checked={useBonuses}
-					onChangeAction={setUseBonuses}
+					onChangeAction={isOrdered ? () => {} : setUseBonuses}
 				/>
 				<p>
 					Списать{' '}
