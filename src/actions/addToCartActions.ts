@@ -4,7 +4,6 @@ import { ObjectId } from 'mongodb';
 import { getServerUserId } from '../../utils/getServerUserId';
 import { CartItem } from '@/types/cart';
 
-
 export async function addToCartAction(
 	productId: string
 ): Promise<{ success: boolean; message: string; loyaltyPrice?: number }> {
@@ -50,7 +49,7 @@ export async function addToCartAction(
 		if (existingItem) {
 			return {
 				success: false,
-				message: '',
+				message: 'Товар уже в корзине',
 			};
 		}
 

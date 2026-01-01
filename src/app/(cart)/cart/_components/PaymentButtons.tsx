@@ -4,7 +4,7 @@ import OrderSuccessMessage from './OrderSuccessMessage';
 
 interface PaymentButtonsProps {
 	isOrdered: boolean;
-	paymentType: 'cash' | 'online' | null;
+	paymentType: 'cash_on_delivery' | 'online' | null;
 	orderNumber: string | null;
 	isProcessing: boolean;
 	canProceedWithPayment: boolean;
@@ -21,7 +21,7 @@ export const PaymentButtons = ({
 	onOnlinePayment,
 	onCashPayment,
 }: PaymentButtonsProps) => {
-	if (isOrdered && paymentType === 'cash') {
+	if (isOrdered && paymentType === 'cash_on_delivery') {
 		return <OrderSuccessMessage orderNumber={orderNumber} />;
 	}
 
