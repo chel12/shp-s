@@ -1,6 +1,7 @@
 const fetchPurchases = async (options?: {
 	userPurchasesLimit?: number;
 	pagination?: { startIdx: number; perPage: number };
+	userId?: string;
 }) => {
 	try {
 		const url = new URL(
@@ -21,6 +22,9 @@ const fetchPurchases = async (options?: {
 				'perPage',
 				options.pagination.perPage.toString()
 			);
+		}
+		if (options?.userId) {
+			url.searchParams.append('userId', options.userId);
 		}
 
 		const res = await fetch(url.toString(), { next: { revalidate: 3600 } });

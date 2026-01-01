@@ -6,7 +6,10 @@ import ErrorComponent from '@/components/ErrorComponent';
 const NewProducts = async () => {
 	try {
 		const { items } = await fetchProductsByTag('actions', {
-			randomLimit: CONFIG.ITEMS_PER_PAGE_MAIN_PRODUCTS,
+			pagination: {
+				startIdx: 0,
+				perPage: CONFIG.ITEMS_PER_PAGE_MAIN_PRODUCTS,
+			},
 		});
 
 		return (

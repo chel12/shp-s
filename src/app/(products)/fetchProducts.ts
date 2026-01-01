@@ -1,19 +1,13 @@
 const fetchProductsByTag = async (
 	tag: string,
 	options?: {
-		randomLimit?: number;
 		pagination?: { startIdx: number; perPage: number };
 	}
 ) => {
 	try {
 		const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
 		url.searchParams.append('tag', tag);
-		if (options?.randomLimit) {
-			url.searchParams.append(
-				'randomLimit',
-				options.randomLimit.toString()
-			);
-		} else if (options?.pagination) {
+		if (options?.pagination) {
 			url.searchParams.append(
 				'startIdx',
 				options.pagination.startIdx.toString()

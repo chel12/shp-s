@@ -71,8 +71,19 @@ export async function POST(request: Request) {
 		const numericPurchasedIds = (purchasedProductIds || []).map(
 			(id: string) => Number(id)
 		);
-		//созд обнов массив ид купленных товаров в числа
-		const updatedPurchases = [...currentPurchases, ...numericPurchasedIds];
+
+		// СОЗДАЕМ МАССИВ ТОЛЬКО С УНИКАЛЬНЫМИ ID
+		const uniqueNewIds = numericPurchasedIds.filter(
+			(id: number, index: number, array: number[]) =>
+				array.indexOf(id) === index // Оставляем только уникальные ID: если индекс первого вхождения равен текущему индексу, значит это не дубликат
+		);
+
+		// ОБЪЕДИНЯЕМ СУЩЕСТВУЮЩИЕ И НОВЫЕ ПОКУПКИ, УБИРАЯ ДУБЛИКАТЫ
+		const allPurchases = [...currentPurchases, ...uniqueNewIds]; // Объединяем два массива в один с помощью spread оператора
+		const updatedPurchases = allPurchases.filter(
+			(id: number, index: number, array: number[]) =>
+				array.indexOf(id) === index // Фильтруем объединенный массив, оставляя только уникальные значения (удаляем возможные дубликаты между currentPurchases и uniqueNewIds)
+		);
 
 		const updateResult = await db.collection('user').updateOne(
 			{ _id: userObjectId },
