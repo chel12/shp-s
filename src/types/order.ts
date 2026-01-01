@@ -19,3 +19,21 @@ export interface CartItemWithPrice {
 	discountPercent?: number;
 	hasLoyaltyDiscount?: boolean;
 }
+export interface CreateOrderRequest {
+	finalPrice: number;
+	totalBonuses: number;
+	usedBonuses: number;
+	totalDiscount: number;
+	deliveryAddress: DeliveryAddress;
+	deliveryTime: DeliveryTime;
+	cartItems: CartItemWithPrice[];
+	totalPrice: number;
+	paymentMethod: 'cash_on_delivery' | 'online';
+	paymentId?: string;
+}
+
+export interface UpdateUserData {
+	usedBonuses: number;
+	earnedBonuses: number;
+	purchasedProductIds: string[];
+}
