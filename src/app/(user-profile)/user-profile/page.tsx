@@ -14,7 +14,7 @@ import ProfileEmail from '../_components/ProfileEmail';
 import ProfilePhoneSetting from '../_components/ProfilePhone/ProfilePhoneSetting';
 import ProfilePassword from '../_components/ProfilePassword';
 import ProfileCard from '../_components/ProfileCard';
-
+import '../styles.css';
 const ProfilePage = () => {
 	const { user, isAuth, checkAuth } = useAuthStore();
 	//состояние проверки
