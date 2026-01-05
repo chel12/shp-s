@@ -37,12 +37,49 @@ export interface UpdateUserData {
 	earnedBonuses: number;
 	purchasedProductIds: string[];
 }
-export interface Order {
-	paymentMethod: 'cash_on_delivery' | 'online';
-	status: 'pending' | 'confirmed' | 'delivered' | 'cancelled';
-	paymentStatus: 'pending' | 'waiting' | 'paid';
+export interface OrderItem {
+	basePrice: number;
+	title: string;
+	productId: string;
+	quantity: number;
+	price: number;
+	discountPercent?: number;
+	hasLoyaltyDiscount?: boolean;
+	productDetails?: {
+		_id: string;
+		id: number;
+		img: string;
+		title: string;
+		description: string;
+		basePrice: number;
+		discountPercent: number;
+	};
 }
 
+export interface Order {
+	_id: string;
+	userId: string;
+	orderNumber: string;
+	status: 'pending' | 'confirmed' | 'cancelled' | 'delivered' | 'failed';
+	paymentMethod: 'cash_on_delivery' | 'online';
+	paymentStatus: 'pending' | 'waiting' | 'paid' | 'failed';
+	paymentId: string;
+	totalAmount: number;
+	discountAmount: number;
+	usedBonuses: number;
+	earnedBonuses: number;
+	deliveryAddress: DeliveryAddress;
+	deliveryDate: string;
+	deliveryTimeSlot: string;
+	surname: string;
+	name: string;
+	phone: string;
+	gender: string;
+	birthday: string;
+	items: OrderItem[];
+	createdAt: string;
+	updatedAt: string;
+}
 // СТАТУС ЗАКАЗА
 // pending - заказ создан, ожидает обработки
 // confirmed - заказ подтвержден и выполняется (для онлайн-оплаты после успешной оплаты, а также для оплаты при получении - после подтверждения менеджером)

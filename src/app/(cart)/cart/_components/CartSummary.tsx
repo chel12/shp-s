@@ -204,7 +204,7 @@ const CartSummary = ({ deliveryData, productsData = {} }: CartSummaryProps) => {
 		setShowSuccessModal(false);
 		setIsOrdered(true);
 		resetAfterOrder();
-		router.push('/orders');
+		router.push('/user-orders');
 	};
 	//проверка валидности пришли ли данные
 	const isFormValid = (): boolean => {

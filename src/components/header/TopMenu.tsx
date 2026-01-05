@@ -15,9 +15,16 @@ const TopMenu = () => {
 	const isCatalogPage = pathname === '/catalog';
 	const isFavoritePage = pathname === '/favorites';
 	const isCartPage = pathname === '/cart';
+	const isUserOrdersPage = pathname === '/user-orders';
+	const isAdminOrdersPage = pathname === '/admin-orders';
+
 	const { user } = useAuthStore();
 	const { totalItems, fetchCart } = useCartStore();
+
 	const isManagerOrAdmin = user?.role === 'manager' || user?.role === 'admin';
+	const ordersLink = isManagerOrAdmin ? '/admin-orders' : '/user-orders';
+	const isOrdersPage = isUserOrdersPage || isAdminOrdersPage;
+
 	//при изменение юзера
 	useEffect(() => {
 		if (user && !isManagerOrAdmin) {
@@ -59,14 +66,15 @@ const TopMenu = () => {
 				</li>
 			)}
 
-			<li className="flex flex-col items-center gap-2.5 w-11 cursor-pointer">
-				<IconBox />
-				<span
-					className={
-						isManagerOrAdmin ? 'text-[#ff6633]' : 'text-main-text'
-					}>
-					Заказы
-				</span>
+			<li>
+				<Link
+					href={ordersLink}
+					className="flex flex-col items-center gap-2.5 w-11 cursor-pointer">
+					<IconBox isActive={isOrdersPage} />
+					<span className={isOrdersPage ? 'text-[#ff6633]' : ''}>
+						Заказы
+					</span>
+				</Link>
 			</li>
 
 			{!isManagerOrAdmin && (
