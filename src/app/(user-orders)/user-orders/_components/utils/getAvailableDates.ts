@@ -22,7 +22,6 @@ export const getAvailableDates = (schedule: Schedule): AvailableDate[] => {
 				date: new Date(dateString),
 				dateString,
 				availableSlots: totalSlots,
-				totalSlots,
 			};
 		})
 		.filter((item): item is AvailableDate => item !== null);

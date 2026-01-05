@@ -9,9 +9,11 @@ const ProductsSection = ({
 	applyIndexStyles = true,
 	contentType,
 	mobileItemsLimit = 4,
+	isOrderPage,
 }: ProductsSectionProps & {
 	applyIndexStyles?: boolean;
 	contentType?: string;
+	isOrderPage?: boolean;
 }) => {
 	const gridClasses =
 		contentType === 'category'
@@ -45,7 +47,10 @@ const ProductsSection = ({
                     ${index >= 4 ? 'xl:hidden' : ''}`
 										: ''
 								}>
-								<ProductCard {...item} />
+								<ProductCard
+									{...item}
+									isOrderPage={isOrderPage}
+								/>
 							</li>
 						))}
 					</ul>
