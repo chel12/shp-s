@@ -4,7 +4,7 @@ import { ProductCardProps } from './product';
 export interface DeliveryData {
 	address: DeliveryAddress;
 	time: DeliveryTime;
-	isValid?: boolean;
+	isValid: boolean;
 }
 export interface CartItem {
 	productId: string;
@@ -18,7 +18,7 @@ export interface CartSummaryProps {
 		time: DeliveryTime;
 		isValid: boolean;
 	} | null;
-	productsData?: { [key: string]: ProductCardProps };
+	productsData?: { [key: string]: Partial<ProductCardProps> };
 }
 
 export interface CartSidebarProps {
@@ -82,4 +82,10 @@ export interface CustomPricing {
 	totalBonuses: number;
 	maxBonusUse: number;
 	isMinimumReached: boolean;
+}
+export interface ExtendedCartSummaryProps extends CartSummaryProps {
+	customCartItems?: CustomCartItem[];
+	customPricing?: CustomPricing;
+	isRepeatOrder?: boolean;
+	onOrderSuccess?: () => void;
 }

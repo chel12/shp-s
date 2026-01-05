@@ -13,12 +13,14 @@ import { useOrderProductsData } from '@/hooks/useOrderProductsData';
 import { usePriceComparison } from '@/hooks/usePriceComparison';
 import { useOrderPricing } from '@/hooks/useOrderPricing';
 import { StockWarningsAlert } from './StockWarningsAlert';
+import RepeatOrderSection from './RepeatOrderSection';
+import { ProductsData } from '@/types/userOrder';
+import { RepeatOrderSuccessAlert } from './RepeatOrderSuccessAlert';
 
 const OrderCard = ({ order }: { order: Order }) => {
 	const [showOrderDetails, setShowOrderDetails] = useState(false);
 	const [showPriceWarning, setShowPriceWarning] = useState(false);
 
-	//обращается за данными о продуктах
 	const { productsData: fetchedProductsData, loading: productsDataLoading } =
 		useOrderProductsData(order);
 
@@ -42,18 +44,20 @@ const OrderCard = ({ order }: { order: Order }) => {
 		handleDeliveryClick,
 		handleDateSelect,
 		handleCancelDelivery,
+		isRepeatOrderCreated,
+		selectedDelivery,
+		handleEditDelivery,
+		handleRepeatOrderSuccess,
 	} = useRepeatOrder();
 
 	const { deliverySchedule } = useDeliveryData();
-	//проверка продуктов на складе
+
 	const hasStockIssues = orderProducts.some(
 		(product) => product.isLowStock || product.insufficientStock
 	);
-	//можем ли повторить заказ
 	const canCreateRepeatOrder = !hasStockIssues;
-	//стили тыкаем через них показ всего заказа
 	const applyIndexStyles = !showOrderDetails;
-	//проверка изменений и в стейт предупрежд кидаем
+
 	useEffect(() => {
 		if (priceComparison?.hasChanges) {
 			setShowPriceWarning(true);
@@ -75,14 +79,29 @@ const OrderCard = ({ order }: { order: Order }) => {
 			/>
 			<ProductsSection
 				products={orderProducts}
-				//для отображ всех карт за счёт стиля
 				applyIndexStyles={applyIndexStyles}
 				isOrderPage={true}
+			/>
+			<RepeatOrderSection
+				isRepeatOrderCreated={isRepeatOrderCreated}
+				selectedDelivery={selectedDelivery}
+				canCreateRepeatOrder={canCreateRepeatOrder}
+				order={order}
+				priceComparison={priceComparison}
+				showPriceWarning={showPriceWarning}
+				onClosePriceWarning={() => setShowPriceWarning(false)}
+				deliveryData={selectedDelivery}
+				onEditDelivery={handleEditDelivery}
+				productsData={productsData as unknown as ProductsData}
+				cartItemsForSummary={cartItemsForSummary}
+				customPricing={customPricing}
+				onOrderSuccess={handleRepeatOrderSuccess}
 			/>
 			<StockWarningsAlert
 				warnings={stockWarnings}
 				hasStockIssues={hasStockIssues}
 			/>
+			{isRepeatOrderCreated && <RepeatOrderSuccessAlert />}
 			<OrderActions
 				showOrderDetails={showOrderDetails}
 				onToggleDetails={() => setShowOrderDetails(!showOrderDetails)}

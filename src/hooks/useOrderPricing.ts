@@ -74,15 +74,19 @@ export const useOrderPricing = (
 				: item.price;
 			return sum + finalPrice * item.quantity;
 		}, 0);
+
 		//сумма скидки
 		const totalDiscount = totalAfterProductDiscounts - finalTotal;
+		const totalBonuses = Math.floor(
+			(finalTotal * CONFIG.BONUSES_PERCENT) / 100
+		);
 
 		return {
 			totalPrice: totalAfterProductDiscounts,
 			totalMaxPrice: totalAfterProductDiscounts,
 			totalDiscount,
 			finalPrice: finalTotal,
-			totalBonuses: 0, //так как корзина требует бонусы
+			totalBonuses: totalBonuses, //так как корзина требует бонусы
 			maxBonusUse: 0, //так как корзина требует бонусы
 			isMinimumReached: true, //минималку вкл вдруг цены упали
 		};
