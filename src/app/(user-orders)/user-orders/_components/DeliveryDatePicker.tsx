@@ -7,9 +7,9 @@ import {
 } from '@/app/(admin)/administrator/delivery-times/utils/dateFormatters';
 import { formatTimeSlot } from '@/app/(cart)/cart/utils/formatTimeSlot';
 import { AvailableDate } from '@/types/availableDate';
-import { getAvailableDates } from './utils/getAvailableDates';
-import { getAvailableTimeSlots } from './utils/getAvailableTimeSlots';
-import { formatDisplayDate } from './utils/formatDisplayDate';
+import { getAvailableDates } from '../utils/getAvailableDates';
+import { getAvailableTimeSlots } from '../utils/getAvailableTimeSlots';
+import { formatDisplayDate } from '../utils/formatDisplayDate';
 
 interface DeliveryDatePickerProps {
 	//получ график

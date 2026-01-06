@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import { formatPrice } from '../../../../../utils/formatPrice';
-import { formatOrderDate } from './utils/formatOrderDate';
-import { getStatusColor } from './utils/getStatusColor';
-import { getStatusText } from './utils/getStatusText';
+import { formatOrderDate } from '../utils/formatOrderDate';
+import { getStatusColor } from '../utils/getStatusColor';
+import { getStatusText } from '../utils/getStatusText';
 import { OrderHeaderProps } from '@/types/order';
 
 const OrderHeader = ({
@@ -22,8 +22,8 @@ const OrderHeader = ({
 					{order.deliveryTimeSlot}
 				</p>
 				<span
-					className={`px-2 py-1 rounded text-xs md:text-base shrink-0 ${getStatusColor(order.status)}`}>
-					{getStatusText(order.status)}
+					className={`px-2 py-1 rounded text-xs md:text-base shrink-0 ${getStatusColor(order)}`}>
+					{getStatusText(order)}
 				</span>
 			</div>
 			<div className="flex flex-col md:flex-row gap-2 xl:gap-6 items-center">

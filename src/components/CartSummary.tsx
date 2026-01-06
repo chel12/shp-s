@@ -11,6 +11,7 @@ import { FakePaymentData, PaymentSuccessData } from '@/types/payment';
 import {
 	clearUserCart,
 	createOrderRequest,
+	markPaymentAsFailed,
 	prepareCartItemsWithPrices,
 	updateUserAfterPayment,
 } from '../app/(cart)/cart/utils/orderHelpers';
@@ -233,6 +234,13 @@ const CartSummary = ({
 
 	const handlePaymentError = async (error: string) => {
 		setShowPaymentModal(false);
+		if (currentOrderId) {
+			await markPaymentAsFailed(currentOrderId);
+		} else {
+			console.error(
+				'Order ID не найден для отметки платежа как неудачного'
+			);
+		}
 		alert(`Ошибка оплаты: ${error}`);
 		resetAfterOrder();
 		await clearUserCart();

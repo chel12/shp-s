@@ -23,6 +23,8 @@ const AdminOrderPage = () => {
 	const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
 	//стейт для выбранной даты
 	const [customDate, setCustomDate] = useState<Date | undefined>(new Date());
+	//тоглерс
+	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<{
 		error: Error;
@@ -77,7 +79,20 @@ const AdminOrderPage = () => {
 				(order) => order.deliveryDate === dateString
 			);
 			setFilteredOrders(filtered);
+			setIsCalendarOpen(false);
 		}
+	};
+
+	const toggleCalendar = () => {
+		setIsCalendarOpen(!isCalendarOpen);
+	};
+
+	const filterOrdersByDate = (date: string) => {
+		setSelectedDate(date);
+		setCustomDate(undefined);
+		setIsCalendarOpen(false);
+		const filtered = orders.filter((order) => order.deliveryDate === date);
+		setFilteredOrders(filtered);
 	};
 
 	const threeDaysDates = getThreeDaysDates();
@@ -100,8 +115,11 @@ const AdminOrderPage = () => {
 				orders={orders}
 				dates={threeDaysDates}
 				selectedDate={selectedDate}
-				onDateSelect={handleDateSelect}
 				customDate={customDate}
+				isCalendarOpen={isCalendarOpen}
+				toggleCalendar={toggleCalendar}
+				onCalendarDateSelect={handleDateSelect}
+				onDateSelect={filterOrdersByDate}
 			/>
 			<TimeSlotSection filteredOrders={filteredOrders} />
 		</div>
