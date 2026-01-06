@@ -16,13 +16,15 @@ const TopMenu = () => {
 	const isFavoritePage = pathname === '/favorites';
 	const isCartPage = pathname === '/cart';
 	const isUserOrdersPage = pathname === '/user-orders';
-	const isAdminOrdersPage = pathname === '/admin-orders';
+	const isAdminOrdersPage = pathname === '/administrator/admin-orders';
 
 	const { user } = useAuthStore();
 	const { totalItems, fetchCart } = useCartStore();
 
 	const isManagerOrAdmin = user?.role === 'manager' || user?.role === 'admin';
-	const ordersLink = isManagerOrAdmin ? '/admin-orders' : '/user-orders';
+	const ordersLink = isManagerOrAdmin
+		? '/administrator/admin-orders'
+		: '/user-orders';
 	const isOrdersPage = isUserOrdersPage || isAdminOrdersPage;
 
 	//при изменение юзера
