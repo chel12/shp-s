@@ -1,5 +1,4 @@
 import React from 'react';
-import iconBurger from '/public/icons-header/icon-burger-menu.svg';
 import MiniLoader from '@/components/MiniLoader';
 import Link from 'next/link';
 import HighlightText from '../HighlightText';
@@ -38,7 +37,7 @@ const SearchResults = ({
 								/>
 							</div>
 							<Image
-								src={iconBurger}
+								src={'/icons-header/icon-burger-menu.svg'}
 								alt={
 									TRANSLATIONS[group.category] ||
 									group.category

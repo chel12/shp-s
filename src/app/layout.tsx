@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { RegFormProvider } from './contexts/RegFormContext';
 import StatesProvider from '@/store/StatesProvider';
+import StoreProvider from './provider';
 
 const rubik = Rubik({
 	variable: '--font-rubik',
@@ -14,7 +15,7 @@ const rubik = Rubik({
 
 export const metadata: Metadata = {
 	metadataBase: new URL(
-		process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000/'
+		process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 	),
 	title: 'Северяночка',
 	description: 'Доставка и покупка продуктов питания',
@@ -28,14 +29,16 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${rubik.variable} font-sans`}>
-				<StatesProvider>
-					<RegFormProvider>
-						<Header />
-						<Breadcrumbs />
-						{children}
-						<Footer />
-					</RegFormProvider>
-				</StatesProvider>
+				<StoreProvider>
+					<StatesProvider>
+						<RegFormProvider>
+							<Header />
+							<Breadcrumbs />
+							{children}
+							<Footer />
+						</RegFormProvider>
+					</StatesProvider>
+				</StoreProvider>
 			</body>
 		</html>
 	);

@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import React from 'react';
-import iconSearch from '/public/icons-header/icon-search.svg';
 import { SearchInputProps } from '@/types/searchInputProps';
 
 const SearchInput = ({
@@ -38,7 +37,7 @@ const SearchInput = ({
 					className="absolute top-2 right-2
 					w-6 h-6 cursor-pointer">
 					<Image
-						src={iconSearch}
+						src={'/icons-header/icon-search.svg'}
 						alt="Поиск"
 						width={24}
 						height={24}
