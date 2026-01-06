@@ -2,6 +2,7 @@ import { CreditCard } from 'lucide-react';
 import { getFullEnding } from '../../../../../utils/getWordEnding';
 import { useCartStore } from '@/store/cartStore';
 import { CONFIG } from '../../../../../config/config';
+import { useRouter } from 'next/navigation';
 
 const OrderSuccessMessage = ({
 	orderNumber,
@@ -11,11 +12,12 @@ const OrderSuccessMessage = ({
 	const { pricing, useBonuses } = useCartStore();
 	const { totalBonuses, maxBonusUse, totalPrice } = pricing;
 	//для выкл состояния
-	const { setIsOrdered } = useCartStore();
+	const { resetAfterOrder } = useCartStore();
+	const router = useRouter();
 	//перенаправ на главную
-	const handleNewOrder = () => {
-		setIsOrdered(false);
-		window.location.reload();
+	const handleToOrder = () => {
+		resetAfterOrder();
+		router.push('/user-orders');
 	};
 
 	const usedBonuses = Math.min(
@@ -49,9 +51,10 @@ const OrderSuccessMessage = ({
 				{getFullEnding(totalBonuses)}
 			</div>
 			<button
-				onClick={handleNewOrder}
-				className="ml-4 bg-[#008c48] text-white px-4 py-2 rounded hover:bg-[#006c38] duration-300 font-medium cursor-pointer">
-				Обновить страницу
+				onClick={handleToOrder}
+				className="ml-4 bg-[#008c48] text-white px-4 py-2 rounded hover:bg-[#006c38] 
+				duration-300 font-medium cursor-pointer">
+				Перейти на страницу заказов
 			</button>
 		</div>
 	);

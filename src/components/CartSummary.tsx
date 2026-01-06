@@ -9,7 +9,7 @@ import PaymentButtons from '../app/(cart)/cart/_components/PaymentButtons';
 import CheckoutButton from '../app/(cart)/cart/_components/CheckoutButton';
 import { FakePaymentData, PaymentSuccessData } from '@/types/payment';
 import {
-	confirmOrderPayment,
+	clearUserCart,
 	createOrderRequest,
 	prepareCartItemsWithPrices,
 	updateUserAfterPayment,
@@ -148,12 +148,12 @@ const CartSummary = ({
 
 		try {
 			//логика после подтверждения платежа
+			//онлайн
 			if (paymentMethod === 'online') {
 				if (paymentData?.status === 'succeeded') {
-					//списывание товара
-					await confirmOrderPayment(currentOrderId!);
 					//обновление коллекции пользователя после платежа
 					await updateUserAfterPayment({
+						orderId: currentOrderId!,
 						usedBonuses: actualUsedBonuses,
 						earnedBonuses: totalBonuses,
 						purchasedProductIds: visibleCartItems.map(
@@ -172,12 +172,18 @@ const CartSummary = ({
 
 				setSuccessData(successModalData);
 				setShowSuccessModal(true);
+				setIsOrdered(true);
+				await clearUserCart();
 			} else {
+				//налом при поруч
 				const result = await createOrder(
 					paymentMethod,
 					paymentData?.id
 				);
+				//чистка корзины
+				await clearUserCart();
 				setOrderNumber(result.orderNumber);
+				setIsOrdered(true);
 			}
 
 			setIsOrdered(true);
@@ -225,9 +231,12 @@ const CartSummary = ({
 		}
 	};
 
-	const handlePaymentError = (error: string) => {
+	const handlePaymentError = async (error: string) => {
 		setShowPaymentModal(false);
 		alert(`Ошибка оплаты: ${error}`);
+		resetAfterOrder();
+		await clearUserCart();
+		router.push('/user-orders');
 	};
 
 	const handleCloseSuccessModal = () => {
