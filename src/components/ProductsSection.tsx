@@ -10,10 +10,12 @@ const ProductsSection = ({
 	contentType,
 	mobileItemsLimit = 4,
 	isOrderPage,
+	isAdminOrderPage,
 }: ProductsSectionProps & {
 	applyIndexStyles?: boolean;
 	contentType?: string;
 	isOrderPage?: boolean;
+	isAdminOrderPage?: boolean;
 }) => {
 	const gridClasses =
 		contentType === 'category'
@@ -50,6 +52,7 @@ const ProductsSection = ({
 								<ProductCard
 									{...item}
 									isOrderPage={isOrderPage}
+									isAdminOrderPage={isAdminOrderPage}
 								/>
 							</li>
 						))}

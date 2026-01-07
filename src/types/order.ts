@@ -38,6 +38,8 @@ export interface UpdateUserData {
 	purchasedProductIds: string[];
 }
 export interface OrderItem {
+	name: string;
+	totalPrice: number;
 	basePrice: number;
 	title: string;
 	productId: string;
