@@ -12,7 +12,7 @@ const ImagesBlock = ({ product }: { product: ProductCardProps }) => {
 						<Image
 							//обман кеша и рис будет актуален
 							//Кеш бастер называется приём
-							src={`${product.img}?t=${Date.now()}`}
+							src={product.img}
 							alt={`${product.title} - миниатюра ${index + 1}`}
 							fill
 							className=" object-cover"

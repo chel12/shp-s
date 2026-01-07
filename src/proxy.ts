@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 //проверяем куки
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 	//защищенные пути
 	const protectedPaths = ['/profile', '/administrator', '/cart', '/favorite'];
 	const isProtectedPath = protectedPaths.some((path) =>
