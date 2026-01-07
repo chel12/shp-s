@@ -55,8 +55,8 @@ const AdminOrderPage = () => {
 			const dateString = `${year}-${month}-${day}`; // YYYY-MM-DD
 
 			setSelectedDate(dateString);
-			setIsCalendarOpen(false);
 		}
+		setIsCalendarOpen(false);
 	};
 
 	const toggleCalendar = () => {

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Order } from '@/types/order';
 import DateFilterButtons from './DateFilterButtons';
 import Calendar from './Calendar';
+import { useEffect, useState } from 'react';
 
 interface DateSelectorProps {
 	customDate: Date | undefined;
@@ -24,6 +25,19 @@ const DateSelector = ({
 	toggleCalendar,
 	onCalendarDateSelect,
 }: DateSelectorProps) => {
+	const [calendarMoth, setCalendarMonth] = useState<Date | undefined>(
+		customDate || new Date()
+	);
+
+	useEffect(() => {
+		if (customDate) setCalendarMonth(customDate);
+	}, [customDate]);
+
+	const handleDateSelect = (date: Date | undefined) => {
+		onCalendarDateSelect(date);
+		if (date) setCalendarMonth(date);
+	};
+
 	return (
 		<div className="flex justify-start items-center gap-3 relative mb-15">
 			<button
@@ -45,8 +59,8 @@ const DateSelector = ({
 			{isCalendarOpen && (
 				<Calendar
 					customDate={customDate}
-					onDateSelect={onCalendarDateSelect}
-					onMonthChange={onCalendarDateSelect}
+					onDateSelect={handleDateSelect}
+					month={calendarMoth}
 				/>
 			)}
 			<DateFilterButtons

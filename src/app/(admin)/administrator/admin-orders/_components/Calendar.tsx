@@ -3,18 +3,18 @@ import { ru } from 'date-fns/locale';
 import 'react-day-picker/style.css';
 import '../daypicker.css';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface CalendarProps {
 	customDate: Date | undefined;
 	onDateSelect: (date: Date | undefined) => void;
-	onMonthChange: (date: Date | undefined) => void;
+	month?: Date;
 }
 
-const Calendar = ({
-	customDate,
-	onDateSelect,
-	onMonthChange,
-}: CalendarProps) => {
+const Calendar = ({ customDate, onDateSelect, month }: CalendarProps) => {
+	const [currentMonth, setCurrentMonth] = useState<Date>(
+		month || customDate || new Date()
+	);
 	const getMonthName = (date: Date) => {
 		const monthName = date.toLocaleDateString('ru-RU', {
 			month: 'long',
@@ -26,23 +26,28 @@ const Calendar = ({
 	};
 
 	const handlePreviousMonth = () => {
-		const newDate = new Date(customDate || new Date());
+		const newDate = new Date(currentMonth);
 		newDate.setMonth(newDate.getMonth() - 1);
-		onMonthChange(newDate);
+		setCurrentMonth(newDate);
 	};
 
 	const handleNextMonth = () => {
-		const newDate = new Date(customDate || new Date());
+		const newDate = new Date(currentMonth);
 		newDate.setMonth(newDate.getMonth() + 1);
-		onMonthChange(newDate);
+		setCurrentMonth(newDate);
 	};
+	useEffect(() => {
+		if (month) {
+			setCurrentMonth(month);
+		}
+	}, [month]);
 
 	return (
 		<div className="absolute top-17 left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-80">
 			{/* Кастомная навигация */}
 			<div className="flex justify-between items-center mb-4">
 				<span className="text-lg font-bold text-main-text">
-					{customDate ? getMonthName(customDate) : 'Выберите дату'}
+					{getMonthName(currentMonth)}
 				</span>
 				<div className="flex gap-x-4 justify-center">
 					<button
@@ -75,6 +80,8 @@ const Calendar = ({
 				selected={customDate}
 				onSelect={onDateSelect}
 				locale={ru}
+				month={currentMonth}
+				onMonthChange={setCurrentMonth}
 				showOutsideDays={true}
 				className="p-0"
 				classNames={{
