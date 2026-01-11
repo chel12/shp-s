@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-//проверяем куки
+import {
+	handleCatalogProductRedirect,
+	handleOldProductRedirect,
+} from '../utils/proxy-redirects';
+
 export async function proxy(request: NextRequest) {
-	//защищенные пути
 	const protectedPaths = ['/profile', '/administrator', '/cart', '/favorite'];
 	const isProtectedPath = protectedPaths.some((path) =>
 		request.nextUrl.pathname.startsWith(path)
@@ -10,11 +13,10 @@ export async function proxy(request: NextRequest) {
 
 	if (isProtectedPath) {
 		try {
-			//проверка сессиии
 			const sessionCookie =
 				request.cookies.get('better-auth.session_token') ||
 				request.cookies.get('session');
-			//шлём нахёр хулигана
+
 			if (!sessionCookie) {
 				return NextResponse.redirect(new URL('/', request.url));
 			}
@@ -23,9 +25,26 @@ export async function proxy(request: NextRequest) {
 		}
 	}
 
+	const redirectHandlers = [
+		handleCatalogProductRedirect,
+		handleOldProductRedirect,
+	];
+
+	for (const handler of redirectHandlers) {
+		const redirectResponse = await handler(request);
+		if (redirectResponse) {
+			return redirectResponse;
+		}
+	}
+
 	return NextResponse.next();
 }
-
+//с какими путями работает
 export const config = {
-	matcher: ['/profile/:path*', '/administrator/:path*'],
+	matcher: [
+		'/profile/:path*',
+		'/administrator/:path*',
+		'/catalog/:path*',
+		'/product/:path*',
+	],
 };
