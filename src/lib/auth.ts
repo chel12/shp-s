@@ -171,7 +171,7 @@ export const auth = betterAuth({
 // import nodemailer from "nodemailer"
 
 // const client = new MongoClient(process.env.DELIVERY_SHOP_DB_URL!);
-// const db = client.db("delivery-shop");
+// const db = client.db("deliveryshop");
 
 // // Локальный SMTP транспорт для разработки
 // const localTransporter = nodemailer.createTransport({

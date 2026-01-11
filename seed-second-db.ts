@@ -4,7 +4,7 @@ import 'dotenv/config';
 
 // Подключение к вашей БД
 const DB_URL = process.env.DELIVERY_SHOP_DB_URL || 'mongodb://localhost:27017';
-const DB_NAME = process.env.DELIVERY_SHOP_DB_NAME || 'delivery-shop';
+const DB_NAME = process.env.DELIVERY_SHOP_DB_NAME || 'deliveryshop';
 
 interface Product {
 	title: string;
@@ -98,7 +98,7 @@ async function seedDatabase() {
 		// Вставка данных (создаст коллекцию автоматически, если её нет)
 		const result = await productsCollection.insertMany(mockProducts);
 		console.log(
-			`Добавлено ${result.insertedCount} товаров в коллекцию other-products`
+			`Добавлено ${result.insertedCount} товаров в коллекцию other-products`,
 		);
 
 		// Создаем индекс для быстрого поиска (опционально)

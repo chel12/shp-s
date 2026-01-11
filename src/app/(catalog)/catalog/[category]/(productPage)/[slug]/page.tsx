@@ -7,23 +7,33 @@ import { ProductCardProps } from '@/types/product';
 import ErrorComponent from '@/components/ErrorComponent';
 import { getProduct } from '../getProducts';
 import ProductPageContent from './ProductPageContent';
+import { baseUrl } from '../../../../../../../utils/baseUrl';
 
 interface PageProps {
-	params: Promise<{ id: string }>;
-	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+	params: Promise<{ category: string; slug: string }>;
+}
+
+//id берет из парамсов а название обрезает
+function extractIdFromSlug(slug: string): string {
+	const match = slug.match(/^(\d+)/);
+	return match ? match[1] : slug;
 }
 //динамически мета данные генерирует
 export async function generateMetadata({
 	params,
-	searchParams,
 }: PageProps): Promise<Metadata> {
 	try {
-		const { id } = await params;
-		const product = await getProduct(id);
-
+		const { category, slug } = await params;
+		const productId = extractIdFromSlug(slug);
+		const product = await getProduct(productId);
+		const canonicalUrl = `${baseUrl}/catalog/${category}/${slug}`;
 		return {
 			title: `${product.title}`,
 			description: `Заказывайте ${product.title} по лучшей цене. Быстрая доставка, гарантия качества.`,
+			metadataBase: new URL(baseUrl),
+			alternates: {
+				canonical: canonicalUrl,
+			},
 			//для соцсетей что показывать
 			openGraph: {
 				title: product.title,
@@ -31,26 +41,24 @@ export async function generateMetadata({
 					product.description ||
 					`Заказывайте ${product.title} по лучшей цене`,
 				images: product.img ? [product.img[0]] : [],
+				url: canonicalUrl,
 			},
 		};
 	} catch {
-		//обработка ошибок
-		const searchParamsObj = await searchParams;
-		const productTitle = decodeURIComponent(String(searchParamsObj.desc));
-
 		return {
-			title: `${productTitle}`,
-			description: `Заказывайте ${productTitle} по лучшей цене. Быстрая доставка, гарантия качества.`,
+			title: 'Товар',
+			description: 'Страница товара',
+			metadataBase: new URL(baseUrl),
 		};
 	}
 }
 
 const ProductPage = async ({ params }: PageProps) => {
 	let product: ProductCardProps;
-	//ид продукта из парамс
-	const productId = (await params).id;
 
 	try {
+		const { slug } = await params;
+		const productId = extractIdFromSlug(slug);
 		product = await getProduct(productId);
 	} catch (error) {
 		return (
@@ -72,7 +80,12 @@ const ProductPage = async ({ params }: PageProps) => {
 		);
 	}
 	//основной компонент страницы
-	return <ProductPageContent product={product} productId={productId} />;
+	return (
+		<ProductPageContent
+			product={product}
+			productId={product.id.toString()}
+		/>
+	);
 };
 
 export default ProductPage;
