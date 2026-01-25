@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
@@ -11,28 +10,24 @@ import { checkAvatarExists } from '../../../utils/avatarUtils';
 import MiniLoader from '../MiniLoader';
 
 const Profile = () => {
-	//получаем из стора
 	const { isAuth, user, logout, checkAuth, isLoading } = useAuthStore();
-	//открытие закрытие меню
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
-	//если мобилка чтобы ui изменить
 	const [isMobile, setIsMobile] = useState(false);
-	//для аватарки
 	const [avatarSrc, setAvatarSrc] = useState<string>('');
 	const [lastUpdate, setLastUpdate] = useState(Date.now());
-
-	//реф для закрытия при клике вне меню
 	const menuRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
 
 	const getDisplayName = () => {
 		if (!user?.name) return <MiniLoader />;
+
 		if (user.role === 'manager') {
 			return 'Менеджер';
 		} else if (user.role === 'admin') {
 			return 'Администратор';
 		}
+
 		return user.name;
 	};
 
@@ -43,16 +38,16 @@ const Profile = () => {
 	useEffect(() => {
 		setLastUpdate(Date.now());
 	}, [user]);
+
 	useEffect(() => {
 		const checkAvatar = async () => {
 			if (user?.id) {
 				try {
-					//проверка есть ли аватар
 					const exists = await checkAvatarExists(user.id);
 
 					if (exists) {
 						setAvatarSrc(
-							`/api/auth/avatar/${user.id}?t=${lastUpdate}`
+							`/api/auth/avatar/${user.id}?t=${lastUpdate}`,
 						);
 					} else {
 						setAvatarSrc(getAvatarByGender(user.gender));
@@ -73,14 +68,16 @@ const Profile = () => {
 	}, [checkAuth]);
 
 	useEffect(() => {
-		//проверка на мобилку
+		checkAuth();
+	}, [checkAuth]);
+
+	useEffect(() => {
 		const checkMobile = () => setIsMobile(window.innerWidth <= 768);
 		checkMobile();
 		window.addEventListener('resize', checkMobile);
 		return () => window.removeEventListener('resize', checkMobile);
 	}, []);
 
-	//закрытие меню вне клика на нём
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
@@ -146,7 +143,7 @@ const Profile = () => {
 			<div
 				className="flex items-center gap-2.5 cursor-pointer"
 				onClick={toggleMenu}>
-				<Image
+				<img
 					src={avatarSrc || getAvatarByGender(user?.gender)}
 					alt="Ваш профиль"
 					width={40}
@@ -159,7 +156,7 @@ const Profile = () => {
 				</p>
 				<div className="hidden xl:block">
 					<Image
-						src={'/icons-header/icon-arrow.svg'}
+						src="/icons-header/icon-arrow.svg"
 						alt="Меню профиля"
 						width={24}
 						height={24}

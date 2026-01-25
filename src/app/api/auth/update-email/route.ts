@@ -1,63 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getDB } from '../../../../../utils/api-routes';
-import { ObjectId } from 'mongodb';
+import { NextRequest, NextResponse } from "next/server";
+import { getDB } from "../../../../../utils/api-routes";
+import { ObjectId } from "mongodb";
 
 export async function POST(request: NextRequest) {
-	const db = await getDB();
+  const db = await getDB();
 
-	try {
-		const { email, userId } = await request.json();
+  try {
+    const { email, userId } = await request.json();
 
-		if (!email || !userId) {
-			return NextResponse.json(
-				{ error: 'Email и userId обязательны' },
-				{ status: 400 }
-			);
-		}
+    if (!email || !userId) {
+      return NextResponse.json(
+        { error: "Email и userId обязательны" },
+        { status: 400 }
+      );
+    }
 
-		// Конвертируем userId в ObjectId
-		let objectId;
-		try {
-			objectId = ObjectId.createFromHexString(userId);
-		} catch {
-			return NextResponse.json(
-				{ error: 'Неверный формат userId' },
-				{ status: 400 }
-			);
-		}
-		//проверка есть ли такой емаил уже в базе
-		const existingUser = await db.collection('user').findOne({
-			email: email,
-			_id: { $ne: objectId },
-		});
+    let objectId;
+    try {
+      objectId = ObjectId.createFromHexString(userId);
+    } catch {
+      return NextResponse.json(
+        { error: "Неверный формат userId" },
+        { status: 400 }
+      );
+    }
 
-		if (existingUser) {
-			return NextResponse.json(
-				{ error: 'Пользователь с таким email уже существует' },
-				{ status: 409 }
-			);
-		}
+    const existingUser = await db.collection("user").findOne({
+      email: email,
+      _id: { $ne: objectId }, 
+    });
 
-		const result = await db
-			.collection('user')
-			.updateOne({ _id: objectId }, { $set: { email: email } });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Пользователь с таким email уже существует" },
+        { status: 409 }
+      );
+    }
 
-		return NextResponse.json({
-			success: true,
-			message: 'Email обновлен',
-			modified: result.modifiedCount > 0,
-		});
-	} catch (error) {
-		console.error('Ошибка при обновлении email:', error);
+    const result = await db
+      .collection("user")
+      .updateOne({ _id: objectId }, { $set: { email: email } });
 
-		return NextResponse.json(
-			{
-				error:
-					error instanceof Error
-						? error.message
-						: 'Внутренняя ошибка сервера',
-			},
-			{ status: 500 }
-		);
-	}
+    return NextResponse.json({
+      success: true,
+      message: "Email обновлен",
+      modified: result.modifiedCount > 0,
+    });
+  } catch (error) {
+    console.error("Ошибка при обновлении email:", error);
+
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error ? error.message : "Внутренняя ошибка сервера",
+      },
+      { status: 500 }
+    );
+  }
 }

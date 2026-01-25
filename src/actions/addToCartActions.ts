@@ -1,82 +1,81 @@
-'use server';
-import { getDB } from '../../utils/api-routes';
-import { ObjectId } from 'mongodb';
-import { getServerUserId } from '../../utils/getServerUserId';
-import { CartItem } from '@/types/cart';
+"use server";
+
+import { getDB } from "../../utils/api-routes";
+import { getServerUserId } from "../../utils/getServerUserId";
+import { ObjectId } from "mongodb";
+import { CartItem } from "../types/cart";
 
 export async function addToCartAction(
-	productId: string
+  productId: string
 ): Promise<{ success: boolean; message: string; loyaltyPrice?: number }> {
-	try {
-		//проверка ид продукта
-		if (!productId) {
-			return { success: false, message: 'ID продукта не указан' };
-		}
-		//проверка ид юзера
-		const userId = await getServerUserId();
+  try {
+    if (!productId) {
+      return { success: false, message: "ID продукта не указан" };
+    }
 
-		if (!userId) {
-			return { success: false, message: 'Не авторизован' };
-		}
+    const userId = await getServerUserId();
 
-		const db = await getDB();
-		//поиск юзера в бд
-		const user = await db.collection('user').findOne({
-			_id: ObjectId.createFromHexString(userId),
-		});
+    if (!userId) {
+      return { success: false, message: "Не авторизован" };
+    }
 
-		if (!user) {
-			return { success: false, message: 'Пользователь не найден' };
-		}
-		//ид в число так как в бд это число
-		const productIdNumber = parseInt(productId);
+    const db = await getDB();
 
-		const product = await db.collection('products').findOne({
-			id: productIdNumber,
-		});
+    const user = await db.collection("user").findOne({
+      _id: ObjectId.createFromHexString(userId),
+    });
 
-		if (!product) {
-			return { success: false, message: 'Продукт не найден' };
-		}
+    if (!user) {
+      return { success: false, message: "Пользователь не найден" };
+    }
 
-		//текущие товары в корзине юзера получаем и пихаем в массив
-		const cartItems: CartItem[] = user.cart || [];
+    const productIdNumber = parseInt(productId);
 
-		const existingItem = cartItems.find(
-			(item: CartItem) => item.productId === productId
-		);
-		//если товар существует уже
-		if (existingItem) {
-			return {
-				success: false,
-				message: 'Товар уже в корзине',
-			};
-		}
+    const product = await db.collection("products").findOne({
+      id: productIdNumber,
+    });
 
-		const productQuantity = product.quantity || 0;
-		const initialQuantity = productQuantity > 0 ? 1 : 0;
+    if (!product) {
+      return { success: false, message: "Продукт не найден" };
+    }
 
-		//новый элемент корзины
-		const newCartItem: CartItem = {
-			productId,
-			quantity: initialQuantity,
-			addedAt: new Date(),
-		};
+    const cartItems: CartItem[] = user.cart || [];
 
-		const newCartItems = [...cartItems, newCartItem];
-		//ищем по бд юзера и переписываем
-		await db
-			.collection('user')
-			.updateOne(
-				{ _id: ObjectId.createFromHexString(userId) },
-				{ $set: { cart: newCartItems } }
-			);
+    const existingItem = cartItems.find(
+      (item: CartItem) => item.productId === productId
+    );
 
-		return {
-			success: true,
-			message: '',
-		};
-	} catch {
-		return { success: false, message: 'Ошибка сервера' };
-	}
+    if (existingItem) {
+      return {
+        success: false,
+        message: "Товар уже в корзине",
+      };
+    }
+
+    const productQuantity = product.quantity || 0;
+
+    const initialQuantity = productQuantity > 0 ? 1 : 0;
+
+    const newCartItem: CartItem = {
+      productId,
+      quantity: initialQuantity,
+      addedAt: new Date(),
+    };
+
+    const newCartItems = [...cartItems, newCartItem];
+
+    await db
+      .collection("user")
+      .updateOne(
+        { _id: ObjectId.createFromHexString(userId) },
+        { $set: { cart: newCartItems } }
+      );
+
+    return {
+      success: true,
+      message: "",
+    };
+  } catch {
+    return { success: false, message: "Ошибка сервера" };
+  }
 }

@@ -1,292 +1,245 @@
-'use client';
-import { useEffect, useState, useCallback } from 'react';
-import { Loader } from '@/components/Loader';
-import { ProductCardProps } from '@/types/product';
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
 import {
-	getOrderCartAction,
-	getUserBonusesAction,
-	removeMultipleOrderItemsAction,
-	updateOrderItemQuantityAction,
-} from '@/actions/orderAction';
-import { useCartStore } from '@/store/cartStore';
-import CartHeader from './_components/CartHeader';
-import CartControls from './_components/CartControls';
-import CartItem from './_components/CartItem';
-import { usePricing } from '@/hooks/usePricing';
-import CartSidebar from './_components/CartSidebar';
-import CheckoutForm from './_components/CheckoutForm';
-import { DeliveryAddress, DeliveryTime } from '@/types/order';
+  getOrderCartAction,
+  getUserBonusesAction,
+  removeMultipleOrderItemsAction,
+  updateOrderItemQuantityAction,
+} from "@/actions/orderActions";
+import { useCartStore } from "@/store/cartStore";
+import { Loader } from "@/components/Loader";
+import { ProductCardProps } from "@/types/product";
+import CartHeader from "./_components/CartHeader";
+import CartControls from "./_components/CartControls";
+import CartItem from "./_components/CartItem";
+import { usePricing } from "@/hooks/usePricing";
+import CartSidebar from "./_components/CartSidebar";
+import CheckoutForm from "./_components/CheckoutForm";
+import { DeliveryAddress, DeliveryTime } from "@/types/order";
 
 const CartPage = () => {
-	// Состояние для отслеживания выбранных товаров (массив ID товаров)
-	const [selectedItems, setSelectedItems] = useState<string[]>([]);
-	// Состояние для хранения данных о товарах (объект, где ключи - ID товаров, значения - данные товаров)
-	const [productsData, setProductsData] = useState<{
-		[key: string]: ProductCardProps;
-	}>({});
-	// Состояние для количества доступных бонусов пользователя
-	const [bonusesCount, setBonusesCount] = useState<number>(0);
-	// Состояние для отслеживания удаленных товаров (чтобы скрыть их из интерфейса без немедленного удаления из store)
-	const [removedItems, setRemovedItems] = useState<string[]>([]);
-	// Состояние загрузки данных корзины (показывает индикатор загрузки)
-	const [isCartLoading, setIsCartLoading] = useState(true);
-	//для заголовка
-	const [title, setTitle] = useState<string>('Корзина');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [productsData, setProductsData] = useState<{
+    [key: string]: ProductCardProps;
+  }>({});
+  const [bonusesCount, setBonusesCount] = useState<number>(0);
+  const [removedItems, setRemovedItems] = useState<string[]>([]);
+  const [isCartLoading, setIsCartLoading] = useState(true);
+  const [title, setTitle] = useState<string>("Корзина");
+  const [deliveryData, setDeliveryData] = useState<{
+    address: DeliveryAddress;
+    time: DeliveryTime;
+    isValid: boolean;
+  } | null>(null);
 
-	const [deliveryData, setDeliveryData] = useState<{
-		address: DeliveryAddress;
-		time: DeliveryTime;
-		isValid: boolean;
-	} | null>(null);
+  const handleFormDataChange = useCallback(
+    (data: {
+      address: DeliveryAddress;
+      time: DeliveryTime;
+      isValid: boolean;
+    }) => {
+      setDeliveryData(data);
+    },
+    []
+  );
 
-	const handleFormDataChange = useCallback(
-		(data: {
-			address: DeliveryAddress;
-			time: DeliveryTime;
-			isValid: boolean;
-		}) => {
-			setDeliveryData(data);
-		},
-		[]
-	);
+  const {
+    cartItems,
+    updateCart,
+    hasLoyaltyCard,
+    setHasLoyaltyCard,
+    useBonuses,
+    isCheckout,
+    isOrdered,
+  } = useCartStore();
 
-	const {
-		cartItems,
-		updateCart,
-		hasLoyaltyCard,
-		setHasLoyaltyCard,
-		useBonuses,
-		isCheckout,
-		isOrdered,
-	} = useCartStore();
+  const sidebarProps = {
+    deliveryData,
+    productsData,
+  };
 
-	const sidebarProps = {
-		deliveryData,
-		productsData,
-	};
+  const visibleCartItems = cartItems.filter(
+    (item) => !removedItems.includes(item.productId)
+  );
 
-	// Фильтруем удаленные товары - показываем только те, что не в списке удаленных
-	// Это оптимистичное обновление UI до подтверждения удаления с сервера
-	const visibleCartItems = cartItems.filter(
-		(item) => !removedItems.includes(item.productId)
-	);
+  const availableCartItems = visibleCartItems.filter((item) => {
+    const product = productsData[item.productId];
+    return product && product.quantity > 0;
+  });
 
-	// Добавил уже после урока.
-	// Фильтруем товары в наличии для расчетов цен Добавлена переменная availableCartItems,
-	// которая фильтрует visibleCartItems, оставляя только товары в наличии.
-	//  Все расчеты цен (totalPrice, totalMaxPrice, totalDiscount, totalBonuses)
-	// теперь используют availableCartItems вместо visibleCartItems
-	const availableCartItems = visibleCartItems.filter((item) => {
-		const product = productsData[item.productId];
-		return product && product.quantity > 0;
-	});
+  usePricing({
+    availableCartItems,
+    productsData,
+    hasLoyaltyCard,
+    bonusesCount,
+    useBonuses,
+  });
 
-	usePricing({
-		availableCartItems,
-		productsData,
-		hasLoyaltyCard,
-		bonusesCount,
-		useBonuses,
-	});
-	// Асинхронная функция загрузки данных корзины и товаров
-	const fetchCartAndProducts = async () => {
-		setIsCartLoading(true); // Включаем индикатор загрузки
-		try {
-			// Получаем данные пользователя (бонусы и карту лояльности)
-			const userData = await getUserBonusesAction();
-			setBonusesCount(userData.bonusesCount); // Устанавливаем количество бонусов
-			setHasLoyaltyCard(userData.hasLoyaltyCard); // Устанавливаем статус карты лояльности
+  const fetchCartAndProducts = async () => {
+    setIsCartLoading(true);
+    try {
+      const userData = await getUserBonusesAction();
+      setBonusesCount(userData.bonusesCount);
+      setHasLoyaltyCard(userData.hasLoyaltyCard);
 
-			// Загружаем актуальные данные корзины с сервера
-			const cartItems = await getOrderCartAction();
+      const cartItems = await getOrderCartAction();
 
-			// ОБНОВЛЯЕМ STORE данными из сервера (синхронизируем локальное состояние с сервером)
-			updateCart(cartItems);
+      updateCart(cartItems);
 
-			// Создаем массив промисов для параллельной загрузки данных о каждом товаре
-			const productPromises = cartItems.map(async (item) => {
-				try {
-					// Запрашиваем данные товара по API
-					const response = await fetch(
-						`/api/products/${item.productId}`
-					);
-					const product = await response.json();
-					return { productId: item.productId, product }; // Возвращаем ID и данные товара
-				} catch (error) {
-					console.error(
-						`Ошибка получения продукта ${item.productId}:`,
-						error
-					);
-					return null; // В случае ошибки возвращаем null
-				}
-			});
+      const productPromises = cartItems.map(async (item) => {
+        try {
+          const response = await fetch(`/api/products/${item.productId}`);
+          const product = await response.json();
+          return { productId: item.productId, product };
+        } catch (error) {
+          console.error(`Ошибка получения продукта ${item.productId}:`, error);
+          return null;
+        }
+      });
 
-			// Ожидаем завершения всех запросов к API товаров
-			const productsResults = await Promise.all(productPromises);
-			const productsMap: { [key: string]: ProductCardProps } = {};
+      const productsResults = await Promise.all(productPromises);
+      const productsMap: { [key: string]: ProductCardProps } = {};
 
-			// Преобразуем массив результатов в объект для быстрого доступа по ID товара
-			productsResults.forEach((result) => {
-				if (result && result.product) {
-					productsMap[result.productId] = result.product; // Сохраняем товар по его ID
-				}
-			});
+      productsResults.forEach((result) => {
+        if (result && result.product) {
+          productsMap[result.productId] = result.product;
+        }
+      });
 
-			setProductsData(productsMap); // Устанавливаем данные товаров в состояние
-		} catch (error) {
-			console.error('Ошибка получения данных корзины:', error);
-		} finally {
-			setIsCartLoading(false); // Выключаем индикатор загрузки в любом случае
-		}
-	};
-	//смена заголовка
-	useEffect(() => {
-		setTitle(isCheckout ? 'Доставка' : 'Корзина');
-	}, [isCheckout]);
-	useEffect(() => {
-		fetchCartAndProducts();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+      setProductsData(productsMap);
+    } catch (error) {
+      console.error("Ошибка получения данных корзины:", error);
+    } finally {
+      setIsCartLoading(false);
+    }
+  };
 
-	// Функция обновления количества товара (мемоизирована для оптимизации перерендеров)
-	const handleQuantityUpdate = useCallback(
-		async (productId: string, newQuantity: number) => {
-			// Оптимистичное обновление store - сразу меняем UI до ответа сервера
-			const updatedCartItems = cartItems.map((item) =>
-				item.productId === productId
-					? { ...item, quantity: newQuantity }
-					: item
-			);
-			updateCart(updatedCartItems); // Обновляем глобальное состояние
+  useEffect(() => {
+    setTitle(isCheckout ? "Доставка" : "Корзина");
+  }, [isCheckout]);
 
-			try {
-				// Синхронизируем изменение с сервером
-				await updateOrderItemQuantityAction(productId, newQuantity);
-			} catch (error) {
-				console.error('Ошибка обновления количества:', error);
-				// Откат к предыдущему состоянию при ошибке (пессимистичное обновление)
-				updateCart(cartItems);
-			}
-		},
-		[cartItems, updateCart] // Зависимости для useCallback
-	);
+  useEffect(() => {
+    fetchCartAndProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-	// Функция удаления выбранных товаров
-	const handleRemoveSelected = async () => {
-		if (selectedItems.length === 0) return; // Выходим если нечего удалять
+  const handleQuantityUpdate = useCallback(
+    async (productId: string, newQuantity: number) => {
+      const updatedCartItems = cartItems.map((item) =>
+        item.productId === productId ? { ...item, quantity: newQuantity } : item
+      );
+      updateCart(updatedCartItems);
 
-		// СРАЗУ убираем товары из рендеринга (оптимистичное обновление UI)
-		setRemovedItems((prev) => [...prev, ...selectedItems]);
+      try {
+        await updateOrderItemQuantityAction(productId, newQuantity);
+      } catch (error) {
+        console.error("Ошибка обновления количества:", error);
+        updateCart(cartItems);
+      }
+    },
+    [cartItems, updateCart]
+  );
 
-		// Фильтруем товары в store, удаляя выбранные
-		const updatedCartItems = cartItems.filter(
-			(item) => !selectedItems.includes(item.productId)
-		);
-		updateCart(updatedCartItems); // Обновляем глобальное состояние
+  const handleRemoveSelected = async () => {
+    if (selectedItems.length === 0) return;
 
-		try {
-			// Удаляем в фоне - НЕ ЖДЕМ ОТВЕТА (неблокирующий запрос)
-			removeMultipleOrderItemsAction(selectedItems);
-			setSelectedItems([]); // Очищаем выбранные товары
-		} catch (error) {
-			console.error('Ошибка удаления товаров:', error);
-			// Откат изменений при ошибке - возвращаем товары в видимые
-			setRemovedItems((prev) =>
-				prev.filter((id) => !selectedItems.includes(id))
-			);
-			updateCart(cartItems); // Восстанавливаем предыдущее состояние store
-		}
-	};
+    setRemovedItems((prev) => [...prev, ...selectedItems]);
 
-	// Выделить все товары в корзине
-	const selectAllItems = () => {
-		setSelectedItems(visibleCartItems.map((item) => item.productId));
-	};
+    const updatedCartItems = cartItems.filter(
+      (item) => !selectedItems.includes(item.productId)
+    );
+    updateCart(updatedCartItems);
 
-	// Снять выделение со всех товаров
-	const deselectAllItems = () => {
-		setSelectedItems([]);
-	};
+    try {
+      removeMultipleOrderItemsAction(selectedItems);
+      setSelectedItems([]);
+    } catch (error) {
+      console.error("Ошибка удаления товаров:", error);
+      setRemovedItems((prev) =>
+        prev.filter((id) => !selectedItems.includes(id))
+      );
+      updateCart(cartItems);
+    }
+  };
 
-	// Обработчик выбора/снятия выбора отдельного товара
-	const handleItemSelection = useCallback(
-		(productId: string, isSelected: boolean) => {
-			if (isSelected) {
-				setSelectedItems((prev) => [...prev, productId]); // Добавляем к выбранным
-			} else {
-				setSelectedItems((prev) =>
-					prev.filter((id) => id !== productId)
-				); // Удаляем из выбранных
-			}
-		},
-		[]
-	);
+  const selectAllItems = () => {
+    setSelectedItems(visibleCartItems.map((item) => item.productId));
+  };
 
-	// Проверка, выбраны ли все товары в корзине
-	// true если есть выбранные товары и их количество равно общему количеству видимых товаров
-	const isAllSelected =
-		selectedItems.length > 0 &&
-		selectedItems.length === visibleCartItems.length;
+  const deselectAllItems = () => {
+    setSelectedItems([]);
+  };
 
-	if (isCartLoading) {
-		return <Loader />;
-	}
+  const handleItemSelection = useCallback(
+    (productId: string, isSelected: boolean) => {
+      if (isSelected) {
+        setSelectedItems((prev) => [...prev, productId]);
+      } else {
+        setSelectedItems((prev) => prev.filter((id) => id !== productId));
+      }
+    },
+    []
+  );
 
-	if (visibleCartItems.length === 0 && removedItems.length === 0) {
-		return (
-			<div className="container mx-auto px-4 py-8">
-				<h1 className="text-2xl font-bold mb-8">Корзина</h1>
-				<div className="text-center py-12">
-					<p className="text-gray-500 text-lg">Корзина пуста</p>
-				</div>
-			</div>
-		);
-	}
+  const isAllSelected =
+    selectedItems.length > 0 &&
+    selectedItems.length === visibleCartItems.length;
 
-	return (
-		<div
-			className="px-[max(12px,calc((100%-1208px)/2))] md:px-[max(16px,calc((100%-1208px)/2))]
-		 text-main-text mx-auto">
-			<CartHeader itemCount={visibleCartItems.length} title={title} />
+  if (isCartLoading) {
+    return <Loader />;
+  }
 
-			<div className="flex flex-col md:flex-row gap-8 xl:gap-x-15">
-				<div
-					className={`flex-1 ${isOrdered ? 'pointer-events-none opacity-50' : ''}`}>
-					{!isCheckout ? (
-						<>
-							<CartControls
-								isAllSelected={isAllSelected}
-								selectedItemsCount={selectedItems.length}
-								onSelectAll={selectAllItems}
-								onDeselectAll={deselectAllItems}
-								onRemoveSelected={handleRemoveSelected}
-							/>
-							<div className="flex flex-col gap-y-6">
-								{visibleCartItems.map((item) => (
-									<CartItem
-										key={item.productId} //уник ключ
-										item={item} //элемент массива
-										productData={
-											productsData[item.productId]
-										} //данные продукта
-										isSelected={selectedItems.includes(
-											item.productId
-										)} //только рендер включенных продуктов
-										onSelectionChange={handleItemSelection} //изменение рендера продуктов
-										onQuantityUpdate={handleQuantityUpdate}
-									/>
-								))}
-							</div>
-						</>
-					) : (
-						<CheckoutForm onFormDataChange={handleFormDataChange} />
-					)}
-				</div>
+  if (visibleCartItems.length === 0 && removedItems.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-8">Корзина</h1>
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">Корзина пуста</p>
+        </div>
+      </div>
+    );
+  }
 
-				<CartSidebar {...sidebarProps} />
-			</div>
-		</div>
-	);
+  return (
+    <div className="px-[max(12px,calc((100%-1208px)/2))] md:px-[max(16px,calc((100%-1208px)/2))] text-main-text mx-auto">
+      <CartHeader itemCount={visibleCartItems.length} title={title} />
+
+      <div className="flex flex-col md:flex-row gap-8 xl:gap-x-15">
+        <div
+          className={`flex-1 ${isOrdered ? "pointer-events-none opacity-50" : ""}`}
+        >
+          {!isCheckout ? (
+            <>
+              <CartControls
+                isAllSelected={isAllSelected}
+                selectedItemsCount={selectedItems.length}
+                onSelectAll={selectAllItems}
+                onDeselectAll={deselectAllItems}
+                onRemoveSelected={handleRemoveSelected}
+              />
+              <div className="flex flex-col gap-y-6">
+                {visibleCartItems.map((item) => (
+                  <CartItem
+                    key={item.productId}
+                    item={item}
+                    productData={productsData[item.productId]}
+                    isSelected={selectedItems.includes(item.productId)}
+                    onSelectionChange={handleItemSelection}
+                    onQuantityUpdate={handleQuantityUpdate}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <CheckoutForm onFormDataChange={handleFormDataChange} />
+          )}
+        </div>
+
+        <CartSidebar {...sidebarProps} />
+      </div>
+    </div>
+  );
 };
 
 export default CartPage;

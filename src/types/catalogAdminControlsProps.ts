@@ -1,5 +1,5 @@
 export interface CatalogAdminControlsProps {
-	isEditing: boolean;
-	onToggleEditingAction: () => void;
-	onResetLayoutAction: () => void;
+  isEditing: boolean;
+  onToggleEditingAction: () => void;
+  onResetLayoutAction: () => void;
 }

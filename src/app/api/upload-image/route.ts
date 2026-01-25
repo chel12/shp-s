@@ -3,74 +3,69 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export async function POST(request: NextRequest) {
-	try {
-		const formData = await request.formData();
-		const image = formData.get('image') as File;
-		const imageId = formData.get('imageId') as string;
+  try {
+    const formData = await request.formData();
+    const image = formData.get('image') as File;
+    const imageId = formData.get('imageId') as string;
 
-		if (!image) {
-			return NextResponse.json(
-				{ error: 'Файл не загружен' },
-				{ status: 400 }
-			);
-		}
+    if (!image) {
+      return NextResponse.json(
+        { error: 'Файл не загружен' },
+        { status: 400 }
+      );
+    }
 
-		if (!imageId) {
-			return NextResponse.json(
-				{ error: 'ID изображения не указан' },
-				{ status: 400 }
-			);
-		}
+    if (!imageId) {
+      return NextResponse.json(
+        { error: 'ID изображения не указан' },
+        { status: 400 }
+      );
+    }
 
-		if (!image.type.includes('image')) {
-			return NextResponse.json(
-				{ error: 'Загруженный файл не является изображением' },
-				{ status: 400 }
-			);
-		}
+    if (!image.type.includes('image')) {
+      return NextResponse.json(
+        { error: 'Загруженный файл не является изображением' },
+        { status: 400 }
+      );
+    }
 
-		if (image.size > 5 * 1024 * 1024) {
-			return NextResponse.json(
-				{ error: 'Файл слишком большой (макс. 5MB)' },
-				{ status: 400 }
-			);
-		}
-		//формируем название файла
-		const filename = `img-${imageId}.jpeg`;
-		//формируем путь
-		const imagePath = `/images/products/${filename}`;
-		//получение абсолют пути к папке
-		const publicDir = path.join(process.cwd(), 'public');
-		//формируем полный путь к папке для хранения изображ
-		const imagesDir = path.join(publicDir, 'images', 'products');
-		//полный путь к файлу на сервере
-		const fullPath = path.join(imagesDir, filename);
-		//проверка директории для изображения
-		try {
-			await fs.access(imagesDir);
-		} catch {
-			await fs.mkdir(imagesDir, { recursive: true });
-		}
-		//преобразуем в бинарку
-		const bytes = await image.arrayBuffer();
-		//преобразуем для записи в файл
-		const buffer = Buffer.from(bytes);
-		//запись файла на диск
-		await fs.writeFile(fullPath, buffer);
+    if (image.size > 5 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'Файл слишком большой (макс. 5MB)' },
+        { status: 400 }
+      );
+    }
 
-		return NextResponse.json({
-			success: true,
-			product: {
-				id: parseInt(imageId),
-				img: imagePath,
-				filename: filename,
-			},
-		});
-	} catch (error) {
-		console.error('Upload error:', error);
-		return NextResponse.json(
-			{ error: 'Ошибка сервера при загрузке изображения' },
-			{ status: 500 }
-		);
-	}
+    const filename = `img-${imageId}.jpeg`;
+    const imagePath = `/images/products/${filename}`;
+    const publicDir = path.join(process.cwd(), 'public');
+    const imagesDir = path.join(publicDir, 'images', 'products');
+    const fullPath = path.join(imagesDir, filename);
+
+    try {
+      await fs.access(imagesDir);
+    } catch {
+      await fs.mkdir(imagesDir, { recursive: true });
+    }
+
+    const bytes = await image.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await fs.writeFile(fullPath, buffer);
+
+    return NextResponse.json({
+      success: true,
+      product: {
+        id: parseInt(imageId),
+        img: imagePath,
+        filename: filename
+      }
+    });
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      { error: 'Ошибка сервера при загрузке изображения' },
+      { status: 500 }
+    );
+  }
 }

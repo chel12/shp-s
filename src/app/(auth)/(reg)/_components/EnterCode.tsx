@@ -8,19 +8,16 @@ import { buttonStyles } from '../../../styles';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import useTimer from '@/hooks/useTimer';
-import { LoadingContent } from './LoadingContent';
 import OTPResendCode from '../../_components/OTPResendButton';
+import { LoadingContent } from './LoadingContent';
 import { CONFIG } from '../../../../../config/config';
 
 export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 	const [code, setCode] = useState('');
-	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState('');
 	const [attemptsLeft, setAttemptsLeft] = useState(CONFIG.MAX_ATTEMPTS);
 	const { regFormData } = useRegFormContext();
-	//timeLeft - сколько осталось времени
-	//canResend - можно отправлять или нет
-	//startTimer - старт таймера
 	const { timeLeft, canResend, startTimer } = useTimer(CONFIG.TIMEOUT_PERIOD);
 	const router = useRouter();
 
@@ -31,12 +28,12 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		//если код меньше 4 защита
 		if (code.length !== 4) return;
+
 		setIsLoading(true);
+
 		try {
 			const { data: verifyData, error: verifyError } =
-				//из документации
 				await authClient.phoneNumber.verify({
 					phoneNumber,
 					code,
@@ -46,36 +43,34 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 			if (verifyError) throw verifyError;
 
 			setAttemptsLeft(CONFIG.MAX_ATTEMPTS);
-			//ещё и пароль надо проверять(с макета)
+
 			const passwordResponse = await fetch('/api/auth/set-password', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					//юзера из id verify берём и пароль из регформы
 					userId: verifyData.user.id,
 					password: regFormData.password,
 				}),
 			});
-			//если не получилось то обращаемся и достаём ошибку
+
 			if (!passwordResponse.ok) {
 				const errorData = await passwordResponse.json();
 				console.error('Детали ошибки', errorData);
 				throw new Error(errorData.error || 'Ошибка установки пароля');
 			}
-			//теперь надо вызвать метод обнов пользователя  из betterAuthCLient
-			// После установки пароля, обновляем дополнительные поля пользователя
 
 			let userDataToUpdate = { ...regFormData };
+
 			if (verifyData.user.phoneNumberVerified) {
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				const { email, ...rest } = userDataToUpdate;
+				const { email, phoneNumber, ...rest } = userDataToUpdate;
 				userDataToUpdate = rest as typeof regFormData;
 			}
+
 			const { error: updateError } =
 				await authClient.updateUser(userDataToUpdate);
-			//если там ошибка то на верх её прокинуть
 			if (updateError) throw updateError;
-			//если всё чётко то го на страницу авторизации
+
 			router.replace('/login');
 		} catch (error) {
 			console.error('Ошибка верификации телефона:', error);
@@ -84,7 +79,7 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 
 			if (attemptsLeft <= 1) {
 				setError(
-					'Попытки исчерпаны. Пожалуйста, зарегистрируйтесь снова'
+					'Попытки исчерпаны. Пожалуйста, зарегистрируйтесь снова',
 				);
 				setTimeout(() => router.replace('/register'), 2000);
 			} else {
@@ -108,16 +103,17 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 					},
 					onError: (ctx) => {
 						setError(
-							ctx.error?.message || 'Ошибка при отправке SMS'
+							ctx.error?.message || 'Ошибка при отправке SMS',
 						);
 					},
-				}
+				},
 			);
 		} catch (error) {
 			console.error('Ошибка отправки кода:', error);
 			setError('Ошибка при отправке кода');
 		}
 	};
+
 	if (isLoading) {
 		return <LoadingContent title={'Проверяем код...'} />;
 	}
@@ -136,7 +132,6 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 						autoComplete="off">
 						<input
 							type="password"
-							//ограничения для html
 							inputMode="numeric"
 							pattern="[0-9]{4}"
 							maxLength={4}
@@ -145,11 +140,7 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 								setCode(e.target.value);
 								setError('');
 							}}
-							className="flex justify-center w-27.5 h-15 text-center 
-							text-2xl px-4 py-3 border border-[#bfbfbf] rounded 
-							focus:border-[#70c05b] focus:shadow-(--shadow-button-default)
-							 focus:bg-white focus:outline-none"
-							//не сохранять код в целях безопасности
+							className="flex justify-center w-27.5 h-15 text-center text-2xl px-4 py-3 border border-[#bfbfbf] rounded focus:border-[#70c05b] focus:shadow-(--shadow-button-default) focus:bg-white focus:outline-none"
 							autoComplete="one-time-code"
 							required
 						/>
@@ -160,11 +151,7 @@ export const EnterCode = ({ phoneNumber }: { phoneNumber: string }) => {
 						)}
 						<button
 							type="submit"
-							className={`${buttonStyles.base} ${
-								code.length !== 4
-									? buttonStyles.inactive
-									: buttonStyles.active
-							} [&&]:mt-8 mb-0`}
+							className={`${buttonStyles.base} ${code.length !== 4 ? buttonStyles.inactive : buttonStyles.active} [&&]:mt-8 mb-0`}
 							disabled={code.length !== 4 || attemptsLeft <= 0}>
 							Подтвердить
 						</button>

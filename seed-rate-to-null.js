@@ -54,8 +54,8 @@ function resetRateField() {
                     productsCollection = db.collection('products');
                     return [4 /*yield*/, productsCollection.updateMany({}, {
                             $set: {
-                                'rating.rate': 0,
-                            },
+                                'rating.rate': 0
+                            }
                         })];
                 case 2:
                     result = _a.sent();

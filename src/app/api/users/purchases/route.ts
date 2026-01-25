@@ -1,76 +1,78 @@
-import { ObjectId } from 'mongodb';
-import { CONFIG } from '../../../../../config/config';
-import { getDB } from '../../../../../utils/api-routes';
-import { NextResponse } from 'next/server';
-export const dynamic = 'force-dynamic';
+import { CONFIG } from "../../../../../config/config";
+import { getDB } from "../../../../../utils/api-routes";
+import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 
 export async function GET(request: Request) {
-	try {
-		const db = await getDB();
+  try {
+    const db = await getDB();
 
-		const url = new URL(request.url);
-		const userId = url.searchParams.get('userId');
-		if (!userId) {
-			return NextResponse.json({ products: [], totalCount: 0 });
-		}
+    const url = new URL(request.url);
 
-		const userPurchasesLimit = url.searchParams.get('userPurchasesLimit');
-		const startIdx = parseInt(url.searchParams.get('startIdx') || '0');
-		const perPage = parseInt(
-			url.searchParams.get('perPage') || CONFIG.ITEMS_PER_PAGE.toString()
-		);
+    // Получаем userId из параметров или из сессии
+    const userId = url.searchParams.get("userId");
 
-		const user = await db.collection('users').findOne({
-			_id: ObjectId.createFromHexString(userId),
-		});
+    if (!userId) {
+      return NextResponse.json({ products: [], totalCount: 0 });
+    }
 
-		if (!user?.purchases?.length) {
-			return NextResponse.json({ products: [], totalCount: 0 });
-		}
+    const userPurchasesLimit = url.searchParams.get("userPurchasesLimit");
+    const startIdx = parseInt(url.searchParams.get("startIdx") || "0");
+    const perPage = parseInt(
+      url.searchParams.get("perPage") || CONFIG.ITEMS_PER_PAGE.toString()
+    );
 
-		const productIds = user.purchases;
+    const user = await db.collection("user").findOne({
+      _id: ObjectId.createFromHexString(userId),
+    });
 
-		if (userPurchasesLimit) {
-			const limit = parseInt(userPurchasesLimit);
+    if (!user?.purchases?.length) {
+      return NextResponse.json({ products: [], totalCount: 0 });
+    }
 
-			const purchases = await db
-				.collection('products')
-				.find({ id: { $in: productIds } })
-				.limit(limit)
-				.toArray();
+    const productIds = user.purchases;
 
-			return NextResponse.json(
-				purchases.map((product) => {
-					const { discountPercent, ...rest } = product;
-					void discountPercent;
-					return rest;
-				})
-			);
-		}
+    if (userPurchasesLimit) {
+      const limit = parseInt(userPurchasesLimit);
 
-		const totalCount = productIds.length;
+      const purchases = await db
+        .collection("products")
+        .find({ id: { $in: productIds } })
+        .limit(limit)
+        .toArray();
 
-		const purchases = await db
-			.collection('products')
-			.find({ id: { $in: productIds } })
-			.sort({ _id: -1 })
-			.skip(startIdx)
-			.limit(perPage)
-			.toArray();
+      return NextResponse.json(
+        purchases.map((product) => {
+          const { discountPercent, ...rest } = product;
+          void discountPercent;
+          return rest;
+        })
+      );
+    }
 
-		return NextResponse.json({
-			products: purchases.map((product) => {
-				const { discountPercent, ...rest } = product;
-				void discountPercent;
-				return rest;
-			}),
-			totalCount,
-		});
-	} catch (error) {
-		console.error('Ошибка сервера:', error);
-		return NextResponse.json(
-			{ message: 'Ошибка при загрузке купленных продуктов' },
-			{ status: 500 }
-		);
-	}
+    const totalCount = productIds.length;
+
+    const purchases = await db
+      .collection("products")
+      .find({ id: { $in: productIds } })
+      .sort({ _id: -1 })
+      .skip(startIdx)
+      .limit(perPage)
+      .toArray();
+
+    return NextResponse.json({
+      products: purchases.map((product) => {
+        const { discountPercent, ...rest } = product;
+        void discountPercent;
+        return rest;
+      }),
+      totalCount,
+    });
+  } catch (error) {
+    console.error("Ошибка сервера:", error);
+    return NextResponse.json(
+      { message: "Ошибка при загрузке купленных продуктов" },
+      { status: 500 }
+    );
+  }
 }

@@ -1,4 +1,4 @@
 export interface ErrorProps {
-	error: Error;
-	userMessage?: string;
+  error: Error;
+  userMessage?: string;
 }

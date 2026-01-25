@@ -1,66 +1,63 @@
-import { auth } from '@/lib/auth';
-import { getDB } from './api-routes';
-import { ObjectId } from 'mongodb';
+import { auth } from "@/lib/auth";
+import { getDB } from "./api-routes";
+import { ObjectId } from "mongodb";
 
-//запрос сессии к BetterAuth
 export async function getBetterAuthSession(headers: Headers) {
-	try {
-		return await auth.api.getSession({ headers });
-	} catch (error) {
-		console.log('Better-Auth session check failed:', error);
-		return null;
-	}
+  try {
+    return await auth.api.getSession({ headers });
+  } catch (error) {
+    console.log("Better-Auth session check failed:", error);
+    return null;
+  }
 }
-//телефон+пароль юзеры.извлечь токен сессии из запроса
+
 export function getCustomSessionToken(
-	cookieHeader: string | null
+  cookieHeader: string | null
 ): string | null {
-	const cookies = (cookieHeader || '').split(';').map((c) => c.trim());
+  const cookies = (cookieHeader || "").split(";").map((c) => c.trim());
 
-	return cookies.find((c) => c.startsWith('session='))?.split('=')[1] || null;
+  return cookies.find((c) => c.startsWith("session="))?.split("=")[1] || null;
 }
-//быстрая проверка есть ли сессия в бд или нет, данные о сессии не возвращает
+
 export async function validateCustomSession(sessionToken: string) {
-	const db = await getDB();
-	const session = await db
-		.collection('session')
-		.findOne({ token: sessionToken });
+  const db = await getDB();
+  const session = await db
+    .collection("session")
+    .findOne({ token: sessionToken });
 
-	return !!session && new Date(session.expiresAt) > new Date();
+  return !!session && new Date(session.expiresAt) > new Date();
 }
 
-//получения данных по ID
 export async function getUserById(userId: string) {
-	const db = await getDB();
-	const user = await db
-		.collection('user')
-		.findOne({ _id: new ObjectId(userId) });
+  const db = await getDB();
+  const user = await db
+    .collection("user")
+    .findOne({ _id: new ObjectId(userId) });
 
-	if (!user) return null;
+  if (!user) return null;
 
-	return {
-		id: user._id.toString(),
-		name: user.name,
-		surname: user.surname,
-		email: user.email,
-		phoneNumber: user.phoneNumber,
-		emailVerified: user.emailVerified,
-		phoneNumberVerified: user.phoneNumberVerified,
-		gender: user.gender,
-		birthdayDate: user.birthdayDate,
-		location: user.location,
-		region: user.region,
-		card: user.card,
-		role: user.role,
-	};
+  return {
+    id: user._id.toString(),
+    name: user.name,
+    surname: user.surname,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    emailVerified: user.emailVerified,
+    phoneNumberVerified: user.phoneNumberVerified,
+    gender: user.gender,
+    birthdayDate: user.birthdayDate,
+    location: user.location,
+    region: user.region,
+    card: user.card,
+    role: user.role,
+  };
 }
 
-//валидность сессии и возврат данных о ней
 export async function getValidCustomSession(sessionToken: string) {
-	const db = await getDB();
-	const session = await db
-		.collection('session')
-		.findOne({ token: sessionToken });
-	if (!session || new Date(session.expiresAt) < new Date()) return null;
-	return session;
+  const db = await getDB();
+  const session = await db
+    .collection("session")
+    .findOne({ token: sessionToken });
+  if (!session || new Date(session.expiresAt) < new Date()) return null;
+  return session;
 }

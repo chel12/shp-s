@@ -1,10 +1,25 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+	images: {
+		remotePatterns: [
+			// Для API роутов с query-параметрами
+			{
+				protocol: 'http',
+				hostname: 'localhost',
+				port: '3000',
+				pathname: '/api/auth/avatar/**',
+			},
+			// Для production - добавьте ваш домен
+			{
+				protocol: 'https',
+				hostname: 'your-domain.com',
+				pathname: '/api/auth/avatar/**',
+			},
+		],
+		// Или используйте unoptimized для таких изображений
+		unoptimized: false,
+	},
+	// Другие настройки...
 };
 
-export default nextConfig;
-
-// PqNS0tgvCUIOMIph
-// mongodb+srv://rybak2108:PqNS0tgvCUIOMIph@cluster0.3pwf06p.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+module.exports = nextConfig;

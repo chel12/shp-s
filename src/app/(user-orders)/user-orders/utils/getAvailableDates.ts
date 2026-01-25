@@ -1,28 +1,27 @@
-import { getThreeDaysDates } from '@/app/(admin)/administrator/delivery-times/utils/getThreeDaysDates';
-import { AvailableDate } from '@/types/availableDate';
-import { Schedule } from '@/types/deliverySchedule';
+import { getThreeDaysDates } from "@/app/(admin)/administrator/delivery-times/utils/getThreeDaysDates";
+import { AvailableDate } from "@/types/availableDate";
+import { Schedule } from "@/types/deliverySchedule";
 
 export const getAvailableDates = (schedule: Schedule): AvailableDate[] => {
-	//принять график
-	const threeDaysDates = getThreeDaysDates();
-	//массив дат
-	return threeDaysDates
-		.map((dateString) => {
-			const daySchedule = schedule[dateString as keyof typeof schedule];
+  const threeDaysDates = getThreeDaysDates();
 
-			if (!daySchedule) {
-				return null;
-			}
+  return threeDaysDates
+    .map((dateString) => {
+      const daySchedule = schedule[dateString as keyof typeof schedule];
 
-			const totalSlots = Object.values(daySchedule).filter(
-				(available) => available
-			).length;
+      if (!daySchedule) {
+        return null;
+      }
 
-			return {
-				date: new Date(dateString),
-				dateString,
-				availableSlots: totalSlots,
-			};
-		})
-		.filter((item): item is AvailableDate => item !== null);
+      const totalSlots = Object.values(daySchedule).filter(
+        (available) => available
+      ).length;
+
+      return {
+        date: new Date(dateString),
+        dateString,
+        availableSlots: totalSlots
+      };
+    })
+    .filter((item): item is AvailableDate => item !== null);
 };

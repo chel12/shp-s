@@ -1,6 +1,6 @@
-import { Order } from './order';
+import { Order } from "./order";
 
 export type OrdersResponse = {
-	orders: Order[];
-	stats: { nextThreeDaysOrders: number };
+  orders: Order[];
+  stats: { nextThreeDaysOrders: number };
 };

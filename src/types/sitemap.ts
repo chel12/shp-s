@@ -1,15 +1,15 @@
 export interface CategoryForSitemap {
-	slug: string;
+  slug: string;
 }
 
 export interface ProductForSitemap {
-	id: number;
-	title: string;
-	updatedAt?: string;
-	categorySlug: string;
+  id: number;
+  title: string;
+  updatedAt?: string;
+  categorySlug: string;
 }
 
 export interface SitemapDataResponse {
-	categories: CategoryForSitemap[];
-	products: ProductForSitemap[];
+  categories: CategoryForSitemap[];
+  products: ProductForSitemap[];
 }

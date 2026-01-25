@@ -15,4 +15,4 @@ Disallow: /_next/
 Disallow: /*.json
 
 # Карта сайта
-Sitemap: https://delivery-shop.ru/sitemap.xml
+Sitemap: https://deliveryshop.ru/sitemap.xml

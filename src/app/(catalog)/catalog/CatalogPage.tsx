@@ -1,223 +1,212 @@
-'use client';
-import { CatalogProps } from '@/types/catalog';
-import { useEffect, useState } from 'react';
-import ErrorComponent from '@/components/ErrorComponent';
-import { Loader } from '@/components/Loader';
-import CatalogAdminControls from '../CatalogAdminControls';
-import CatalogGrid from '../CatalogGrid';
-import { useAuthStore } from '@/store/authStore';
+"use client";
+
+import { CatalogProps } from "@/types/catalog";
+import { useEffect, useState } from "react";
+import ErrorComponent from "@/components/ErrorComponent";
+import { Loader } from "@/components/Loader";
+import CatalogAdminControls from "../CatalogAdminControls";
+import CatalogGrid from "../CatalogGrid";
+import { useAuthStore } from "@/store/authStore";
 
 export const metadata = {
-	title: 'Каталог товаров магазина "Северяночка"',
-	description: 'Каталог всех товаров магазина "Северяночка"',
+  title: 'Каталог товаров магазина "Северяночка"',
+  description: 'Каталог всех товаров магазина "Северяночка"',
 };
 
 const CatalogPage = () => {
-	const [categories, setCategories] = useState<CatalogProps[]>([]);
-	const [isEditing, setIsEditing] = useState(false);
-	const [draggedCategory, setDraggedCategory] = useState<CatalogProps | null>(
-		null
-	);
-	const [hoveredCategoryId, setHoveredCategoryId] = useState<number | null>(
-		null
-	);
-	const [error, setError] = useState<{
-		error: Error;
-		userMessage: string;
-	} | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const { user } = useAuthStore();
-	const isAdmin = user?.role === 'admin';
-	const fetchCategories = async () => {
-		try {
-			const response = await fetch('api/catalog');
-			if (!response.ok)
-				throw new Error(`Ошибка ответа сервера: ${response.status}`);
+  const [categories, setCategories] = useState<CatalogProps[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draggedCategory, setDraggedCategory] = useState<CatalogProps | null>(
+    null
+  );
+  const [hoveredCategoryId, setHoveredCategoryId] = useState<string | null>(
+    null
+  );
+  const [error, setError] = useState<{
+    error: Error;
+    userMessage: string;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
 
-			const data: CatalogProps[] = await response.json();
-			setCategories(data.sort((a, b) => a.order - b.order));
-		} catch (error) {
-			setError({
-				error:
-					error instanceof Error
-						? error
-						: new Error('Неизвестная ошибка'),
-				userMessage: 'Не удалось загрузить каталог категорий',
-			});
-		} finally {
-			setIsLoading(false);
-		}
-	};
+  const isAdmin = user?.role === "admin";
 
-	useEffect(() => {
-		fetchCategories();
-	}, []);
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("api/catalog");
+      if (!response.ok)
+        throw new Error(`Ошибка ответа сервера: ${response.status}`);
 
-	const updateOrderInDB = async () => {
-		try {
-			setIsLoading(true);
-			const response = await fetch('api/catalog', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(
-					categories.map((category, index) => ({
-						_id: category._id,
-						order: index + 1,
-						title: category.title,
-						img: category.img,
-						colSpan: category.colSpan,
-						tabletColSpan: category.tabletColSpan,
-						mobileColSpan: category.mobileColSpan,
-					}))
-				),
-			});
+      const data: CatalogProps[] = await response.json();
+      setCategories(data.sort((a, b) => a.order - b.order));
+    } catch (error) {
+      setError({
+        error: error instanceof Error ? error : new Error("Неизвестная ошибка"),
+        userMessage: "Не удалось загрузить каталог категорий",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-			if (!response.ok) throw new Error('Ошибка при обновлении порядка');
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-			const result = await response.json();
+  const updateOrderInDB = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("api/catalog", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          categories.map((category, index) => ({
+            _id: category._id,
+            order: index + 1,
+            title: category.title,
+            img: category.img,
+            colSpan: category.colSpan,
+            tabletColSpan: category.tabletColSpan,
+            mobileColSpan: category.mobileColSpan,
+          }))
+        ),
+      });
 
-			if (result.success) {
-				console.log('Порядок спешно обновлен в БД');
-			}
-		} catch (error) {
-			setError({
-				error:
-					error instanceof Error
-						? error
-						: new Error('Неизвестная ошибка'),
-				userMessage: 'Не удалось изменить порядок категорий',
-			});
-		} finally {
-			setIsLoading(false);
-		}
-	};
+      if (!response.ok) throw new Error("Ошибка при обновлении порядка");
 
-	const handleToggleEditing = async () => {
-		if (isEditing) {
-			await updateOrderInDB();
-		}
-		setIsEditing(!isEditing);
-	};
+      await response.json();
+    } catch (error) {
+      setError({
+        error: error instanceof Error ? error : new Error("Неизвестная ошибка"),
+        userMessage: "Не удалось изменить порядок категорий",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-	const handleDragStart = (category: CatalogProps) => {
-		if (isEditing) {
-			setDraggedCategory(category);
-		}
-	};
+  const handleToggleEditing = async () => {
+    if (isEditing) {
+      await updateOrderInDB();
+    }
+    setIsEditing(!isEditing);
+  };
 
-	const handleDragOver = (e: React.DragEvent, categoryId: number) => {
-		e.preventDefault();
-		if (draggedCategory && draggedCategory._id !== categoryId) {
-			setHoveredCategoryId(categoryId);
-		}
-	};
+  const handleDragStart = (category: CatalogProps) => {
+    if (isEditing) {
+      setDraggedCategory(category);
+    }
+  };
 
-	const handleDragLeave = () => {
-		setHoveredCategoryId(null);
-	};
+  const handleDragOver = (e: React.DragEvent, categoryId: string) => {
+    e.preventDefault();
+    if (draggedCategory && draggedCategory._id !== categoryId) {
+      setHoveredCategoryId(categoryId);
+    }
+  };
 
-	const handleDrop = (e: React.DragEvent, targetCategoryId: number) => {
-		e.preventDefault();
+  const handleDragLeave = () => {
+    setHoveredCategoryId(null);
+  };
 
-		if (!isEditing || !draggedCategory) return;
+  const handleDrop = (e: React.DragEvent, targetCategoryId: string) => {
+    e.preventDefault();
 
-		setCategories((prevCategories) => {
-			const draggedIndex = prevCategories.findIndex(
-				(c) => c._id === draggedCategory._id
-			);
+    if (!isEditing || !draggedCategory) return;
 
-			const targetIndex = prevCategories.findIndex(
-				(c) => c._id === targetCategoryId
-			);
+    setCategories((prevCategories) => {
+      const draggedIndex = prevCategories.findIndex(
+        (c) => c._id === draggedCategory._id
+      );
 
-			if (draggedIndex === -1 || targetIndex === -1)
-				return prevCategories;
+      const targetIndex = prevCategories.findIndex(
+        (c) => c._id === targetCategoryId
+      );
 
-			const newCategories = [...prevCategories];
+      if (draggedIndex === -1 || targetIndex === -1) return prevCategories;
 
-			const draggedItem = newCategories[draggedIndex];
-			const targetItem = newCategories[targetIndex];
+      const newCategories = [...prevCategories];
 
-			const targetSizes = {
-				mobileColSpan: targetItem.mobileColSpan,
-				tabletColSpan: targetItem.tabletColSpan,
-				colSpan: targetItem.colSpan,
-			};
+      const draggedItem = newCategories[draggedIndex];
+      const targetItem = newCategories[targetIndex];
 
-			const draggedSizes = {
-				mobileColSpan: draggedItem.mobileColSpan,
-				tabletColSpan: draggedItem.tabletColSpan,
-				colSpan: draggedItem.colSpan,
-			};
+      const targetSizes = {
+        mobileColSpan: targetItem.mobileColSpan,
+        tabletColSpan: targetItem.tabletColSpan,
+        colSpan: targetItem.colSpan,
+      };
 
-			newCategories[targetIndex] = {
-				...draggedItem,
-				...targetSizes,
-			};
+      const draggedSizes = {
+        mobileColSpan: draggedItem.mobileColSpan,
+        tabletColSpan: draggedItem.tabletColSpan,
+        colSpan: draggedItem.colSpan,
+      };
 
-			newCategories[draggedIndex] = {
-				...targetItem,
-				...draggedSizes,
-			};
+      newCategories[targetIndex] = {
+        ...draggedItem,
+        ...targetSizes,
+      };
 
-			return newCategories;
-		});
+      newCategories[draggedIndex] = {
+        ...targetItem,
+        ...draggedSizes,
+      };
 
-		setDraggedCategory(null);
-		setHoveredCategoryId(null);
-	};
+      return newCategories;
+    });
 
-	const resetLayout = () => {
-		fetchCategories();
-	};
+    setDraggedCategory(null);
+    setHoveredCategoryId(null);
+  };
 
-	if (isLoading) {
-		return <Loader />;
-	}
+  const resetLayout = () => {
+    fetchCategories();
+  };
 
-	if (error) {
-		return (
-			<ErrorComponent
-				error={error.error}
-				userMessage={error.userMessage}
-			/>
-		);
-	}
+  if (isLoading) {
+    return <Loader />;
+  }
 
-	if (!categories.length) {
-		return (
-			<div className="text-center py-8 text-gray-500">
-				Категорий каталога не найдено
-			</div>
-		);
-	}
+  if (error) {
+    return (
+      <ErrorComponent error={error.error} userMessage={error.userMessage} />
+    );
+  }
 
-	return (
-		<section className="px-[max(12px,calc((100%-1208px)/2))] mx-auto">
-			{isAdmin && (
-				<CatalogAdminControls
-					isEditing={isEditing}
-					onToggleEditingAction={handleToggleEditing}
-					onResetLayoutAction={resetLayout}
-				/>
-			)}
-			<h1 className="mb-4 md:mb-8 xl:mb-10 flex flex-row text-4xl md:text-5xl xl:text-[64px] text-main-text font-bold">
-				Каталог
-			</h1>
-			<CatalogGrid
-				categories={categories}
-				isEditing={isEditing}
-				draggedCategory={draggedCategory}
-				hoveredCategoryId={hoveredCategoryId}
-				onDragStartAction={handleDragStart}
-				onDragOverAction={handleDragOver}
-				onDragLeaveAction={handleDragLeave}
-				onDropAction={handleDrop}
-			/>
-		</section>
-	);
+  if (!categories.length) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        Категорий каталога не найдено
+      </div>
+    );
+  }
+
+  return (
+    <section className="px-[max(12px,calc((100%-1208px)/2))] mx-auto">
+      {isAdmin && (
+        <CatalogAdminControls
+          isEditing={isEditing}
+          onToggleEditingAction={handleToggleEditing}
+          onResetLayoutAction={resetLayout}
+        />
+      )}
+      <h1 className="mb-4 md:mb-8 xl:mb-10 flex flex-row text-4xl md:text-5xl xl:text-[64px] text-main-text font-bold">
+        Каталог
+      </h1>
+      <CatalogGrid
+        categories={categories}
+        isEditing={isEditing}
+        draggedCategory={draggedCategory}
+        hoveredCategoryId={hoveredCategoryId}
+        onDragStartAction={handleDragStart}
+        onDragOverAction={handleDragOver}
+        onDragLeaveAction={handleDragLeave}
+        onDropAction={handleDrop}
+      />
+    </section>
+  );
 };
 
 export default CatalogPage;

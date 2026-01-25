@@ -26,13 +26,9 @@ export const auth = betterAuth({
 		resetPasswordTokenExpiresIn: 86400,
 		sendResetPassword: async ({ user, url }) => {
 			await resend.emails.send({
-				//почтовый домен надо/заглушка щас
 				from: 'Северяночка <onboarding@resend.dev>',
-				//куда отправлять
 				to: user.email,
-				//заголовок
 				subject: 'Сброс пароля для Северяночки',
-				//компонент - тело письма
 				react: PasswordResetEmail({
 					username: user.name,
 					resetUrl: url,
@@ -43,13 +39,9 @@ export const auth = betterAuth({
 	emailVerification: {
 		sendVerificationEmail: async ({ user, url }) => {
 			await resend.emails.send({
-				//почтовый домен надо/заглушка щас
 				from: 'Северяночка <onboarding@resend.dev>',
-				//куда отправлять
 				to: user.email,
-				//заголовок
 				subject: 'Подтвердите email',
-				//компонент - тело письма
 				react: VerifyEmail({ username: user.name, verifyUrl: url }),
 			});
 		},
@@ -61,22 +53,21 @@ export const auth = betterAuth({
 			sendOTP: async ({ phoneNumber, code }) => {
 				console.log(`[DEBUG] Отправка OTP: ${code} для ${phoneNumber}`);
 			},
-			//чтобы лимиты не тратить берём заглушку сверху, а этот код коментим
 			// sendOTP: async ({ phoneNumber, code }) => {
-			// 	try {
-			// 		const response = await fetch(
-			// 			`https://sms.ru/sms/send?api_id=${process.env.SMS_API_ID}&
-			// 			to=${phoneNumber}&msg=Ваш код подтверждения от магазина
-			// 			"Северяночка" :${code}&json=1`
-			// 		);
-			// 		const result = await response.json();
-			// 		if (result.status !== 'OK') {
-			// 			throw new Error(result.status || 'Ошибка отправки SMS');
-			// 		}
-			// 	} catch (error) {
-			// 		console.error('Ошибка отправки SMS:', error);
-			// 		throw error;
-			// 	}
+			//   try {
+			//     const response = await fetch(
+			//       `https://sms.ru/sms/send?api_id=${process.env.SMS_API_ID}&to=${phoneNumber}&msg=Ваш код подтверждения от "Северяночки": ${code}&json=1`
+			//     );
+
+			//     const result = await response.json();
+
+			//     if (result.status !== "OK") {
+			//       throw new Error(result.status || "Ошибка отправки SMS");
+			//     }
+			//   } catch (error) {
+			//     console.error("Ошибка отправки SMS:", error);
+			//     throw error;
+			//   }
 			// },
 			signUpOnVerification: {
 				getTempEmail: (phoneNumber) => {
@@ -137,13 +128,11 @@ export const auth = betterAuth({
 					}),
 				});
 			},
-			//юзер удалился? так удали его аватр из БД!
 			afterDelete: async (user) => {
 				await deleteUserAvatarFromGridFS(user.id);
 			},
 		},
 		additionalFields: {
-			//имя и емаил не надо, это система будет автоматом писать
 			phoneNumber: { type: 'string', input: true, required: true },
 			surname: { type: 'string', input: true, required: true },
 			birthdayDate: { type: 'date', input: true, required: true },
@@ -162,7 +151,6 @@ export const auth = betterAuth({
 	},
 });
 
-//!для отладки, так как реакт компоненты пакет не читает
 // import { CONFIG } from "../../config/config";
 // import { betterAuth } from "better-auth";
 // import { mongodbAdapter } from "better-auth/adapters/mongodb";
@@ -171,7 +159,7 @@ export const auth = betterAuth({
 // import nodemailer from "nodemailer"
 
 // const client = new MongoClient(process.env.DELIVERY_SHOP_DB_URL!);
-// const db = client.db("delivery-shop");
+// const db = client.db("deliveryshop");
 
 // // Локальный SMTP транспорт для разработки
 // const localTransporter = nodemailer.createTransport({

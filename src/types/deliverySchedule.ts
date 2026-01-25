@@ -1,7 +1,7 @@
 interface DaySchedule {
-	[timeSlot: string]: boolean;
+  [timeSlot: string]: boolean;
 }
 
 export interface Schedule {
-	[date: string]: DaySchedule;
+  [date: string]: DaySchedule;
 }

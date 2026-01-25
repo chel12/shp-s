@@ -1,339 +1,312 @@
-import { ExtendedCartSummaryProps } from '../types/cart';
-import { useCartStore } from '@/store/cartStore';
-import { CONFIG } from '../../config/config';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import PriceSummary from '../app/(cart)/cart/_components/PriceSummary';
-import MinimumOrderWarning from '../app/(cart)/cart/_components/MinimumOrderWarning';
-import PaymentButtons from '../app/(cart)/cart/_components/PaymentButtons';
-import CheckoutButton from '../app/(cart)/cart/_components/CheckoutButton';
-import { FakePaymentData, PaymentSuccessData } from '@/types/payment';
+import { ExtendedCartSummaryProps } from "../types/cart";
+import { useCartStore } from "@/store/cartStore";
+import { CONFIG } from "../../config/config";
+import { useState } from "react";
+import PriceSummary from "../app/(cart)/cart/_components/PriceSummary";
+import MinimumOrderWarning from "../app/(cart)/cart/_components/MinimumOrderWarning";
+import CheckoutButton from "../app/(cart)/cart/_components/CheckoutButton";
+import PaymentButtons from "../app/(cart)/cart/_components/PaymentButtons";
+import { FakePaymentData, PaymentSuccessData } from "@/types/payment";
 import {
-	clearUserCart,
-	createOrderRequest,
-	markPaymentAsFailed,
-	prepareCartItemsWithPrices,
-	updateUserAfterPayment,
-} from '../app/(cart)/cart/utils/orderHelpers';
-import FakePaymentModal from '@/app/(payment)/FakePaymentModal';
-import PaymentSuccessModal from '@/app/(payment)/PaymentSuccessModal';
-import { useAuthStore } from '@/store/authStore';
-import { ProductCardProps } from '@/types/product';
+  clearUserCart,
+  createOrderRequest,
+  markPaymentAsFailed,
+  prepareCartItemsWithPrices,
+  updateUserAfterPayment,
+} from "../app/(cart)/cart/utils/orderHelpers";
+import FakePaymentModal from "@/app/(payment)/FakePaymentModal";
+import PaymentSuccessModal from "@/app/(payment)/PaymentSuccessModal";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { ProductCardProps } from "@/types/product";
 
 const CartSummary = ({
-	deliveryData,
-	productsData = {},
-	isRepeatOrder = false,
-	customCartItems,
-	customPricing,
-	onOrderSuccess,
+  deliveryData,
+  productsData = {},
+  isRepeatOrder = false,
+  customPricing,
+  customCartItems,
+  onOrderSuccess,
 }: ExtendedCartSummaryProps) => {
-	const [isProcessing, setIsProcessing] = useState(false);
-	//номер заказа
-	const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const [paymentType, setPaymentType] = useState<
+    "cash_on_delivery" | "online" | null
+  >(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState<PaymentSuccessData | null>(
+    null
+  );
+  const router = useRouter();
 
-	const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const { user } = useAuthStore();
+  const actualHasLoyaltyCard = !!user?.card;
 
-	const [paymentType, setPaymentType] = useState<
-		'cash_on_delivery' | 'online' | null
-	>(null);
-	//модалка для ввода карты
-	const [showPaymentModal, setShowPaymentModal] = useState(false);
-	//модалка об статусе оплаты
-	const [showSuccessModal, setShowSuccessModal] = useState(false);
-	const [successData, setSuccessData] = useState<PaymentSuccessData | null>(
-		null
-	);
-	const { user } = useAuthStore();
-	//чтобы узнать начислять 5% бонус или нет
-	const actualHasLoyaltyCard = !!user?.card;
+  const {
+    pricing,
+    cartItems,
+    hasLoyaltyCard,
+    isCheckout,
+    setIsCheckout,
+    isOrdered,
+    setIsOrdered,
+    useBonuses,
+    resetAfterOrder,
+    updatePricing,
+  } = useCartStore();
 
-	const router = useRouter();
+  const visibleCartItems =
+    isRepeatOrder && customCartItems
+      ? customCartItems
+      : cartItems.filter((item) => item.quantity > 0);
 
-	const {
-		pricing,
-		cartItems,
-		hasLoyaltyCard,
-		isCheckout,
-		setIsCheckout,
-		isOrdered,
-		setIsOrdered,
-		useBonuses,
-		resetAfterOrder,
-		updatePricing,
-	} = useCartStore();
+  const currentPricing =
+    isRepeatOrder && customPricing ? customPricing : pricing;
 
-	const visibleCartItems =
-		isRepeatOrder && customCartItems
-			? customCartItems
-			: cartItems.filter((item) => item.quantity > 0);
+  const {
+    totalPrice,
+    totalMaxPrice,
+    totalDiscount,
+    finalPrice,
+    totalBonuses,
+    maxBonusUse,
+    isMinimumReached,
+  } = currentPricing;
 
-	const currentPricing =
-		isRepeatOrder && customPricing ? customPricing : pricing;
+  const usedBonuses = Math.min(
+    maxBonusUse,
+    Math.floor((totalPrice * CONFIG.MAX_BONUSES_PERCENT) / 100)
+  );
 
-	const {
-		totalPrice,
-		totalMaxPrice,
-		totalDiscount,
-		finalPrice,
-		totalBonuses,
-		maxBonusUse,
-		isMinimumReached,
-	} = currentPricing;
+  const actualUsedBonuses = useBonuses ? usedBonuses : 0;
 
-	//расчёт сколько можно списать бонусов
-	const usedBonuses = Math.min(
-		maxBonusUse,
-		Math.floor((totalPrice * CONFIG.MAX_BONUSES_PERCENT) / 100)
-	);
+  const createOrder = async (
+    paymentMethod: "cash_on_delivery" | "online",
+    paymentId?: string
+  ) => {
+    if (!deliveryData) {
+      throw new Error("Данные доставки не заполнены");
+    }
 
-	//используем бонусы если нет тогда 0
-	const actualUsedBonuses = useBonuses ? usedBonuses : 0;
+    if (isRepeatOrder) {
+      updatePricing({
+        ...currentPricing,
+        totalBonuses,
+      });
+    }
 
-	//функция создания платежа
-	const createOrder = async (
-		paymentMethod: 'cash_on_delivery' | 'online',
-		paymentId?: string
-	) => {
-		if (!deliveryData) {
-			throw new Error('Данные доставки не заполнены');
-		}
-		if (isRepeatOrder) {
-			updatePricing({
-				...currentPricing,
-				totalBonuses,
-			});
-		}
+    const effectiveHasLoyaltyCard = isRepeatOrder
+      ? actualHasLoyaltyCard
+      : hasLoyaltyCard;
 
-		const effectiveHasLoyaltyCard = isRepeatOrder
-			? actualHasLoyaltyCard
-			: hasLoyaltyCard;
+    const cartItemsWithPrices = prepareCartItemsWithPrices(
+      visibleCartItems,
+      productsData as { [key: string]: ProductCardProps },
+      effectiveHasLoyaltyCard
+    );
 
-		//расчет цены
-		const cartItemsWithPrices = prepareCartItemsWithPrices(
-			visibleCartItems,
-			productsData as { [key: string]: ProductCardProps },
-			effectiveHasLoyaltyCard
-		);
+    const orderData = {
+      finalPrice,
+      totalBonuses,
+      usedBonuses: actualUsedBonuses,
+      totalDiscount,
+      deliveryAddress: deliveryData.address,
+      deliveryTime: deliveryData.time,
+      cartItems: cartItemsWithPrices,
+      totalPrice: totalMaxPrice,
+      paymentMethod,
+      paymentId,
+    };
 
-		const orderData = {
-			finalPrice,
-			totalBonuses,
-			usedBonuses: actualUsedBonuses,
-			totalDiscount,
-			deliveryAddress: deliveryData.address,
-			deliveryTime: deliveryData.time,
-			cartItems: cartItemsWithPrices,
-			totalPrice: totalMaxPrice,
-			paymentMethod,
-			paymentId,
-		};
+    return await createOrderRequest(orderData);
+  };
 
-		return await createOrderRequest(orderData);
-	};
+  const handlePaymentResult = async (
+    paymentMethod: "cash_on_delivery" | "online",
+    paymentData?: FakePaymentData
+  ) => {
+    if (!deliveryData) {
+      console.error("Данные доставки не заполнены");
+      return;
+    }
 
-	//оплата онлайн
-	const handlePaymentResult = async (
-		paymentMethod: 'cash_on_delivery' | 'online',
-		paymentData?: FakePaymentData
-	) => {
-		if (!deliveryData) {
-			console.error('Данные доставки не заполнены');
-			return;
-		}
+    setIsProcessing(true);
+    setPaymentType(paymentMethod === "online" ? "online" : "cash_on_delivery");
 
-		setIsProcessing(true);
-		setPaymentType(
-			paymentMethod === 'online' ? 'online' : 'cash_on_delivery'
-		);
+    try {
+      if (paymentMethod === "online") {
+        if (paymentData?.status === "succeeded") {
+          await updateUserAfterPayment({
+            orderId: currentOrderId!,
+            usedBonuses: actualUsedBonuses,
+            earnedBonuses: totalBonuses,
+            purchasedProductIds: visibleCartItems.map((item) => item.productId),
+          });
+        }
 
-		try {
-			//логика после подтверждения платежа
-			//онлайн
-			if (paymentMethod === 'online') {
-				if (paymentData?.status === 'succeeded') {
-					//обновление коллекции пользователя после платежа
-					await updateUserAfterPayment({
-						orderId: currentOrderId!,
-						usedBonuses: actualUsedBonuses,
-						earnedBonuses: totalBonuses,
-						purchasedProductIds: visibleCartItems.map(
-							(item) => item.productId
-						),
-					});
-				}
+        const successModalData: PaymentSuccessData = {
+          orderNumber: orderNumber!,
+          paymentId: paymentData!.id,
+          amount: finalPrice,
+          cardLast4: paymentData!.cardLast4,
+        };
 
-				//данные для модалки по результам оплаты
-				const successModalData: PaymentSuccessData = {
-					orderNumber: orderNumber!,
-					paymentId: paymentData!.id,
-					amount: finalPrice,
-					cardLast4: paymentData!.cardLast4,
-				};
+        setSuccessData(successModalData);
+        setShowSuccessModal(true);
+        setIsOrdered(true);
 
-				setSuccessData(successModalData);
-				setShowSuccessModal(true);
-				setIsOrdered(true);
-				await clearUserCart();
-			} else {
-				//налом при поруч
-				const result = await createOrder(
-					paymentMethod,
-					paymentData?.id
-				);
-				//чистка корзины
-				await clearUserCart();
-				setOrderNumber(result.orderNumber);
-				setIsOrdered(true);
-			}
+        await clearUserCart();
+      } else {
+        const result = await createOrder(paymentMethod, paymentData?.id);
+        await clearUserCart();
+        setOrderNumber(result.orderNumber);
+        setIsOrdered(true);
+      }
 
-			setIsOrdered(true);
-		} catch (error: unknown) {
-			console.error(`Ошибка`, error);
-			alert(`Ошибка при обработки заказа`);
-		} finally {
-			setIsProcessing(false);
-		}
-	};
+      setIsOrdered(true);
+    } catch (error) {
+      console.error(`Ошибка:`, error);
+      alert(`Ошибка при обработке заказаы`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-	const handleCashPayment = async () => {
-		await handlePaymentResult('cash_on_delivery');
-	};
+  const handleCashPayment = async () => {
+    await handlePaymentResult("cash_on_delivery");
+  };
 
-	const handleOnlinePayment = async () => {
-		if (!deliveryData) {
-			console.error('Данные доставки не заполнены');
-			return;
-		}
-		setIsProcessing(true);
+  const handleOnlinePayment = async () => {
+    if (!deliveryData) {
+      console.error("Данные доставки не заполнены");
+      return;
+    }
 
-		try {
-			const result = await createOrder('online');
-			setOrderNumber(result.orderNumber);
-			setCurrentOrderId(result.order._id);
-			setShowPaymentModal(true);
-		} catch (error) {
-			console.error('Ошибка при создании заказа:', error);
-			alert('Ошибка при создании заказа');
-		} finally {
-			setIsProcessing(false);
-		}
-	};
-	const handleClosePaymentModal = () => {
-		setShowPaymentModal(false);
-	};
-	//успешная онлайн оплата
-	const handlePaymentSuccess = async (paymentData: FakePaymentData) => {
-		setShowPaymentModal(false);
-		try {
-			await handlePaymentResult('online', paymentData);
-		} catch (error) {
-			console.error('Ошибка обработки заказа:', error);
-		}
-	};
+    setIsProcessing(true);
 
-	const handlePaymentError = async (error: string) => {
-		setShowPaymentModal(false);
-		if (currentOrderId) {
-			await markPaymentAsFailed(currentOrderId);
-		} else {
-			console.error(
-				'Order ID не найден для отметки платежа как неудачного'
-			);
-		}
-		alert(`Ошибка оплаты: ${error}`);
-		resetAfterOrder();
-		await clearUserCart();
-		router.push('/user-orders');
-	};
+    try {
+      const result = await createOrder("online");
+      setOrderNumber(result.orderNumber);
+      setCurrentOrderId(result.order._id);
+      setShowPaymentModal(true);
+    } catch (error) {
+      console.error("Ошибка при создании заказа:", error);
+      alert("Ошибка при создании заказа");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-	const handleCloseSuccessModal = () => {
-		setShowSuccessModal(false);
-		if (isRepeatOrder && onOrderSuccess) {
-			onOrderSuccess();
-		}
-		setIsOrdered(true);
-		resetAfterOrder();
-		router.push('/user-orders');
-	};
-	//проверка валидности пришли ли данные
-	const isFormValid = (): boolean => {
-		if (!deliveryData) {
-			return false;
-		}
+  const handleClosePaymentModal = () => {
+    setShowPaymentModal(false);
+  };
 
-		const { address, time } = deliveryData;
+  const handlePaymentSuccess = async (paymentData: FakePaymentData) => {
+    setShowPaymentModal(false);
+    try {
+      await handlePaymentResult("online", paymentData);
+    } catch (error) {
+      console.error("Ошибка обработки заказа:", error);
+    }
+  };
 
-		// Проверяем обязательные поля адреса
-		const isAddressValid = Boolean(
-			address.city?.trim() &&
-			address.street?.trim() &&
-			address.house?.trim()
-		);
+  const handlePaymentError = async (error: string) => {
+    setShowPaymentModal(false);
+    if (currentOrderId) {
+      await markPaymentAsFailed(currentOrderId);
+    } else {
+      console.error("Order ID не найден для отметки платежа как неудачного");
+    }
+    alert(`Ошибка оплаты: ${error}`);
+    resetAfterOrder();
+    await clearUserCart();
+    router.push("/user-orders");
+  };
 
-		// Проверяем время доставки
-		const isTimeValid = Boolean(time.date?.trim() && time.timeSlot?.trim());
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    if (isRepeatOrder && onOrderSuccess) {
+      onOrderSuccess();
+    }
+    setIsOrdered(true);
+    resetAfterOrder();
+    router.push("/user-orders");
+  };
 
-		// Используем отфильтрованные товары
-		const isValidForm =
-			isAddressValid &&
-			isTimeValid &&
-			isMinimumReached && //есть ли минимальая цена заказа
-			visibleCartItems.length > 0;
+  const isFormValid = (): boolean => {
+    if (!deliveryData) {
+      return false;
+    }
 
-		return isValidForm;
-	};
-	//можно ли продолжать оплату. проверка: загрузка прошла? данные есть?
-	const canProceedWithPayment = (): boolean => {
-		return isFormValid() && !isProcessing;
-	};
+    const { address, time } = deliveryData;
 
-	return (
-		<>
-			<PriceSummary
-				visibleCartItems={visibleCartItems}
-				totalMaxPrice={totalMaxPrice}
-				totalDiscount={totalDiscount}
-				finalPrice={finalPrice}
-				totalBonuses={totalBonuses}
-			/>
+    const isAddressValid = Boolean(
+      address.city?.trim() && address.street?.trim() && address.house?.trim()
+    );
 
-			<div className="w-full">
-				<MinimumOrderWarning isMinimumReached={isMinimumReached} />
-				{isRepeatOrder || !isCheckout ? (
-					<PaymentButtons
-						isOrdered={isOrdered}
-						paymentType={paymentType}
-						orderNumber={orderNumber}
-						isProcessing={isProcessing}
-						canProceedWithPayment={canProceedWithPayment()}
-						onOnlinePayment={handleOnlinePayment}
-						onCashPayment={handleCashPayment}
-					/>
-				) : (
-					<CheckoutButton
-						isCheckout={isCheckout}
-						isMinimumReached={isMinimumReached}
-						visibleCartItemsCount={visibleCartItems.length}
-						onCheckout={() => setIsCheckout(true)}
-					/>
-				)}
-			</div>
-			<FakePaymentModal
-				amount={finalPrice}
-				isOpen={showPaymentModal}
-				onClose={handleClosePaymentModal}
-				onSuccess={handlePaymentSuccess}
-				onError={handlePaymentError}
-			/>
+    const isTimeValid = Boolean(time.date?.trim() && time.timeSlot?.trim());
 
-			<PaymentSuccessModal
-				isOpen={showSuccessModal}
-				onClose={handleCloseSuccessModal}
-				successData={successData}
-			/>
-		</>
-	);
+    const isValidForm =
+      isAddressValid &&
+      isTimeValid &&
+      isMinimumReached &&
+      visibleCartItems.length > 0;
+
+    return isValidForm;
+  };
+
+  const canProceedWithPayment = (): boolean => {
+    return isFormValid() && !isProcessing;
+  };
+
+  return (
+    <>
+      <PriceSummary
+        visibleCartItems={visibleCartItems}
+        totalMaxPrice={totalMaxPrice}
+        totalDiscount={totalDiscount}
+        finalPrice={finalPrice}
+        totalBonuses={totalBonuses}
+      />
+
+      <div className="w-full">
+        <MinimumOrderWarning isMinimumReached={isMinimumReached} />
+        {isRepeatOrder || isCheckout ? (
+          <PaymentButtons
+            isOrdered={isOrdered}
+            paymentType={paymentType}
+            orderNumber={orderNumber}
+            isProcessing={isProcessing}
+            canProceedWithPayment={canProceedWithPayment()}
+            onOnlinePayment={handleOnlinePayment}
+            onCashPayment={handleCashPayment}
+          />
+        ) : (
+          <CheckoutButton
+            isCheckout={isCheckout}
+            isMinimumReached={isMinimumReached}
+            visibleCartItemsCount={visibleCartItems.length}
+            onCheckout={() => setIsCheckout(true)}
+          />
+        )}
+      </div>
+      <FakePaymentModal
+        amount={finalPrice}
+        isOpen={showPaymentModal}
+        onClose={handleClosePaymentModal}
+        onSuccess={handlePaymentSuccess}
+        onError={handlePaymentError}
+      />
+
+      <PaymentSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        successData={successData}
+      />
+    </>
+  );
 };
 
 export default CartSummary;
